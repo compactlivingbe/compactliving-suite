@@ -489,6 +489,16 @@ def main():
     delay = cfg.get("scrape", {}).get("delay_seconds", 0.7)
     by_tmpl = {}
     ok = err = 0
+    # CSV writer voor dashboard
+    import csv as _csv
+    csv_path = Path("results.csv")
+    new_csv = not csv_path.exists()
+    csv_f = open(csv_path, "a", newline="", encoding="utf-8")
+    csv_w = _csv.writer(csv_f)
+    if new_csv:
+        csv_w.writerow(["timestamp","tmpl_id","tmpl_name","code","variant_label",
+                        "raw_status","klassifizierung","verfuegbarkeit","expected_date",
+                        "discontinued","action","msg","free_qty","incoming_qty"])
     for i, c in enumerate(codes, 1):
         try:
             info = pw.lookup(c["code"])
@@ -509,12 +519,19 @@ def main():
                 info["_po_override"] = incoming_qty
             by_tmpl.setdefault(c["tmpl_id"], {"name": c["tmpl_name"], "results": []})\
                 ["results"].append((c["code"], c["variant_label"], info, action, msg))
+            csv_w.writerow([datetime.now().isoformat(timespec="seconds"),
+                            c["tmpl_id"], c["tmpl_name"], c["code"], c.get("variant_label",""),
+                            info["raw_status"], info["klassifizierung"], info.get("verfuegbarkeit",""),
+                            info["expected_date"], info["discontinued"], action, msg,
+                            free_qty, incoming_qty])
+            csv_f.flush()
             ok += 1
             log(f"[{i}/{len(codes)}] {c['code']} → {action} | {info['raw_status']}")
         except Exception as e:
             err += 1
             log(f"[{i}/{len(codes)}] {c['code']} FOUT: {e}")
         time.sleep(delay)
+    csv_f.close()
 
     log(f"Aggregeren naar {len(by_tmpl)} templates...")
     wrote = 0
