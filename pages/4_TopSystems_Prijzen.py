@@ -7,9 +7,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 
 st.set_page_config(page_title="Top Systems prijzen", page_icon="💰", layout="wide")
 
-if not st.session_state.get("pw_ok"):
-    st.warning("Login eerst via Home.")
-    st.stop()
+from auth import require_auth
+require_auth()
 
 st.title("💰 Top Systems Victron prijssync")
 st.caption("Vergelijk Top Systems XML productlijst met Odoo + update Victron prijzen.")

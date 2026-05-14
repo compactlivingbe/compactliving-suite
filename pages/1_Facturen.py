@@ -23,6 +23,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+from auth import require_auth
+require_auth()
+
 
 st.markdown("""
 <style>

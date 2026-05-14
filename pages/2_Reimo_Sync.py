@@ -8,9 +8,8 @@ from reimo_scraper import Profiweb, Odoo, decide, aggregate, DEFAULT_RULES
 
 st.set_page_config(page_title="Reimo Sync", page_icon="📦", layout="wide")
 
-if not st.session_state.get("pw_ok"):
-    st.warning("Login eerst via Home.")
-    st.stop()
+from auth import require_auth
+require_auth()
 
 st.title("📦 Reimo Profiweb sync")
 st.caption("Scrape Reimo beschikbaarheid → schrijft `sale_line_warn_msg` per template in Odoo.")

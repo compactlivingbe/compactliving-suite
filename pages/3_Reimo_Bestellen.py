@@ -13,9 +13,8 @@ except ImportError:
 
 st.set_page_config(page_title="Reimo Bestellen", page_icon="🛒", layout="wide")
 
-if not st.session_state.get("pw_ok"):
-    st.warning("Login eerst via Home.")
-    st.stop()
+from auth import require_auth
+require_auth()
 
 st.title("🛒 Reimo automatische bestelling")
 st.caption("Selecteer Odoo PO('s) met leverancier Reimo → plaats in Profiweb winkelmandje")
