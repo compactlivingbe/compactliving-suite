@@ -77,6 +77,52 @@ class ReimoOrderer:
         if m:
             self.transaktionsnr = m.group(1)
 
+    # ---------- ARTIKEL TOEVOEGEN AAN WINKELMANDJE ----------
+    def add_to_cart(self, code, qty):
+        """Voegt 1 item toe aan het Profiweb winkelmandje (Bestellung lijst).
+        Equivalent van klik op 'Bestellen' knop op de Artikel-Details pagina.
+        Items zijn dan zichtbaar voor user die in Profiweb inlogt onder dezelfde account.
+        """
+        # Stap A: open de artikel-detail pagina (om var_transaktionsnr te krijgen)
+        # Hergebruik bestaande pagina als die al goed staat
+        if not self.last_response_html or "form_artikelanzeige_suche" not in self.last_response_html:
+            # Nav naar artikeldetails
+            soup = BeautifulSoup(self.last_response_html or "", "html.parser")
+            nav = soup.find("form", {"name": "form_navigation_artikel_detail_info"})
+            if nav:
+                nav_data = {inp.get("name"): inp.get("value", "")
+                            for inp in nav.find_all("input") if inp.get("name")}
+                action = (nav.get("action") or CALL_URL).strip()
+                url = "https://profiweb.reimo.com" + action if action.startswith("/") else action
+                r = self.s.post(url, data=nav_data, timeout=30); r.raise_for_status()
+                self.last_response_html = r.text
+                self._extract_transaktionsnr(r.text)
+
+        # Stap B: zoek artikel op (ARTIKEL_ANZEIGEN)
+        data = {
+            "var_schnittstelle": "000120",
+            "var_hauptpfad": "../r40/easyweb400/kunde_reimo/",
+            "var_folgemaske": "reimo_artikel_detail_info.html",
+            "var_transaktionsnr": self.transaktionsnr or "",
+            "var_sprache": "DE",
+            "var_htmlpruefliste": "ARTNR|ADMENGE",
+            "var_liste_zahlenfelder": "ADMENGE=5=0",
+            "AKTION": "ARTIKEL_ANZEIGEN",
+            "ARTNR": str(code).strip(),
+            "ADMENGE": str(int(qty)),
+            "ANZ_PREIS": "J",
+        }
+        r = self.s.post(CALL_URL, data=data, timeout=30); r.raise_for_status()
+        self.last_response_html = r.text
+        self._extract_transaktionsnr(r.text)
+
+        # Stap C: klik "Bestellen" (= ARTIKEL_BESTELLEN, voegt toe aan lijst)
+        data["AKTION"] = "ARTIKEL_BESTELLEN"
+        r = self.s.post(CALL_URL, data=data, timeout=30); r.raise_for_status()
+        self.last_response_html = r.text
+        self._extract_transaktionsnr(r.text)
+        self.log(f"  + toegevoegd aan winkelmandje: {code} x {qty}")
+
     # ---------- NAVIGATIE NAAR SCHNELLBESTELLUNG ----------
     def goto_schnellbestellung(self):
         """Open de Schnellbestellung pagina (AKTION=NAVIGATION, schnittstelle=000070)."""
@@ -121,7 +167,21 @@ class ReimoOrderer:
         if not abholdatum:
             abholdatum = date.today().strftime("%d.%m.%y")
 
-        # Stap 1: open Schnellbestellung
+        # Stap 1: voeg elk item toe aan winkelmandje (zichtbaar in Profiweb voor user)
+        self.log(f"Items toevoegen aan Profiweb winkelmandje ({len(items)}):")
+        for code, qty in items:
+            try:
+                self.add_to_cart(code, qty)
+            except Exception as e:
+                self.log(f"  ✗ {code} faalde: {e}")
+
+        if dry_run:
+            self.log(f"DRY RUN klaar: {len(items)} items zitten nu in Profiweb winkelmandje.")
+            self.log(f"   Login op profiweb.reimo.com → Bestellung → Schnellbestellung om te zien.")
+            self.log(f"   Geen echte order geplaatst (BEST_REG overgeslagen).")
+            return "DRY_RUN_ITEMS_IN_CART"
+
+        # Stap 2: open Schnellbestellung pagina (om var_transaktionsnr te refreshen)
         self.goto_schnellbestellung()
 
         # Stap 2: parse current form to get hidden fields + structure
@@ -179,13 +239,7 @@ class ReimoOrderer:
                 data[f"MENGE{idx}"] = " "
                 data[f"RABATT{idx}"] = "   0,00"
 
-        if dry_run:
-            self.log(f"DRY RUN: zou bestellen {len(items)} item(s):")
-            for code, qty in items:
-                self.log(f"   - {code} x {qty}")
-            return "DRY_RUN"
-
-        # Stap 4: POST BEST_REG
+        # Stap 4: POST BEST_REG (= echte commit, items uit cart worden order)
         self.log(f"BEST_REG: {len(items)} items, abholdatum={abholdatum}, versand={versand}")
         r = self.s.post(CALL_URL, data=data, timeout=60); r.raise_for_status()
         self.last_response_html = r.text

@@ -199,8 +199,10 @@ if order_payload:
 
     cc1, cc2, cc3 = st.columns([1, 1, 2])
     with cc1:
-        dry = st.button("🔬 Dry run", use_container_width=True,
-                        help="Volledige flow zonder de finale BEST_REG. Geen echte order.")
+        dry = st.button("🛒 Items in winkelmandje (dry run)", use_container_width=True,
+                        help="Voegt items toe aan jouw Profiweb winkelmandje (Bestellung lijst), "
+                             "MAAR plaatst geen finale order. Login op profiweb.reimo.com om te controleren. "
+                             "Geen echte aankoop.")
     with cc2:
         confirm_text = st.text_input("Type **BESTELLEN** om te bevestigen",
                                       key="confirm_input", label_visibility="collapsed",
