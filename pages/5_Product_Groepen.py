@@ -135,6 +135,14 @@ with tab_view:
                         "_id": t["id"],
                     })
                 df = pd.DataFrame(rows)
+                # Check unieke leveranciers
+                unique_sups = set()
+                for sups in sup_per_tmpl.values():
+                    for s in sups:
+                        unique_sups.add(s["partner_id"][1] if isinstance(s, dict) else s)
+                if len(unique_sups) < 2:
+                    st.warning(f"⚠ Alle producten in deze groep hebben dezelfde leverancier ({list(unique_sups)}). "
+                               f"Geen echt prijsvergelijking mogelijk.")
                 # Sort by inkoop
                 df_sorted = df.sort_values("Inkoop")
                 st.dataframe(df_sorted, hide_index=True, use_container_width=True,
@@ -257,23 +265,42 @@ with tab_ai:
             domain.append(("categ_id.complete_name", "ilike", categ_filter))
         with st.spinner("Producten ophalen uit Odoo..."):
             tmpls = odoo.search_read("product.template", domain,
-                                       ["id", "name", "default_code", "product_tag_ids"],
+                                       ["id", "name", "default_code", "product_tag_ids", "seller_ids"],
                                        int(limit), "name")
         if not tmpls:
             st.warning("Geen producten gevonden voor deze filter.")
         else:
+            # Resolve suppliers per template
+            with st.spinner("Leveranciers ophalen..."):
+                all_si_ids = sum((t["seller_ids"] for t in tmpls), [])
+                sis = odoo.search_read("product.supplierinfo",
+                                        [("id", "in", all_si_ids)],
+                                        ["product_tmpl_id", "partner_id"]) if all_si_ids else []
+                sup_per_tmpl = {}
+                for s in sis:
+                    tid = s["product_tmpl_id"][0] if s["product_tmpl_id"] else None
+                    pname = s["partner_id"][1] if s["partner_id"] else "?"
+                    if tid:
+                        sup_per_tmpl.setdefault(tid, set()).add(pname)
             st.info(f"{len(tmpls)} producten geladen. Claude bezig...")
             try:
                 from anthropic import Anthropic
                 client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-                product_list = "\n".join(f"- {t['name']}" for t in tmpls)
-                prompt = f"""Lijst Odoo-producten Compact Living (camper-accessoires).
-Identificeer **groepen van gelijkaardige producten** (zelfde functie, verschillende leveranciers/uitvoeringen).
+                # Bouw lijst MET supplier per regel
+                product_list = "\n".join(
+                    f"- {t['name']}  [leveranciers: {', '.join(sorted(sup_per_tmpl.get(t['id'], {'?'})))}]"
+                    for t in tmpls
+                )
+                prompt = f"""Lijst Odoo-producten Compact Living (camper-accessoires) met hun leveranciers tussen [].
 
-Regels:
+Identificeer **groepen van gelijkaardige producten van VERSCHILLENDE leveranciers** (zelfde functie, andere bron).
+
+Strikte regels:
 - Min 2 producten per groep
+- Producten in een groep MOETEN VERSCHILLENDE leveranciers hebben (anders geen echte alternatieven)
 - Korte groep_naam (max 50 karakters)
-- Gebruik EXACT de productnaam zoals in lijst (zonder leverancierprefix)
+- Gebruik EXACT de productnaam zoals in lijst (zonder de leverancier annotatie)
+- Sla over: producten waar alle alternatieven dezelfde leverancier hebben
 - Output ALLEEN valid JSON, GEEN commentaar voor of na
 
 Format:
@@ -321,9 +348,32 @@ Producten:
                 # Sanity filter
                 groups = [g for g in groups if isinstance(g, dict)
                           and g.get("groep_naam") and len(g.get("producten", [])) >= 2]
+
+                # Strict filter: alleen groepen met >= 2 unieke leveranciers
+                name_to_id = {t["name"]: t["id"] for t in tmpls}
+                filtered = []
+                rejected = []
+                for g in groups:
+                    sups = set()
+                    for pname in g["producten"]:
+                        pid = name_to_id.get(pname)
+                        if pid:
+                            sups |= sup_per_tmpl.get(pid, set())
+                    if len(sups) >= 2:
+                        g["_unique_suppliers"] = sorted(sups)
+                        filtered.append(g)
+                    else:
+                        rejected.append((g["groep_naam"], list(sups)))
+
+                groups = filtered
                 st.session_state["_ai_groups"] = groups
                 st.session_state["_ai_tmpls"] = tmpls
-                st.success(f"✓ {len(groups)} groep-suggesties")
+                st.session_state["_ai_sup_per_tmpl"] = sup_per_tmpl
+                st.success(f"✓ {len(groups)} groep-suggesties met ≥2 verschillende leveranciers")
+                if rejected:
+                    with st.expander(f"⚠ {len(rejected)} suggesties verworpen (zelfde leverancier)"):
+                        for name, sups in rejected:
+                            st.caption(f"  • {name} — leveranciers: {sups or '(geen)'}")
             except Exception as e:
                 st.error(f"AI analyse faalde: {e}")
 
