@@ -265,8 +265,12 @@ def create_po_from_bill(odoo: OdooClient, bill_id: int,
     bill_lines = odoo.read("account.move.line", bill["invoice_line_ids"],
                            ["id", "product_id", "name", "quantity", "price_unit",
                             "purchase_line_id", "display_type"])
-    # Filter echte product-lines (geen sectie/note)
-    bill_lines = [bl for bl in bill_lines if not bl.get("display_type")]
+    # Filter: hou alleen ECHTE productlijnen (skip section/note/tax/payment).
+    # In Odoo SaaS 19 kan display_type ook 'product' zijn (truthy) - die WEL meenemen.
+    SKIP_TYPES = {"line_section", "line_note", "tax", "payment_term", "rounding"}
+    bill_lines = [bl for bl in bill_lines
+                  if (bl.get("display_type") or "") not in SKIP_TYPES
+                  and (bl.get("quantity") or 0) > 0]
 
     po_lines_vals = []
     line_mapping = []  # [(bill_line_id, index_in_po_lines)]

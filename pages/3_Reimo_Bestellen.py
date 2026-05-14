@@ -130,13 +130,11 @@ with col_email:
 with col_komm:
     bemerk = st.text_input("Opmerking (optioneel)", value="")
 
-c1, c2, c3 = st.columns(3)
+st.markdown("#### 1️⃣ Bouw bestelvoorbeeld")
+c1, c2 = st.columns(2)
 with c1:
-    dry = st.button("🔬 Dry run (geen echte bestelling)", use_container_width=True)
+    preview_btn = st.button("👁 Preview bestelling", use_container_width=True)
 with c2:
-    real = st.button("🚀 Bestel nu bij Reimo", type="primary", use_container_width=True,
-                     disabled=ReimoOrderer is None)
-with c3:
     if st.button("📋 Kopieer codes (handmatig)", use_container_width=True):
         all_items = []
         for pid in selected_ids:
@@ -150,55 +148,113 @@ with c3:
         st.code("\n".join(all_items))
         st.caption("Plak in Profiweb Schnellbestellung.")
 
-if (dry or real) and ReimoOrderer is not None:
+# Bouw preview / order data
+order_payload = []  # [{po_name, po_id, items:[(code,qty,desc,price)]}]
+if preview_btn or st.session_state.get("_preview_built"):
+    st.session_state["_preview_built"] = True
+    for pid in selected_ids:
+        p = next(x for x in pos if x["id"] == pid)
+        lines = odoo.search_read("purchase.order.line", [("order_id", "=", pid)],
+                                 ["product_id", "product_qty", "price_unit", "name"], 100)
+        items = []
+        missing = []
+        for l in lines:
+            pv = l["product_id"][0] if l["product_id"] else None
+            if pv in code_map:
+                items.append((code_map[pv], int(l["product_qty"]),
+                              l["product_id"][1] if l["product_id"] else l["name"],
+                              l["price_unit"]))
+            else:
+                missing.append(l["product_id"][1] if l["product_id"] else "(geen product)")
+        order_payload.append({"po_name": p["name"], "po_id": pid, "po_total": p["amount_total"],
+                              "items": items, "missing": missing})
+
+if order_payload:
+    st.markdown("#### 2️⃣ Controleer wat naar Reimo gaat")
+    total_items = sum(len(o["items"]) for o in order_payload)
+    total_value = sum(sum(qty*price for _,qty,_,price in o["items"]) for o in order_payload)
+    cm1, cm2, cm3 = st.columns(3)
+    cm1.metric("PO's", len(order_payload))
+    cm2.metric("Items totaal", total_items)
+    cm3.metric("Geschatte waarde", f"€ {total_value:,.2f}")
+
+    for o in order_payload:
+        with st.expander(f"📦 {o['po_name']} — {len(o['items'])} items, €{o['po_total']:.2f}",
+                          expanded=True):
+            if o["missing"]:
+                st.warning(f"⚠ {len(o['missing'])} lijn(en) zonder Reimo code worden OVERGESLAGEN: {o['missing']}")
+            if o["items"]:
+                st.dataframe(pd.DataFrame([
+                    {"Reimo code": c, "Aantal": q, "Product": d[:60], "Prijs": f"€ {p:.2f}"}
+                    for c, q, d, p in o["items"]
+                ]), hide_index=True, use_container_width=True)
+                if len(o["items"]) > 10:
+                    st.warning(f"⚠ {len(o['items'])} items > 10 → wordt gesplitst in {-(-len(o['items'])//10)} Reimo orders")
+            else:
+                st.error("Geen items met Reimo code → kan niet bestellen")
+
+    # Confirmatie
+    st.markdown("#### 3️⃣ Bevestig en bestel")
+    st.warning("⚠ Eens je op '🚀 Bestel definitief' klikt wordt de bestelling **echt** geplaatst bij Reimo. Geen undo.")
+
+    cc1, cc2, cc3 = st.columns([1, 1, 2])
+    with cc1:
+        dry = st.button("🔬 Dry run", use_container_width=True,
+                        help="Volledige flow zonder de finale BEST_REG. Geen echte order.")
+    with cc2:
+        confirm_text = st.text_input("Type **BESTELLEN** om te bevestigen",
+                                      key="confirm_input", label_visibility="collapsed",
+                                      placeholder="type BESTELLEN")
+    with cc3:
+        real = st.button("🚀 Bestel definitief bij Reimo",
+                         type="primary", use_container_width=True,
+                         disabled=(ReimoOrderer is None or confirm_text != "BESTELLEN"),
+                         help="Vul eerst BESTELLEN in het veld" if confirm_text != "BESTELLEN" else None)
+else:
+    dry = False
+    real = False
+
+if (dry or real) and ReimoOrderer is not None and order_payload:
+    st.markdown("#### 4️⃣ Uitvoeren")
+    log_box = st.empty()
+    log_lines = []
+    def stlog(m):
+        log_lines.append(m)
+        log_box.code("\n".join(log_lines[-30:]))
+
     try:
         orderer = ReimoOrderer(
             user=os.environ["PROFIWEB_USER"],
             password=os.environ["PROFIWEB_PASS"],
-            log=lambda m: st.write(f"_{m}_"),
+            log=stlog,
         )
         orderer.login()
-        for pid in selected_ids:
-            p = next(x for x in pos if x["id"] == pid)
-            with st.expander(f"📦 {p['name']}", expanded=True):
-                lines = odoo.search_read(
-                    "purchase.order.line", [("order_id", "=", pid)],
-                    ["product_id", "product_qty"], 100
+        for o in order_payload:
+            if not o["items"]:
+                continue
+            items_only = [(c, q) for c, q, _, _ in o["items"]]
+            refs = []
+            for batch_idx in range(0, len(items_only), 10):
+                batch = items_only[batch_idx:batch_idx+10]
+                suffix = f" deel {batch_idx//10 + 1}" if len(items_only) > 10 else ""
+                aunr = orderer.place_order(
+                    batch,
+                    kommission=o["po_name"] + suffix,
+                    email=email,
+                    bemerkung=bemerk,
+                    dry_run=dry,
                 )
-                items = []
-                missing = []
-                for l in lines:
-                    pv = l["product_id"][0] if l["product_id"] else None
-                    if pv in code_map:
-                        items.append((code_map[pv], int(l["product_qty"])))
-                    else:
-                        missing.append(l["product_id"][1] if l["product_id"] else "(geen product)")
-                if missing:
-                    st.warning(f"⚠ {len(missing)} lijn(en) zonder Reimo code overgeslagen: {missing}")
-                if not items:
-                    st.error("Geen items met Reimo code gevonden.")
-                    continue
-                if len(items) > 10:
-                    st.warning(f"⚠ {len(items)} items > 10 (Reimo limiet). Wordt gesplitst in batches van 10.")
-                # Split in batches of 10
-                refs = []
-                for batch_idx in range(0, len(items), 10):
-                    batch = items[batch_idx:batch_idx+10]
-                    suffix = f" deel {batch_idx//10 + 1}" if len(items) > 10 else ""
-                    aunr = orderer.place_order(
-                        batch,
-                        kommission=p["name"] + suffix,
-                        email=email,
-                        bemerkung=bemerk,
-                        dry_run=dry,
-                    )
-                    refs.append(aunr)
-                ref_str = ", ".join(refs)
-                if dry:
-                    st.info(f"🔬 Dry run: {p['name']} → zou {len(items)} items besteld hebben")
-                else:
-                    odoo.write("purchase.order", [pid], {"partner_ref": ref_str})
-                    st.success(f"✓ {p['name']} → Reimo Auftrag-Nr: **{ref_str}**")
+                refs.append(aunr)
+            ref_str = ", ".join(refs)
+            if dry:
+                st.info(f"🔬 Dry run **{o['po_name']}** → zou {len(items_only)} items besteld hebben")
+            else:
+                odoo.write("purchase.order", [o["po_id"]], {"partner_ref": ref_str})
+                st.success(f"✓ **{o['po_name']}** → Reimo Auftrag-Nr: **{ref_str}** (geschreven naar Odoo)")
+        if not dry:
+            # Reset confirmation veld + payload
+            st.session_state.pop("_preview_built", None)
+            st.session_state.pop("confirm_input", None)
     except Exception as e:
         st.error(f"FOUT: {e}")
         import traceback
