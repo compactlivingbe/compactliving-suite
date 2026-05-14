@@ -19,6 +19,110 @@ require_auth()
 st.title("🛒 Reimo automatische bestelling")
 st.caption("Selecteer Odoo PO('s) met leverancier Reimo → plaats in Profiweb winkelmandje")
 
+# ============ WINKELMAND BEHEER (BOVENAAN) ============
+with st.expander("🛒 Profiweb winkelmand bekijken / bewerken", expanded=False):
+    cart_col1, cart_col2 = st.columns([3, 1])
+    with cart_col1:
+        st.caption("Items die nu in jouw Profiweb winkelmand staan (Schnellbestellung pagina).")
+    with cart_col2:
+        refresh = st.button("🔄 Ververs", use_container_width=True, key="cart_refresh")
+
+    if refresh or "cart_data" not in st.session_state:
+        if ReimoOrderer is not None:
+            try:
+                with st.spinner("Cart ophalen..."):
+                    o = ReimoOrderer(user=os.environ["PROFIWEB_USER"],
+                                     password=os.environ["PROFIWEB_PASS"], log=lambda m: None)
+                    o.login()
+                    st.session_state["cart_data"] = o.get_cart()
+                    st.session_state["cart_orderer"] = o
+            except Exception as e:
+                st.error(f"Cart ophalen faalde: {e}")
+                st.session_state["cart_data"] = []
+        else:
+            st.warning("ReimoOrderer niet beschikbaar.")
+
+    cart = st.session_state.get("cart_data", [])
+    if not cart:
+        st.success("Winkelmand is leeg.")
+    else:
+        st.markdown(f"**{len(cart)} item(s) in winkelmand:**")
+        edit_df = pd.DataFrame([{
+            "Pos": c["pos"], "Code": c["code"],
+            "Aantal": int(c["qty"]) if c["qty"].isdigit() else 1,
+            "Naam": c["name"] or "(geen naam)",
+            "Prijs": c["price_unit"] or "—",
+            "Verwijder": False,
+        } for c in cart])
+        edited = st.data_editor(edit_df, hide_index=True, use_container_width=True,
+                                  disabled=["Pos", "Code", "Naam", "Prijs"],
+                                  key="cart_editor")
+
+        ec1, ec2, ec3 = st.columns(3)
+        with ec1:
+            if st.button("💾 Pas aanpassingen toe", type="primary", use_container_width=True):
+                try:
+                    o = st.session_state.get("cart_orderer")
+                    if not o:
+                        o = ReimoOrderer(user=os.environ["PROFIWEB_USER"],
+                                         password=os.environ["PROFIWEB_PASS"], log=lambda m: None)
+                        o.login()
+                    updates = []
+                    for _, row in edited.iterrows():
+                        if row["Verwijder"]:
+                            updates.append({"pos": int(row["Pos"]), "qty": None})
+                        elif int(row["Aantal"]) != int(edit_df.loc[edit_df["Pos"] == row["Pos"], "Aantal"].iloc[0]):
+                            updates.append({"pos": int(row["Pos"]), "qty": int(row["Aantal"])})
+                    if updates:
+                        o.update_cart(updates)
+                        st.success(f"✓ {len(updates)} wijziging(en) doorgevoerd")
+                        st.session_state.pop("cart_data", None)
+                        st.rerun()
+                    else:
+                        st.info("Geen wijzigingen om door te voeren.")
+                except Exception as e:
+                    st.error(f"Update faalde: {e}")
+        with ec2:
+            del_count = sum(edited["Verwijder"]) if "Verwijder" in edited.columns else 0
+            if st.button(f"🗑 Verwijder {del_count} aangevinkt", use_container_width=True,
+                          disabled=del_count == 0):
+                try:
+                    o = st.session_state.get("cart_orderer") or ReimoOrderer(
+                        user=os.environ["PROFIWEB_USER"],
+                        password=os.environ["PROFIWEB_PASS"], log=lambda m: None)
+                    if not st.session_state.get("cart_orderer"):
+                        o.login()
+                    updates = [{"pos": int(row["Pos"]), "qty": None}
+                               for _, row in edited.iterrows() if row["Verwijder"]]
+                    o.update_cart(updates)
+                    st.success(f"✓ {len(updates)} item(s) verwijderd")
+                    st.session_state.pop("cart_data", None)
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Verwijderen faalde: {e}")
+        with ec3:
+            if st.button("🚮 Wis volledige winkelmand", use_container_width=True,
+                          help="Verwijdert ALLES uit de Profiweb cart"):
+                if st.session_state.get("_clear_confirm"):
+                    try:
+                        o = st.session_state.get("cart_orderer") or ReimoOrderer(
+                            user=os.environ["PROFIWEB_USER"],
+                            password=os.environ["PROFIWEB_PASS"], log=lambda m: None)
+                        if not st.session_state.get("cart_orderer"):
+                            o.login()
+                        o.clear_cart()
+                        st.success("✓ Cart geleegd")
+                        st.session_state.pop("cart_data", None)
+                        st.session_state.pop("_clear_confirm", None)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Wissen faalde: {e}")
+                else:
+                    st.session_state["_clear_confirm"] = True
+                    st.warning("⚠ Klik nogmaals om te bevestigen")
+
+st.divider()
+
 st.success("""
 **✓ Auto-bestelling actief.** Flow gemapt uit Profiweb HAR capture.
 

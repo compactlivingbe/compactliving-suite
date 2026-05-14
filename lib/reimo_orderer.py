@@ -276,3 +276,86 @@ class ReimoOrderer:
             if m:
                 return m.group(1).strip()
         return None
+
+    # ---------- WINKELMAND BEHEER ----------
+    def get_cart(self):
+        """Lees de huidige Profiweb winkelmand (Schnellbestellung pagina).
+        Returns: list of dicts {pos, code, qty, name, price_unit, price_total}"""
+        self.goto_schnellbestellung()
+        soup = BeautifulSoup(self.last_response_html, "html.parser")
+        items = []
+        # Voor elke positie zoeken we ARTNR<n> en MENGE<n>
+        for n in range(1, 21):  # tot 20 posities (Reimo gebruikt max 10 per pagina, kan 2 pages)
+            artnr_inp = soup.find("input", {"name": f"ARTNR{n}"})
+            menge_inp = soup.find("input", {"name": f"MENGE{n}"})
+            if not artnr_inp:
+                continue
+            code = (artnr_inp.get("value") or "").strip()
+            qty = (menge_inp.get("value") or "").strip() if menge_inp else ""
+            if not code:
+                continue
+            # Probeer naam/prijs te vinden in de buurt (Bezeichnung label)
+            name = ""
+            price = ""
+            # Zoek labels in de zelfde card / row als de input
+            row = artnr_inp.find_parent("div", class_=re.compile(r"row|card|positionen", re.I)) or \
+                  artnr_inp.find_parent("table") or artnr_inp.find_parent()
+            if row:
+                txt = row.get_text(" ", strip=True)
+                m = re.search(r"Bezeichnung:\s*([^\n]+?)\s+(?:Verf|H[aä]ndler|Brutto|€)", txt)
+                if m:
+                    name = m.group(1).strip()[:60]
+                m = re.search(r"H[aä]ndlerpreis:?\s*([0-9.,]+)\s*€", txt)
+                if m:
+                    price = m.group(1)
+            items.append({
+                "pos": n, "code": code, "qty": qty,
+                "name": name, "price_unit": price,
+            })
+        return items
+
+    def update_cart(self, updates):
+        """Update qty van bestaande items en/of mark for delete.
+        updates: list of {pos, qty (int) of None om te verwijderen}
+        Doet PREIS_VERFUEG (recalc) wat ook qty changes opslaat.
+        """
+        self.goto_schnellbestellung()
+        soup = BeautifulSoup(self.last_response_html, "html.parser")
+        # Verzamel alle huidige form inputs
+        form = (soup.find("form", attrs={"name": re.compile(r"schnellbest|artikelanzeige", re.I)}) or
+                soup.find("form"))
+        data = {}
+        if form:
+            for inp in form.find_all("input"):
+                name = inp.get("name")
+                if name:
+                    data[name] = inp.get("value", "")
+        # Apply updates
+        for u in updates:
+            pos = u["pos"]
+            qty = u.get("qty")
+            if qty is None:
+                # Verwijder via LOESCHEN vinkje of MENGE leeg
+                data[f"LOESCHEN{pos}"] = "J"
+                data[f"MENGE{pos}"] = " "
+            else:
+                data[f"MENGE{pos}"] = str(int(qty))
+        # Force fields die bij PREIS_VERFUEG horen
+        data["AKTION"] = "PREIS_VERFUEG"
+        data["var_schnittstelle"] = data.get("var_schnittstelle") or "000070"
+        data["var_folgemaske"] = "reimo_suche_schnellbestellung.html"
+        data["var_transaktionsnr"] = self.transaktionsnr or data.get("var_transaktionsnr", "")
+        r = self.s.post(CALL_URL, data=data, timeout=60); r.raise_for_status()
+        self.last_response_html = r.text
+        self._extract_transaktionsnr(r.text)
+        self.log(f"Cart geüpdate: {len(updates)} wijziging(en)")
+
+    def clear_cart(self):
+        """Verwijder ALLE items uit de winkelmand."""
+        cart = self.get_cart()
+        if not cart:
+            self.log("Cart is al leeg.")
+            return
+        updates = [{"pos": item["pos"], "qty": None} for item in cart]
+        self.update_cart(updates)
+        self.log(f"Cart geleegd ({len(cart)} items verwijderd)")
