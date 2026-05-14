@@ -50,7 +50,7 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p logs
-          python -X utf8 scripts/reimo_scraper.py --config config.json 2>&1 | tee logs/reimo_$(date +%Y-%m-%d).log
+          python -X utf8 lib/reimo_scraper.py --config config.json 2>&1 | tee logs/reimo_$(date +%Y-%m-%d).log
           # The script writes results.csv in working directory by default
           if [ -f results.csv ]; then cp results.csv logs/; fi
 

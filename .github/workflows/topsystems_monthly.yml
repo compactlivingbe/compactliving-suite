@@ -65,7 +65,7 @@ jobs:
           if [ "${{ github.event.inputs.dry_run }}" != "true" ]; then
             ARGS="$ARGS --apply"
           fi
-          python -X utf8 scripts/topsystems_sync.py $ARGS 2>&1 | tee logs/topsystems_$(date +%Y-%m-%d).log
+          python -X utf8 lib/topsystems_sync.py $ARGS 2>&1 | tee logs/topsystems_$(date +%Y-%m-%d).log
 
       - name: Publish dashboard data
         if: always()
