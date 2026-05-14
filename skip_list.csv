@@ -1,0 +1,5 @@
+code,reason,date_added
+# Plaats hier Top Systems codes die NIET in Odoo geïmporteerd mogen worden.
+# Eén code per regel. reason en date_added zijn optioneel.
+# Voorbeeld:
+# ASS030064900,niet nodig - kabel,2026-05-12

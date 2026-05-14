@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Compact Living — Reimo Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<meta http-equiv="refresh" content="300">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="logo">⚡</span>
+    <h1>Compact Living — Sync Dashboard</h1>
+  </div>
+  <div class="meta">
+    Auto-refresh: 5 min · <a id="repo_link" href="#" target="_blank">repo</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ========== STATUS CARDS ========== -->
+<section class="status-cards">
+  <div class="card status-card" id="card_reimo">
+    <div class="card-head">
+      <h3>🔄 Reimo Profiweb</h3>
+      <span class="last-run" id="reimo_when">—</span>
+    </div>
+    <div class="card-body">
+      <div class="big-numbers">
+        <div class="num ok"><b id="reimo_ok">—</b><span>op voorraad</span></div>
+        <div class="num warn"><b id="reimo_warn">—</b><span>warnings</span></div>
+        <div class="num block"><b id="reimo_block">—</b><span>geblokkeerd</span></div>
+      </div>
+      <div class="trend muted" id="reimo_trend">Geen vorige run</div>
+    </div>
+  </div>
+
+  <div class="card status-card" id="card_topsystems">
+    <div class="card-head">
+      <h3>📦 Top Systems Victron</h3>
+      <span class="last-run" id="ts_when">—</span>
+    </div>
+    <div class="card-body">
+      <div class="big-numbers">
+        <div class="num ok"><b id="ts_updated">—</b><span>prijzen up-to-date</span></div>
+        <div class="num warn"><b id="ts_changed">—</b><span>geüpdate</span></div>
+        <div class="num neutral"><b id="ts_missing">—</b><span>missing</span></div>
+      </div>
+      <div class="trend muted" id="ts_trend">Geen vorige run</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TEMPLATES MET WAARSCHUWING ========== -->
+<section class="card">
+  <div class="card-head">
+    <h3>🚫 Templates met waarschuwing</h3>
+    <input type="search" id="search_warn" placeholder="zoeken..." style="width:240px">
+  </div>
+  <div class="table-wrap">
+    <table id="warn_table">
+      <thead>
+        <tr><th>Status</th><th>Template</th><th>Categorie</th><th>Detail</th><th>Actie</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ========== RUN HISTORIEK ========== -->
+<section class="card">
+  <h3>📅 Recente runs</h3>
+  <div class="table-wrap">
+    <table id="history_table">
+      <thead>
+        <tr><th>Tijdstip</th><th>Type</th><th>Status</th><th>Resultaat</th><th>Logs</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Compact Living · gegenereerd door GitHub Actions ·
+  <span id="generated_at">—</span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

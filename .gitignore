@@ -1,0 +1,16 @@
+.env
+.streamlit/secrets.toml
+*.pyc
+__pycache__/
+inbox/
+verwerkt/
+manueel/
+logs/
+reports/
+dumps/
+config.json
+*.xml
+results.csv
+productlist.xml
+!skip_list.csv
+!docs/data/*.json

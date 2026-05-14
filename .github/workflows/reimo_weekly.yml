@@ -1,0 +1,85 @@
+name: Reimo Profiweb weekly sync
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"   # maandag 05:00 UTC = ~06-07 Brussel
+  workflow_dispatch:
+
+permissions:
+  contents: write   # nodig om dashboard data te committen
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install requests beautifulsoup4
+
+      - name: Build config from secrets
+        env:
+          ODOO_URL: ${{ secrets.ODOO_URL }}
+          ODOO_DB: ${{ secrets.ODOO_DB }}
+          ODOO_LOGIN: ${{ secrets.ODOO_LOGIN }}
+          ODOO_PASSWORD: ${{ secrets.ODOO_PASSWORD }}
+          PROFIWEB_USER: ${{ secrets.PROFIWEB_USER }}
+          PROFIWEB_PASS: ${{ secrets.PROFIWEB_PASS }}
+        run: |
+          cat > config.json << EOF
+          {
+            "odoo": {"url": "$ODOO_URL", "db": "$ODOO_DB",
+                     "user": "$ODOO_LOGIN", "password": "$ODOO_PASSWORD"},
+            "profiweb": {"user": "$PROFIWEB_USER", "password": "$PROFIWEB_PASS"},
+            "scope": {"supplier_partner_ids": [66], "categ_ids": [],
+                      "include_archived": false, "only_with_supplier_code": true},
+            "rules": {"auslauf_action": "block", "backorder_action": "warning",
+                      "no_stock_action": "warning", "available_action": "no-message",
+                      "max_warning_days": 60},
+            "scrape": {"delay_seconds": 0.7}
+          }
+          EOF
+
+      - name: Run Reimo scraper
+        id: scrape
+        continue-on-error: true
+        run: |
+          mkdir -p logs
+          python -X utf8 scripts/reimo_scraper.py --config config.json 2>&1 | tee logs/reimo_$(date +%Y-%m-%d).log
+          # The script writes results.csv in working directory by default
+          if [ -f results.csv ]; then cp results.csv logs/; fi
+
+      - name: Publish dashboard data
+        if: always()
+        env:
+          ODOO_URL: ${{ secrets.ODOO_URL }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          SUCCESS="true"
+          [ "${{ steps.scrape.outcome }}" != "success" ] && SUCCESS="false"
+          python scripts/publish_dashboard.py --type reimo \
+            --csv results.csv \
+            --workflow-url "$WORKFLOW_URL" \
+            --success "$SUCCESS"
+
+      - name: Commit dashboard updates
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data/
+          git diff --cached --quiet || git commit -m "Dashboard: Reimo run $(date +%Y-%m-%d)"
+          git push
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reimo-${{ github.run_number }}
+          path: logs/
+          retention-days: 90

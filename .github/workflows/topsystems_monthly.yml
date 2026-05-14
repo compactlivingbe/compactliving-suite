@@ -1,0 +1,99 @@
+name: Top Systems Victron monthly sync
+
+on:
+  schedule:
+    - cron: "30 5 1 * *"   # 1e van de maand 05:30 UTC
+  workflow_dispatch:
+    inputs:
+      xml_url:
+        description: "Override XML URL (anders uit secret TOPSYSTEMS_XML_URL)"
+        required: false
+      dry_run:
+        description: "Dry run (geen Odoo wijzigingen)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Build config from secrets
+        env:
+          ODOO_URL: ${{ secrets.ODOO_URL }}
+          ODOO_DB: ${{ secrets.ODOO_DB }}
+          ODOO_LOGIN: ${{ secrets.ODOO_LOGIN }}
+          ODOO_PASSWORD: ${{ secrets.ODOO_PASSWORD }}
+        run: |
+          cat > config.json << EOF
+          {
+            "odoo": {"url": "$ODOO_URL", "db": "$ODOO_DB",
+                     "user": "$ODOO_LOGIN", "password": "$ODOO_PASSWORD"}
+          }
+          EOF
+
+      - name: Download Top Systems XML
+        env:
+          XML_URL: ${{ github.event.inputs.xml_url || secrets.TOPSYSTEMS_XML_URL }}
+        run: |
+          if [ -z "$XML_URL" ]; then
+            echo "::warning::Geen XML URL — workflow stopt."
+            exit 0
+          fi
+          curl -sSL -o productlist.xml "$XML_URL"
+          ls -la productlist.xml
+
+      - name: Run Top Systems sync
+        id: sync
+        if: hashFiles('productlist.xml') != ''
+        continue-on-error: true
+        run: |
+          mkdir -p logs reports
+          ARGS="--xml productlist.xml --config config.json"
+          if [ "${{ github.event.inputs.dry_run }}" != "true" ]; then
+            ARGS="$ARGS --apply"
+          fi
+          python -X utf8 scripts/topsystems_sync.py $ARGS 2>&1 | tee logs/topsystems_$(date +%Y-%m-%d).log
+
+      - name: Publish dashboard data
+        if: always()
+        env:
+          ODOO_URL: ${{ secrets.ODOO_URL }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          SUCCESS="true"
+          [ "${{ steps.sync.outcome }}" == "failure" ] && SUCCESS="false"
+          python scripts/publish_dashboard.py --type topsystems \
+            --workflow-url "$WORKFLOW_URL" \
+            --success "$SUCCESS"
+
+      - name: Commit dashboard updates
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data/
+          git diff --cached --quiet || git commit -m "Dashboard: Top Systems run $(date +%Y-%m-%d)"
+          git push
+
+      - name: Upload reports + logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: topsystems-${{ github.run_number }}
+          path: |
+            reports/
+            logs/
+          retention-days: 90
