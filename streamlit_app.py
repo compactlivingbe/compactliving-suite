@@ -107,6 +107,13 @@ with c2:
         st.caption("Maandelijks automatisch, of nu handmatig.")
         st.page_link("pages/4_TopSystems_Prijzen.py", label="Open →", icon="💰")
 
+    with st.container(border=True):
+        st.markdown("#### 🔗 Product groepen")
+        st.write("Markeer gelijkaardige producten (van verschillende leveranciers) als groep. "
+                 "Vergelijk inkoop- en verkoopprijzen naast elkaar.")
+        st.caption("AI suggereert automatisch mogelijke groepen.")
+        st.page_link("pages/5_Product_Groepen.py", label="Open →", icon="🔗")
+
 st.divider()
 
 # Quick links
