@@ -19,23 +19,14 @@ require_auth()
 st.title("🛒 Reimo automatische bestelling")
 st.caption("Selecteer Odoo PO('s) met leverancier Reimo → plaats in Profiweb winkelmandje")
 
-st.info("""
-**🔬 Beta status — vereist eenmalige flow capture**
+st.success("""
+**✓ Auto-bestelling actief.** Flow gemapt uit Profiweb HAR capture.
 
-De checkout-flow van Profiweb (HTTP POST naar Warenkorb + Bestellen endpoints)
-moet eerst gemapt worden. Zonder die mapping kan deze pagina:
+Per PO klik je "Bestel nu" → de items worden via Reimo Schnellbestellung verstuurd,
+het Reimo Auftrag-Nr wordt automatisch teruggeschreven naar Odoo `Reimo ref`.
 
-- ✓ Lijst van Reimo PO's tonen die nog niet besteld zijn
-- ✓ Per PO de regels + Reimo codes tonen
-- ✓ De **Profiweb URL openen** met code voor manuele winkelmandje
-- ✗ Niet automatisch checken-out (nog niet)
-
-**Voor full automation** stuur me een HAR-export van een test bestelling:
-1. Login Profiweb in Chrome
-2. F12 → Network tab → "Preserve log" aan
-3. Doe een test order van 1 stuk goedkoop artikel
-4. Rechtsklik in Network tab → "Save all as HAR with content"
-5. Stuur het bestand
+⚠️ Eerste keer: gebruik **Dry run** om te valideren zonder echte bestelling.
+Max 10 lijnen per bestelling (Reimo Schnellbestellung limit) — meer wordt gesplitst.
 """)
 
 
@@ -130,37 +121,23 @@ for pid in selected_ids:
                      column_config={"Profiweb": st.column_config.LinkColumn("Open in Profiweb")})
 
 st.divider()
-col1, col2 = st.columns(2)
-with col1:
-    if ReimoOrderer is None:
-        st.button("🚀 Plaats bestelling bij Reimo (auto)", disabled=True,
-                  help="Niet beschikbaar — vereist HAR capture (zie info hierboven)")
-    else:
-        if st.button("🚀 Plaats bestelling bij Reimo (auto)", type="primary"):
-            try:
-                orderer = ReimoOrderer(
-                    user=os.environ["PROFIWEB_USER"],
-                    password=os.environ["PROFIWEB_PASS"],
-                )
-                orderer.login()
-                for pid in selected_ids:
-                    p = next(x for x in pos if x["id"] == pid)
-                    lines = odoo.search_read(
-                        "purchase.order.line", [("order_id", "=", pid)],
-                        ["product_id", "product_qty"], 100
-                    )
-                    items = []
-                    for l in lines:
-                        pv = l["product_id"][0] if l["product_id"] else None
-                        if pv in code_map:
-                            items.append((code_map[pv], int(l["product_qty"])))
-                    ref = orderer.place_order(items, kommission=p["name"])
-                    odoo.write("purchase.order", [pid], {"partner_ref": ref})
-                    st.success(f"✓ {p['name']} → Reimo ref: {ref}")
-            except Exception as e:
-                st.error(f"FOUT: {e}")
-with col2:
-    if st.button("📋 Kopieer codes naar klembord (handmatig)"):
+st.markdown("### 📤 Bestelling versturen")
+
+col_email, col_komm = st.columns(2)
+with col_email:
+    email = st.text_input("Bevestigings-email",
+                          value=os.environ.get("ODOO_LOGIN", "leveranciers@compactliving.be"))
+with col_komm:
+    bemerk = st.text_input("Opmerking (optioneel)", value="")
+
+c1, c2, c3 = st.columns(3)
+with c1:
+    dry = st.button("🔬 Dry run (geen echte bestelling)", use_container_width=True)
+with c2:
+    real = st.button("🚀 Bestel nu bij Reimo", type="primary", use_container_width=True,
+                     disabled=ReimoOrderer is None)
+with c3:
+    if st.button("📋 Kopieer codes (handmatig)", use_container_width=True):
         all_items = []
         for pid in selected_ids:
             p = next(x for x in pos if x["id"] == pid)
@@ -170,6 +147,59 @@ with col2:
                 pv = l["product_id"][0] if l["product_id"] else None
                 if pv in code_map:
                     all_items.append(f"{code_map[pv]}\t{int(l['product_qty'])}")
-        text = "\n".join(all_items)
-        st.code(text)
-        st.caption("Selecteer + copy bovenstaande lijst, plak in Profiweb Schnellbestellung.")
+        st.code("\n".join(all_items))
+        st.caption("Plak in Profiweb Schnellbestellung.")
+
+if (dry or real) and ReimoOrderer is not None:
+    try:
+        orderer = ReimoOrderer(
+            user=os.environ["PROFIWEB_USER"],
+            password=os.environ["PROFIWEB_PASS"],
+            log=lambda m: st.write(f"_{m}_"),
+        )
+        orderer.login()
+        for pid in selected_ids:
+            p = next(x for x in pos if x["id"] == pid)
+            with st.expander(f"📦 {p['name']}", expanded=True):
+                lines = odoo.search_read(
+                    "purchase.order.line", [("order_id", "=", pid)],
+                    ["product_id", "product_qty"], 100
+                )
+                items = []
+                missing = []
+                for l in lines:
+                    pv = l["product_id"][0] if l["product_id"] else None
+                    if pv in code_map:
+                        items.append((code_map[pv], int(l["product_qty"])))
+                    else:
+                        missing.append(l["product_id"][1] if l["product_id"] else "(geen product)")
+                if missing:
+                    st.warning(f"⚠ {len(missing)} lijn(en) zonder Reimo code overgeslagen: {missing}")
+                if not items:
+                    st.error("Geen items met Reimo code gevonden.")
+                    continue
+                if len(items) > 10:
+                    st.warning(f"⚠ {len(items)} items > 10 (Reimo limiet). Wordt gesplitst in batches van 10.")
+                # Split in batches of 10
+                refs = []
+                for batch_idx in range(0, len(items), 10):
+                    batch = items[batch_idx:batch_idx+10]
+                    suffix = f" deel {batch_idx//10 + 1}" if len(items) > 10 else ""
+                    aunr = orderer.place_order(
+                        batch,
+                        kommission=p["name"] + suffix,
+                        email=email,
+                        bemerkung=bemerk,
+                        dry_run=dry,
+                    )
+                    refs.append(aunr)
+                ref_str = ", ".join(refs)
+                if dry:
+                    st.info(f"🔬 Dry run: {p['name']} → zou {len(items)} items besteld hebben")
+                else:
+                    odoo.write("purchase.order", [pid], {"partner_ref": ref_str})
+                    st.success(f"✓ {p['name']} → Reimo Auftrag-Nr: **{ref_str}**")
+    except Exception as e:
+        st.error(f"FOUT: {e}")
+        import traceback
+        st.code(traceback.format_exc())
