@@ -514,11 +514,11 @@ with tab_ontvangst:
 with tab_peppol:
     st.markdown("### 📨 Peppol Bills → Purchase Order")
     st.caption("Voor Bills die binnen kwamen via Peppol/email zonder gekoppelde PO. "
-               "Maakt een PO van de bill-lijnen en linkt ze terug (qty_invoiced klopt).")
+               "Match elke lijn aan een product (bestaand / nieuw / bewerken), maak dan PO.")
 
     try:
         odoo = get_odoo()
-        from verwerk import get_unlinked_draft_bills, create_po_from_bill, validate_receipts_for_pos
+        from verwerk import get_unlinked_draft_bills, create_po_from_bill, validate_receipts_for_pos, auto_create_product
 
         with st.spinner("Bills zonder PO-link zoeken..."):
             unlinked = get_unlinked_draft_bills(odoo, limit=30)
@@ -542,36 +542,112 @@ with tab_peppol:
                     cols[1].metric("Totaal", fmt_eur(b["amount_total"]))
                     cols[0].link_button("Open Bill ↗",
                                        odoo_url("action-account.action_move_in_invoice_type", b["id"]))
-
-                    # Toon lijnen-preview
-                    with cols[0].expander(f"📋 {len(b.get('_lines', []))} lijnen", expanded=False):
-                        line_rows = [{
-                            "Product": (ln["product_id"] or [None, "(geen)"])[1],
-                            "Naam": (ln.get("name") or "")[:60],
-                            "Qty": ln.get("quantity"),
-                            "Prijs": ln.get("price_unit"),
-                        } for ln in b.get("_lines", [])]
-                        if line_rows:
-                            st.dataframe(pd.DataFrame(line_rows), hide_index=True,
-                                       use_container_width=True)
-
-                    # Opties per Bill
                     pep_received = cols[2].toggle("📦 Geleverd", value=False, key=f"pep_recv_{b['id']}")
 
-                    if cols[3].button("➕ Maak PO", key=f"pep_po_{b['id']}", type="primary"):
-                        # Check: alle lijnen moeten product_id hebben (anders foutmelding)
-                        no_prod = [ln for ln in b.get("_lines", []) if not ln.get("product_id")]
-                        if no_prod:
-                            st.warning(
-                                f"⚠️ {len(no_prod)} lijn(en) zonder product op de Bill. "
-                                f"Vul eerst producten in op de Bill in Odoo, of de PO heeft lege productlijnen."
-                            )
+                    bill_lines = b.get("_lines", [])
+                    no_prod_lines = [ln for ln in bill_lines if not ln.get("product_id")]
+
+                    # Per-lijn matcher UI in expander
+                    if no_prod_lines:
+                        with st.expander(f"⚠ {len(no_prod_lines)} lijn(en) zonder product — koppel hier", expanded=True):
+                            st.caption("Selecteer per regel een bestaand product of maak een nieuw aan.")
+                            for ln in bill_lines:
+                                if ln.get("product_id"):
+                                    cc = st.columns([3, 2, 1])
+                                    cc[0].markdown(f"✓ **{(ln['product_id'] or [None,'?'])[1]}**")
+                                    cc[1].caption((ln.get("name") or "")[:60])
+                                    cc[2].caption(f"qty {ln.get('quantity')}")
+                                    continue
+                                lid = ln["id"]
+                                key = f"pep_match_{b['id']}_{lid}"
+                                cc = st.columns([2, 3, 2, 1.5, 1.5])
+                                cc[0].caption("Beschrijving")
+                                cc[0].markdown(f"_{(ln.get('name') or '')[:50]}_")
+                                cc[1].caption("Match (Odoo zoeken)")
+                                # Lazy load candidates per line, cached in session
+                                cand_key = f"_cands_{lid}"
+                                if cand_key not in st.session_state:
+                                    cands = find_product_candidates(
+                                        odoo,
+                                        beschrijving=ln.get("name") or "",
+                                        artikelnr=None,
+                                        prijs_hint=ln.get("price_unit"),
+                                        top_n=10,
+                                    )
+                                    st.session_state[cand_key] = cands
+                                cands = st.session_state[cand_key]
+                                opts = ["(kies / nieuw / open zoekveld)"] + \
+                                       [f"[{c.get('default_code') or '—'}] {c['name']}  (€{c.get('standard_price', 0):.2f}, score {c.get('score', 0):.2f})"
+                                        for c in cands]
+                                idx = cc[1].selectbox("kandidaat", opts, key=f"{key}_sel",
+                                                      label_visibility="collapsed")
+                                # Free-text search
+                                search = cc[2].text_input("of typ naam", key=f"{key}_search",
+                                                          label_visibility="collapsed",
+                                                          placeholder="zoeken...")
+                                if search and len(search) >= 2:
+                                    extra = odoo.search_read(
+                                        "product.product",
+                                        ['|', ("name", "ilike", search), ("default_code", "ilike", search)],
+                                        ["id", "name", "default_code", "list_price", "standard_price"], 10
+                                    )
+                                    if extra:
+                                        opts2 = [f"[{e.get('default_code') or '—'}] {e['name']}" for e in extra]
+                                        sel2 = cc[2].selectbox("zoekresultaten", ["(geen)"] + opts2,
+                                                                key=f"{key}_search_sel",
+                                                                label_visibility="collapsed")
+                                        if sel2 != "(geen)":
+                                            chosen = extra[opts2.index(sel2)]
+                                            if cc[3].button("Koppel", key=f"{key}_link2"):
+                                                odoo.call("account.move.line", "write",
+                                                          [[lid], {"product_id": chosen["id"]}])
+                                                st.success(f"✓ Gekoppeld aan [{chosen.get('default_code') or '—'}] {chosen['name']}")
+                                                st.session_state.pop(cand_key, None)
+                                                st.rerun()
+
+                                # Action buttons
+                                if idx > 0 and cc[3].button("Koppel", key=f"{key}_link"):
+                                    chosen = cands[idx - 1]
+                                    odoo.call("account.move.line", "write",
+                                              [[lid], {"product_id": chosen["id"]}])
+                                    st.success(f"✓ Gekoppeld aan {chosen['name']}")
+                                    st.session_state.pop(cand_key, None)
+                                    st.rerun()
+                                if cc[4].button("➕ Nieuw", key=f"{key}_new",
+                                                help="Maak nieuw product met deze beschrijving + prijs"):
+                                    new = auto_create_product(
+                                        odoo,
+                                        beschrijving=ln.get("name") or f"Nieuw product {lid}",
+                                        artikelnr=None,
+                                        prijs=ln.get("price_unit") or 0.0,
+                                    )
+                                    odoo.call("account.move.line", "write",
+                                              [[lid], {"product_id": new["id"]}])
+                                    st.success(f"✓ Nieuw product **{new['name']}** aangemaakt + gekoppeld.")
+                                    st.session_state.pop(cand_key, None)
+                                    st.rerun()
+                    else:
+                        # Toon read-only preview
+                        with st.expander(f"📋 {len(bill_lines)} lijnen (alle gematcht)", expanded=False):
+                            line_rows = [{
+                                "Product": (ln["product_id"] or [None, "(geen)"])[1],
+                                "Naam": (ln.get("name") or "")[:60],
+                                "Qty": ln.get("quantity"),
+                                "Prijs": ln.get("price_unit"),
+                            } for ln in bill_lines]
+                            if line_rows:
+                                st.dataframe(pd.DataFrame(line_rows), hide_index=True,
+                                           use_container_width=True)
+
+                    # Maak PO knop
+                    if cols[3].button("➕ Maak PO", key=f"pep_po_{b['id']}", type="primary",
+                                      disabled=bool(no_prod_lines),
+                                      help="Eerst alle lijnen koppelen" if no_prod_lines else None):
                         try:
                             with st.spinner("PO aanmaken vanuit Bill..."):
                                 res = create_po_from_bill(
                                     odoo, b["id"],
-                                    link_back=True,
-                                    confirm=True,  # PO altijd direct bevestigen
+                                    link_back=True, confirm=True,
                                     validate_receipt=pep_received,
                                 )
                             if res.get("po_id"):
