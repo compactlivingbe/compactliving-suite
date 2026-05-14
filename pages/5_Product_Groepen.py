@@ -248,6 +248,9 @@ with tab_ai:
     with col2:
         limit = st.number_input("Max producten scannen", min_value=20, max_value=2000, value=200, step=20)
 
+    st.caption("ℹ️ Tip: dit veld is `product_tag_ids` op product.template in Odoo. "
+                "Je kan groepen ook direct in Odoo bewerken op de productpagina (sectie 'Algemene info' → tags).")
+
     if st.button("🔍 Analyseer met Claude", type="primary"):
         domain = []
         if categ_filter:
@@ -263,34 +266,61 @@ with tab_ai:
             try:
                 from anthropic import Anthropic
                 client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-                # Bouw input
-                product_list = "\n".join(f"- [{t.get('default_code') or '—'}] {t['name']}" for t in tmpls)
-                prompt = f"""Hier is een lijst Odoo-producten van Compact Living (camper-accessoires).
-Identificeer **groepen van gelijkaardige producten** (dezelfde functie, verschillende leveranciers/uitvoeringen).
+                product_list = "\n".join(f"- {t['name']}" for t in tmpls)
+                prompt = f"""Lijst Odoo-producten Compact Living (camper-accessoires).
+Identificeer **groepen van gelijkaardige producten** (zelfde functie, verschillende leveranciers/uitvoeringen).
 
-Voor elke groep:
-- Geef een korte naam (bv. "Batterij schakelaar 275A enkel polig")
-- Som de productnamen op die er bij horen (minstens 2 per groep)
+Regels:
+- Min 2 producten per groep
+- Korte groep_naam (max 50 karakters)
+- Gebruik EXACT de productnaam zoals in lijst (zonder leverancierprefix)
+- Output ALLEEN valid JSON, GEEN commentaar voor of na
 
-Negeer groepen van slechts 1 product. Focus op echte alternatieven.
-
-Output als JSON: [{{"groep_naam": "...", "producten": ["...", "..."]}}]
-Geen extra tekst, alleen valid JSON.
+Format:
+[{{"groep_naam":"naam","producten":["prod1","prod2"]}}]
 
 Producten:
 {product_list}
 """
                 resp = client.messages.create(
                     model=os.environ.get("CLAUDE_MODEL", "claude-sonnet-4-6"),
-                    max_tokens=4000,
+                    max_tokens=8000,
                     messages=[{"role": "user", "content": prompt}]
                 )
                 txt = resp.content[0].text.strip()
-                # Extract JSON
+                # Robust JSON extraction + repair
                 import json, re
-                m = re.search(r'\[.*\]', txt, re.S)
-                if m: txt = m.group(0)
-                groups = json.loads(txt)
+                # Strip markdown code fences
+                txt = re.sub(r'^```(?:json)?\s*', '', txt)
+                txt = re.sub(r'\s*```$', '', txt)
+                # Find first [ to last ]
+                start = txt.find('[')
+                end = txt.rfind(']')
+                if start >= 0 and end > start:
+                    txt = txt[start:end+1]
+                groups = None
+                try:
+                    groups = json.loads(txt)
+                except json.JSONDecodeError as e:
+                    # Try repair: remove trailing comma, truncated last entry
+                    repaired = re.sub(r',\s*([\]\}])', r'\1', txt)
+                    try:
+                        groups = json.loads(repaired)
+                    except Exception:
+                        # Last resort: parse object-by-object via regex
+                        groups = []
+                        for m in re.finditer(r'\{[^{}]*"groep_naam"[^{}]*"producten"\s*:\s*\[[^\]]+\][^{}]*\}', txt):
+                            try:
+                                obj = json.loads(m.group(0))
+                                groups.append(obj)
+                            except: pass
+                        if not groups:
+                            st.error(f"AI antwoord niet parseerbaar. Eerste 500 chars:\n```\n{txt[:500]}\n```")
+                            st.caption(f"JSON error: {e}")
+                            raise RuntimeError("JSON parse failed")
+                # Sanity filter
+                groups = [g for g in groups if isinstance(g, dict)
+                          and g.get("groep_naam") and len(g.get("producten", [])) >= 2]
                 st.session_state["_ai_groups"] = groups
                 st.session_state["_ai_tmpls"] = tmpls
                 st.success(f"✓ {len(groups)} groep-suggesties")
