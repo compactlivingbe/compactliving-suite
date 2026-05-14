@@ -85,26 +85,54 @@ if not selected_ids:
 
 st.markdown(f"### {len(selected_ids)} PO('s) geselecteerd")
 
+# Build code_map across ALL selected POs (cached resolution: variant → reimo code)
+all_lines_per_po = {}
+all_product_ids = set()
+for pid in selected_ids:
+    lines = odoo.search_read(
+        "purchase.order.line", [("order_id", "=", pid)],
+        ["product_id", "product_qty", "price_unit", "name"], 100
+    )
+    all_lines_per_po[pid] = lines
+    for l in lines:
+        if l.get("product_id"):
+            all_product_ids.add(l["product_id"][0])
+
+product_ids = list(all_product_ids)
+prods = odoo.search_read("product.product", [("id", "in", product_ids)],
+                          ["id", "product_tmpl_id", "default_code"]) if product_ids else []
+var_to_tmpl = {p["id"]: p["product_tmpl_id"][0] for p in prods if p.get("product_tmpl_id")}
+var_default_code = {p["id"]: p.get("default_code") for p in prods}
+tmpl_ids = list({tid for tid in var_to_tmpl.values()})
+sis_var = odoo.search_read(
+    "product.supplierinfo",
+    [("product_id", "in", product_ids), ("partner_id", "=", REIMO_PARTNER_ID)],
+    ["product_id", "product_code"]
+) if product_ids else []
+sis_tmpl = odoo.search_read(
+    "product.supplierinfo",
+    [("product_tmpl_id", "in", tmpl_ids), ("partner_id", "=", REIMO_PARTNER_ID),
+     ("product_id", "=", False)],
+    ["product_tmpl_id", "product_code"]
+) if tmpl_ids else []
+code_map = {}
+for s in sis_var:
+    if s.get("product_id") and s.get("product_code"):
+        code_map[s["product_id"][0]] = s["product_code"].strip()
+tmpl_code_map = {s["product_tmpl_id"][0]: s["product_code"].strip()
+                 for s in sis_tmpl if s.get("product_tmpl_id") and s.get("product_code")}
+for vid, tid in var_to_tmpl.items():
+    if vid not in code_map and tid in tmpl_code_map:
+        code_map[vid] = tmpl_code_map[tid]
+for vid, dc in var_default_code.items():
+    if vid not in code_map and dc:
+        code_map[vid] = dc.strip()
+
 # Toon details + Reimo codes
 for pid in selected_ids:
     p = next(x for x in pos if x["id"] == pid)
     with st.expander(f"📋 {p['name']} — €{p['amount_total']:.2f}", expanded=True):
-        # Get order lines
-        lines = odoo.search_read(
-            "purchase.order.line",
-            [("order_id", "=", pid)],
-            ["product_id", "product_qty", "price_unit", "name"],
-            100
-        )
-        # Get supplier codes per product
-        product_ids = [l["product_id"][0] for l in lines if l["product_id"]]
-        sis = odoo.search_read(
-            "product.supplierinfo",
-            [("product_id", "in", product_ids), ("partner_id", "=", REIMO_PARTNER_ID)],
-            ["product_id", "product_code"]
-        )
-        code_map = {s["product_id"][0]: s["product_code"] for s in sis if s.get("product_id")}
-
+        lines = all_lines_per_po[pid]
         rows = []
         for l in lines:
             pid_v = l["product_id"][0] if l["product_id"] else None
