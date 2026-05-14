@@ -579,8 +579,9 @@ with tab_peppol:
                                 opts = ["(kies / nieuw / open zoekveld)"] + \
                                        [f"[{c.get('default_code') or '—'}] {c['name']}  (€{c.get('standard_price', 0):.2f}, score {c.get('score', 0):.2f})"
                                         for c in cands]
-                                idx = cc[1].selectbox("kandidaat", opts, key=f"{key}_sel",
-                                                      label_visibility="collapsed")
+                                sel_label = cc[1].selectbox("kandidaat", opts, key=f"{key}_sel",
+                                                            label_visibility="collapsed")
+                                idx = opts.index(sel_label) if sel_label in opts else 0
                                 # Free-text search
                                 search = cc[2].text_input("of typ naam", key=f"{key}_search",
                                                           label_visibility="collapsed",
