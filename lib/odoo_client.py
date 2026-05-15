@@ -1,4 +1,4 @@
-"""Odoo JSON-RPC client via /jsonrpc endpoint (werkt met API-key OF wachtwoord).
+"""v2: Odoo JSON-RPC client via /jsonrpc endpoint (werkt met API-key OF wachtwoord).
 Equivalent van XML-RPC maar over JSON HTTP — robuuster onder Streamlit/cloud.
 """
 import json
