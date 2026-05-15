@@ -174,7 +174,7 @@ def compare_with_odoo(odoo, partner_id, vbd_products, log=print):
                        ["id", "name", "standard_price", "list_price"]) if tmpl_ids else []
     tmpl_by_id = {t["id"]: t for t in tmpls}
 
-    missing, cost_diffs, sale_diffs = [], [], []
+    missing, cost_diffs, sale_diffs, matches = [], [], [], []
     for p in vbd_products:
         sku = p["sku"]
         cost = p["price_excl"]
@@ -184,29 +184,49 @@ def compare_with_odoo(odoo, partner_id, vbd_products, log=print):
         si = by_code[sku]
         tid = si["product_tmpl_id"][0] if si.get("product_tmpl_id") else None
         tmpl = tmpl_by_id.get(tid, {})
-        # Kostprijs verschil (supplierinfo.price vs VBD excl BTW)
-        if cost is not None and abs(float(si.get("price") or 0) - cost) > 0.01:
+        cur_supplier_price = float(si.get("price") or 0)
+        cur_list = float(tmpl.get("list_price") or 0)
+        cur_cost = float(tmpl.get("standard_price") or 0)
+        cost_delta = (cost - cur_supplier_price) if cost is not None else None
+        sale_delta = (p["price_incl"] - cur_list) if p["price_incl"] is not None else None
+        matches.append({
+            "sku": sku,
+            "name": p["name"],
+            "odoo_name": tmpl.get("name", ""),
+            "image_url": p.get("image_url", ""),
+            "vbd_excl": cost,
+            "vbd_incl": p["price_incl"],
+            "odoo_supplier_price": cur_supplier_price,
+            "odoo_standard_price": cur_cost,
+            "odoo_list_price": cur_list,
+            "Δ_kost": cost_delta,
+            "Δ_verkoop": sale_delta,
+            "template_id": tid,
+            "supplierinfo_id": si["id"],
+            "url": p.get("url", ""),
+        })
+        # Kostprijs verschil
+        if cost is not None and abs(cur_supplier_price - cost) > 0.01:
             cost_diffs.append({
                 "sku": sku, "name": p["name"],
-                "current_supplier_price": float(si.get("price") or 0),
+                "current_supplier_price": cur_supplier_price,
                 "new_pricenett": cost,
                 "supplierinfo_id": si["id"],
                 "template_id": tid,
             })
-        # Verkoopprijs verschil (template.list_price vs VBD incl BTW als referentie)
-        if p["price_incl"] is not None:
-            cur_list = float(tmpl.get("list_price") or 0)
-            if abs(cur_list - p["price_incl"]) > 0.01:
-                sale_diffs.append({
-                    "sku": sku, "name": p["name"],
-                    "current_list_price": cur_list,
-                    "vbd_incl_btw": p["price_incl"],
-                    "template_id": tid,
-                })
+        # Verkoopprijs verschil
+        if p["price_incl"] is not None and abs(cur_list - p["price_incl"]) > 0.01:
+            sale_diffs.append({
+                "sku": sku, "name": p["name"],
+                "current_list_price": cur_list,
+                "vbd_incl_btw": p["price_incl"],
+                "template_id": tid,
+            })
     return {
         "missing": missing,
         "cost_diffs": cost_diffs,
         "sale_diffs": sale_diffs,
+        "matches": matches,
         "total_vbd": len(vbd_products),
         "total_matched": len(vbd_products) - len(missing),
     }

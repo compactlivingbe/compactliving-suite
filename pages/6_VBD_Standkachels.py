@@ -229,11 +229,13 @@ if "_vbd_result" in st.session_state:
     miss_df = pd.DataFrame(filtered_missing)
     cost_df = pd.DataFrame(result["cost_diffs"])
     sale_df = pd.DataFrame(result["sale_diffs"])
+    match_df = pd.DataFrame(result.get("matches", []))
 
     tabs = st.tabs([
         f"❓ Ontbrekend ({len(miss_df)})",
         f"📥 Kostprijs ({len(cost_df)})",
         f"📤 Verkoopprijs ({len(sale_df)})",
+        f"✓ Matches ({len(match_df)})",
     ])
 
     odoo = get_odoo()
@@ -419,3 +421,64 @@ if "_vbd_result" in st.session_state:
                         err += 1
                         st.error(f"{r['sku']}: {e}")
                 st.success(f"✓ {ok} updates toegepast, {err} fout")
+
+    # ----- TAB 4: MATCHES -----
+    with tabs[3]:
+        if match_df.empty:
+            st.info("Geen matches — eerst scrape draaien.")
+        else:
+            st.caption("Producten die zowel op VBD als in Odoo bestaan (gematcht op SKU = supplierinfo.product_code).")
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                m_search = st.text_input("🔍 Filter op SKU/naam", key="vbd_match_search")
+            with c2:
+                show_filter = st.selectbox(
+                    "Toon", ["Alles", "Alleen kostprijs ≠", "Alleen verkoopprijs ≠",
+                             "Beide identiek (kost+verkoop)"], key="vbd_match_filter")
+            with c3:
+                show_imgs = st.checkbox("📷 Foto's tonen", value=True, key="vbd_match_imgs")
+
+            df = match_df.copy()
+            if m_search:
+                mask = df.apply(
+                    lambda r: m_search.lower() in " ".join(str(v) for v in r.values).lower(),
+                    axis=1)
+                df = df[mask]
+            if show_filter == "Alleen kostprijs ≠":
+                df = df[df["Δ_kost"].abs() > 0.01]
+            elif show_filter == "Alleen verkoopprijs ≠":
+                df = df[df["Δ_verkoop"].abs() > 0.01]
+            elif show_filter == "Beide identiek (kost+verkoop)":
+                df = df[(df["Δ_kost"].abs() <= 0.01) & (df["Δ_verkoop"].abs() <= 0.01)]
+
+            st.caption(f"**{len(df)} / {len(match_df)} weergegeven**")
+
+            col_cfg = {
+                "sku": st.column_config.TextColumn("SKU", width="small"),
+                "name": st.column_config.TextColumn("VBD naam"),
+                "odoo_name": st.column_config.TextColumn("Odoo naam"),
+                "vbd_excl": st.column_config.NumberColumn("VBD excl", format="€ %.2f"),
+                "vbd_incl": st.column_config.NumberColumn("VBD incl", format="€ %.2f"),
+                "odoo_supplier_price": st.column_config.NumberColumn("Odoo kost (sup)", format="€ %.2f"),
+                "odoo_standard_price": st.column_config.NumberColumn("Odoo standard", format="€ %.2f"),
+                "odoo_list_price": st.column_config.NumberColumn("Odoo verkoop", format="€ %.2f"),
+                "Δ_kost": st.column_config.NumberColumn("Δ kost", format="€ %.2f"),
+                "Δ_verkoop": st.column_config.NumberColumn("Δ verkoop", format="€ %.2f"),
+                "url": st.column_config.LinkColumn("VBD"),
+                "template_id": None,
+                "supplierinfo_id": None,
+            }
+            if show_imgs:
+                col_cfg["image_url"] = st.column_config.ImageColumn("Foto", width="small")
+            else:
+                col_cfg["image_url"] = None
+
+            st.dataframe(df, use_container_width=True, hide_index=True,
+                          column_config=col_cfg)
+
+            odoo_url = os.environ.get("ODOO_URL", "https://compactliving.odoo.com").rstrip("/")
+            with st.expander("🔗 Direct naar Odoo product"):
+                for _, r in df.head(50).iterrows():
+                    if r["template_id"]:
+                        link = f"{odoo_url}/odoo/inventory/products/{int(r['template_id'])}"
+                        st.markdown(f"- [{r['sku']} — {r['odoo_name'] or r['name']}]({link})")
