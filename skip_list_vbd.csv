@@ -34,3 +34,19 @@ VBD A 0104,ventilatorsnelheidsregelaar Autoterm FC9,niet nodig,2026-05-15
 VBD A 0105,thermische ventilatorcontroller Autoterm CHM36,niet nodig,2026-05-15
 VBD MA 0004,Warmtewisselaar van rvs 20 platen max. 115 kW platenwarmtewisselaar RVS,niet nodig,2026-05-15
 VBD MA 0003,Warmtewisselaar van rvs 30 platen max. 66 kW platenwarmtewisselaar RVS,niet nodig,2026-05-15
+VBD A 0038,Huiddoorvoer 24 mm gebogen rvs.,niet nodig,2026-05-15
+VBD A 0101,Huiddoorvoer 24 mm met vaste draadeinden,niet nodig,2026-05-15
+VBD A 0042,Huiddoorvoer 38 mm gebogen rvs.,niet nodig,2026-05-15
+VBD A 0040,"Huiddoorvoer Autoterm met bocht  24 mm, RVS",niet nodig,2026-05-15
+VBD A 0260,Huiddoorvoer door vloer of wand 24 mm,niet nodig,2026-05-15
+VBD A 0041,"Huiddoorvoer Autoterm voor negatieve spiegel, aansluiting 24 mm, RVS",niet nodig,2026-05-15
+VBD A 0262,Huiddoorvoer 28 mm gebogen rvs voor Wallas en Safire,niet nodig,2026-05-15
+VBD A 0263,"Huiddoorvoer Autoterm voor negatieve spiegel, aansluiting 28 mm, RVS  voor Wallas en Safire",niet nodig,2026-05-15
+VBD A 0214,Temperatuursensor ingesteld Flow 5d,niet nodig,2026-05-15
+VBD A 0287,"Temperatuursensor ingesteld Flow 5d GD, nieuw model",niet nodig,2026-05-15
+VBD A 0207,Verbrandingskamer Flow 5d,niet nodig,2026-05-15
+VBD A 0208,Vlamindicator Flow 5d,niet nodig,2026-05-15
+VBD A 0128,Pakking reparatieset 5d -importeur-autoterm,niet nodig,2026-05-15
+VBD A 0140,Behuizing Flow 5D,niet nodig,2026-05-15
+VBD A 0141,Warmtewisselaar Flow 5D,niet nodig,2026-05-15
+VBD A 0122,Pakking reparatieset Flow14D,niet nodig,2026-05-15
