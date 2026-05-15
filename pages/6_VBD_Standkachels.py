@@ -181,10 +181,13 @@ with st.expander("⚙ Categorieën om te scrapen", expanded=False):
     st.caption(f"{len(selected_cats)} categorieën geselecteerd.")
 
 
-col1, col2 = st.columns([3, 1])
+col1, col2, col3 = st.columns([2, 2, 1])
 with col1:
-    delay = st.slider("Delay tussen pagina's (sec)", 0.0, 2.0, 0.4, 0.1)
+    delay = st.slider("Delay tussen pagina's (sec)", 0.0, 3.0, 0.6, 0.1)
 with col2:
+    between_cats = st.slider("Pauze tussen categorieën (sec)", 0.5, 5.0, 1.5, 0.5,
+                              help="Hoger = minder kans op anti-bot 403's.")
+with col3:
     run_btn = st.button("▶ Scrape + analyseren", type="primary", use_container_width=True)
 
 
@@ -198,7 +201,7 @@ if run_btn:
         log_box.code("\n".join(log_lines[-30:]), language=None)
 
     with st.spinner("VBD productlijst ophalen..."):
-        products = fetch_all(selected_cats, log=log, delay=delay)
+        products = fetch_all(selected_cats, log=log, delay=delay, between_cats=between_cats)
     st.success(f"✓ {len(products)} unieke producten gevonden op VBD")
 
     with st.spinner("Vergelijken met Odoo..."):

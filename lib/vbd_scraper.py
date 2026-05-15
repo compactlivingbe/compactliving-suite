@@ -7,8 +7,37 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
 BASE = "https://vbdservices.nl"
-UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 CompactLivingSync/1.0"
+# Echte Chrome UA — anti-bot WAF blokkeert custom UA's
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
 BTW_NL = 0.21
+
+
+def _make_session():
+    s = requests.Session()
+    s.headers.update({
+        "User-Agent": UA,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "nl-NL,nl;q=0.9,en;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-User": "?1",
+    })
+    return s
+
+
+def _warmup(s, log=print):
+    """Eerst homepage bezoeken om cookies/sessie te krijgen."""
+    try:
+        r = s.get(BASE + "/", timeout=20)
+        log(f"  warmup: {r.status_code} ({len(s.cookies)} cookies)")
+        time.sleep(1.0)
+    except Exception as e:
+        log(f"  warmup faalde: {e}")
 
 # Default categorieën - kan via UI uitgebreid worden
 DEFAULT_CATEGORIES = [
@@ -94,19 +123,33 @@ def _parse_card(card):
     }
 
 
-def fetch_category(path, log=print, delay=0.4):
-    """Crawl one category path with all pages. Returns list of products."""
+def fetch_category(path, log=print, delay=0.4, session=None, referer=None):
+    """Crawl one category path with all pages. Returns list of products.
+    Use shared session for cookie persistence across categories."""
     out = []
     seen_skus = set()
-    s = requests.Session()
-    s.headers["User-Agent"] = UA
+    s = session or _make_session()
+    if session is None:
+        _warmup(s, log=log)
     page = 1
     while True:
         url = urljoin(BASE, path)
         params = {"page": page} if page > 1 else None
-        r = s.get(url, params=params, timeout=30)
-        if r.status_code != 200:
-            log(f"  [{path}] page {page} HTTP {r.status_code}")
+        headers = {"Referer": referer or (BASE + "/")}
+        # Retry-loop voor 403 (anti-bot)
+        r = None
+        for attempt in range(3):
+            r = s.get(url, params=params, timeout=30, headers=headers)
+            if r.status_code == 200:
+                break
+            if r.status_code in (403, 429, 503):
+                wait = (attempt + 1) * 3
+                log(f"  [{path}] page {page} HTTP {r.status_code} — backoff {wait}s (attempt {attempt+1}/3)")
+                time.sleep(wait)
+                continue
+            break
+        if r is None or r.status_code != 200:
+            log(f"  [{path}] page {page} HTTP {r.status_code if r else '?'} — opgegeven")
             break
         soup = BeautifulSoup(r.text, "html.parser")
         cards = soup.select(".product-layout")
@@ -135,17 +178,25 @@ def fetch_category(path, log=print, delay=0.4):
     return out
 
 
-def fetch_all(categories=None, log=print, delay=0.4):
-    """Crawl all configured categories. Returns deduped list by SKU."""
+def fetch_all(categories=None, log=print, delay=0.4, between_cats=1.5):
+    """Crawl all configured categories. Returns deduped list by SKU.
+    Eén shared session voor cookies; tussen categorieën pauze om WAF te ontwijken."""
     cats = categories or DEFAULT_CATEGORIES
     by_sku = {}
-    for cat in cats:
+    s = _make_session()
+    _warmup(s, log=log)
+    prev_url = BASE + "/"
+    for i, cat in enumerate(cats):
         try:
-            for p in fetch_category(cat, log=log, delay=delay):
-                # First-seen wins (preserve original category)
+            prods = fetch_category(cat, log=log, delay=delay,
+                                    session=s, referer=prev_url)
+            for p in prods:
                 by_sku.setdefault(p["sku"], p)
+            prev_url = urljoin(BASE, cat)
         except Exception as e:
             log(f"  [{cat}] FOUT: {e}")
+        if i < len(cats) - 1:
+            time.sleep(between_cats)
     return list(by_sku.values())
 
 
