@@ -1,10 +1,16 @@
 """VBD Services (vbdservices.nl) - OpenCart productlijst scraper.
 Geen login: openbare prijzen incl BTW (NL 21%), excl wordt afgeleid.
 """
-import re, time
+import os, re, time
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+
+try:
+    import cloudscraper
+    HAS_CLOUDSCRAPER = True
+except ImportError:
+    HAS_CLOUDSCRAPER = False
 
 BASE = "https://vbdservices.nl"
 # Echte Chrome UA — anti-bot WAF blokkeert custom UA's
@@ -14,7 +20,14 @@ BTW_NL = 0.21
 
 
 def _make_session():
-    s = requests.Session()
+    """Bouw een session die Cloudflare challenges kan omzeilen."""
+    if HAS_CLOUDSCRAPER:
+        s = cloudscraper.create_scraper(
+            browser={"browser": "chrome", "platform": "windows", "mobile": False},
+            delay=2,
+        )
+    else:
+        s = requests.Session()
     s.headers.update({
         "User-Agent": UA,
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -22,6 +35,9 @@ def _make_session():
         "Accept-Encoding": "gzip, deflate, br",
         "Connection": "keep-alive",
         "Upgrade-Insecure-Requests": "1",
+        "Sec-Ch-Ua": '"Chromium";v="131", "Not_A Brand";v="24", "Google Chrome";v="131"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
         "Sec-Fetch-Dest": "document",
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-Site": "same-origin",
@@ -34,10 +50,26 @@ def _warmup(s, log=print):
     """Eerst homepage bezoeken om cookies/sessie te krijgen."""
     try:
         r = s.get(BASE + "/", timeout=20)
-        log(f"  warmup: {r.status_code} ({len(s.cookies)} cookies)")
+        cf = "cf" if r.headers.get("Server", "").lower() == "cloudflare" else "no-cf"
+        log(f"  warmup: {r.status_code} ({len(s.cookies)} cookies, {cf}, "
+             f"cloudscraper={HAS_CLOUDSCRAPER})")
         time.sleep(1.0)
     except Exception as e:
         log(f"  warmup faalde: {e}")
+
+
+SCRAPER_API_KEY = os.environ.get("SCRAPER_API_KEY", "")  # https://www.scraperapi.com/ free 1000/maand
+
+
+def _proxied_get(url, params=None, timeout=60):
+    """Fallback via ScraperAPI als VBD direct blokt."""
+    if not SCRAPER_API_KEY:
+        return None
+    payload = {"api_key": SCRAPER_API_KEY, "url": url, "country_code": "nl"}
+    if params:
+        from urllib.parse import urlencode
+        payload["url"] = url + ("&" if "?" in url else "?") + urlencode(params)
+    return requests.get("https://api.scraperapi.com/", params=payload, timeout=timeout)
 
 # Default categorieën - kan via UI uitgebreid worden
 DEFAULT_CATEGORIES = [
@@ -144,12 +176,26 @@ def fetch_category(path, log=print, delay=0.4, session=None, referer=None):
                 break
             if r.status_code in (403, 429, 503):
                 wait = (attempt + 1) * 3
+                # Eerste 403 → log diagnose
+                if attempt == 0:
+                    body_snip = (r.text or "")[:200].replace("\n", " ")
+                    cf_ray = r.headers.get("cf-ray", "")
+                    log(f"  [{path}] page {page} HTTP {r.status_code} (cf-ray={cf_ray}) "
+                         f"— body: {body_snip!r}")
                 log(f"  [{path}] page {page} HTTP {r.status_code} — backoff {wait}s (attempt {attempt+1}/3)")
                 time.sleep(wait)
                 continue
             break
+        # ScraperAPI fallback bij volharding 403
+        if (r is None or r.status_code != 200) and SCRAPER_API_KEY:
+            log(f"  [{path}] page {page} → ScraperAPI fallback")
+            try:
+                r = _proxied_get(url, params=params)
+            except Exception as e:
+                log(f"  ScraperAPI faalde: {e}")
         if r is None or r.status_code != 200:
-            log(f"  [{path}] page {page} HTTP {r.status_code if r else '?'} — opgegeven")
+            log(f"  [{path}] page {page} HTTP {r.status_code if r else '?'} — opgegeven"
+                + ("" if SCRAPER_API_KEY else " (tip: voeg SCRAPER_API_KEY secret toe als fallback)"))
             break
         soup = BeautifulSoup(r.text, "html.parser")
         cards = soup.select(".product-layout")

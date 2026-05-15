@@ -28,7 +28,7 @@ st.set_page_config(
 # Map secrets → env (zodat alle modules werken zonder st.secrets dependency)
 for key in ["ANTHROPIC_API_KEY", "ODOO_URL", "ODOO_DB", "ODOO_LOGIN", "ODOO_API_KEY",
             "ODOO_PASSWORD", "CLAUDE_MODEL", "PROFIWEB_USER", "PROFIWEB_PASS",
-            "TOPSYSTEMS_XML_URL", "APP_PASSWORD"]:
+            "TOPSYSTEMS_XML_URL", "APP_PASSWORD", "GH_TOKEN", "SCRAPER_API_KEY"]:
     try:
         if key in st.secrets:
             os.environ[key] = st.secrets[key]
