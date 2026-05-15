@@ -561,35 +561,113 @@ Producten:
     if st.session_state.get("_ai_groups"):
         groups = st.session_state["_ai_groups"]
         tmpls = st.session_state["_ai_tmpls"]
+        sup_per_tmpl_ai = st.session_state.get("_ai_sup_per_tmpl", {})
         name_to_id = {t["name"]: t["id"] for t in tmpls}
+        id_to_name = {t["id"]: t["name"] for t in tmpls}
         # Bestaande groepen ophalen voor overlap-detectie
         existing_tags = {t["name"].lower(): t["id"]
                           for t in odoo.search_read("product.tag", [], ["id", "name"], 500)}
+
+        def _sup_str(prod_name):
+            tid = name_to_id.get(prod_name)
+            if not tid: return "(niet gevonden)"
+            return ", ".join(sorted(sup_per_tmpl_ai.get(tid, set()))) or "(geen)"
+
         for i, g in enumerate(groups):
-            already_exists = g["groep_naam"].lower() in existing_tags
-            badge = " ⚠ groep met deze naam bestaat al" if already_exists else ""
-            with st.expander(f"📦 {g['groep_naam']} ({len(g['producten'])} producten){badge}",
+            current_name_key = f"ai_name_{i}"
+            current_prods_key = f"ai_prods_{i}"
+            # Initialiseer session state per groep
+            if current_name_key not in st.session_state:
+                st.session_state[current_name_key] = g["groep_naam"]
+            if current_prods_key not in st.session_state:
+                st.session_state[current_prods_key] = list(g["producten"])
+
+            current_name = st.session_state[current_name_key]
+            current_prods = st.session_state[current_prods_key]
+            already_exists = current_name.lower() in existing_tags
+            badge = " ⚠ bestaat al" if already_exists else ""
+            with st.expander(f"📦 {current_name} ({len(current_prods)} producten){badge}",
                               expanded=False):
-                matched_ids = [name_to_id[n] for n in g["producten"] if n in name_to_id]
-                st.write(g["producten"])
+                # Editable naam
+                new_name = st.text_input("Groep naam", value=current_name,
+                                          key=f"name_input_{i}")
+                st.session_state[current_name_key] = new_name
+
+                # Producten in groep met leverancier + verwijder
+                if current_prods:
+                    st.markdown("**Producten in suggestie** (vink aan om te verwijderen):")
+                    rows = []
+                    for pname in current_prods:
+                        rows.append({
+                            "Verwijder": False,
+                            "Product": pname,
+                            "Leverancier(s)": _sup_str(pname),
+                            "_in_odoo": pname in name_to_id,
+                        })
+                    df = pd.DataFrame(rows)
+                    edited = st.data_editor(df, hide_index=True, use_container_width=True,
+                                              disabled=["Product", "Leverancier(s)", "_in_odoo"],
+                                              column_config={"_in_odoo": None},
+                                              key=f"prod_editor_{i}")
+                    to_remove = [r["Product"] for _, r in edited.iterrows() if r["Verwijder"]]
+                    if to_remove and st.button(f"🗑 Verwijder {len(to_remove)} aangevinkt",
+                                                key=f"remove_btn_{i}"):
+                        st.session_state[current_prods_key] = [
+                            p for p in current_prods if p not in to_remove
+                        ]
+                        st.rerun()
+
+                # Producten toevoegen — kies uit gescande tmpls die nog niet in groep zitten
+                available_to_add = [t["name"] for t in tmpls
+                                     if t["name"] not in current_prods]
+                if available_to_add:
+                    add_sel = st.multiselect(
+                        "➕ Voeg producten toe (uit gescande lijst)",
+                        available_to_add,
+                        format_func=lambda n: f"{n}  [{_sup_str(n)}]",
+                        key=f"add_sel_{i}",
+                    )
+                    if add_sel and st.button(f"➕ Voeg {len(add_sel)} toe",
+                                              key=f"add_btn_{i}"):
+                        st.session_state[current_prods_key] = current_prods + [
+                            p for p in add_sel if p not in current_prods
+                        ]
+                        st.rerun()
+
+                # Verificatie: minstens 2 verschillende leveranciers
+                final_prods = st.session_state[current_prods_key]
+                final_sups = set()
+                for pname in final_prods:
+                    tid = name_to_id.get(pname)
+                    if tid:
+                        final_sups |= sup_per_tmpl_ai.get(tid, set())
+                if len(final_sups) < 2:
+                    st.warning(f"⚠ Slechts {len(final_sups)} leverancier(s): "
+                               f"{', '.join(final_sups) or '(geen)'}. Voeg producten van andere leverancier toe.")
+
                 if already_exists:
-                    st.warning(f"⚠ Een groep met naam '{g['groep_naam']}' bestaat al in Odoo. "
-                               f"Producten worden eraan toegevoegd ipv nieuwe groep maken.")
-                if st.button(f"➕ {'Voeg toe aan bestaande' if already_exists else 'Maak deze groep aan'}",
-                              key=f"ai_create_{i}"):
+                    st.info(f"ℹ Groep '{new_name}' bestaat al in Odoo — producten worden eraan toegevoegd.")
+
+                # Maak/update knop
+                btn_label = ("➕ Voeg toe aan bestaande groep"
+                              if already_exists else "✓ Maak deze groep aan")
+                if st.button(btn_label, key=f"create_btn_{i}",
+                              type="primary",
+                              disabled=(not final_prods or not new_name.strip())):
+                    matched_ids = [name_to_id[n] for n in final_prods if n in name_to_id]
                     if not matched_ids:
-                        st.error("Geen producten gematcht in Odoo (namen kloppen niet exact)")
+                        st.error("Geen producten gematcht in Odoo")
                     else:
-                        tid = (existing_tags[g["groep_naam"].lower()] if already_exists
-                               else odoo.create("product.tag", {"name": g["groep_naam"]}))
+                        tid = (existing_tags.get(new_name.lower())
+                               or odoo.create("product.tag", {"name": new_name.strip()}))
                         added = 0
                         for pid in matched_ids:
                             cur = odoo.read("product.template", [pid], ["product_tag_ids"])[0]
                             if tid in cur["product_tag_ids"]:
-                                continue  # al in deze groep
+                                continue
                             new_tags = list(set(cur["product_tag_ids"] + [tid]))
                             odoo.write("product.template", [pid],
                                        {"product_tag_ids": [(6, 0, new_tags)]})
                             added += 1
-                        st.success(f"✓ Groep '{g['groep_naam']}': {added} nieuwe producten toegevoegd "
-                                   f"(van {len(matched_ids)} suggesties)")
+                        st.success(f"✓ Groep '{new_name}': {added} nieuwe producten toegevoegd "
+                                   f"({len(matched_ids) - added} zaten er al in)")
