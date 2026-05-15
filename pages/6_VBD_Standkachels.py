@@ -346,12 +346,13 @@ if "_vbd_result" in st.session_state:
             df_show.insert(0, "Selecteer", False)
             edited = st.data_editor(
                 df_show, hide_index=True, use_container_width=True,
+                row_height=120,
                 disabled=[c for c in df_show.columns if c != "Selecteer"],
                 column_config={
                     "price_incl": st.column_config.NumberColumn("Incl BTW", format="€ %.2f"),
                     "price_excl": st.column_config.NumberColumn("Excl BTW (kost)", format="€ %.2f"),
                     "url": st.column_config.LinkColumn("Bekijk"),
-                    "image_url": st.column_config.ImageColumn("Foto", width="small"),
+                    "image_url": st.column_config.ImageColumn("Foto", width="medium"),
                     "category": None, "description": None,
                 },
                 key="vbd_miss_editor",
@@ -559,11 +560,12 @@ if "_vbd_result" in st.session_state:
                 "supplierinfo_id": None,
             }
             if show_imgs:
-                col_cfg["image_url"] = st.column_config.ImageColumn("Foto", width="small")
+                col_cfg["image_url"] = st.column_config.ImageColumn("Foto", width="medium")
             else:
                 col_cfg["image_url"] = None
 
             st.dataframe(df, use_container_width=True, hide_index=True,
+                          row_height=120 if show_imgs else 35,
                           column_config=col_cfg)
 
             odoo_url = os.environ.get("ODOO_URL", "https://compactliving.odoo.com").rstrip("/")
