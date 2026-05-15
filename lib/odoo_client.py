@@ -1,5 +1,5 @@
-"""Odoo JSON-RPC client (vervangt XML-RPC) - werkt met API-key OF wachtwoord.
-Gebruikt requests.Session, robuuster onder Streamlit Cloud (geen XML-RPC state issues).
+"""Odoo JSON-RPC client via /jsonrpc endpoint (werkt met API-key OF wachtwoord).
+Equivalent van XML-RPC maar over JSON HTTP — robuuster onder Streamlit/cloud.
 """
 import json
 import requests
@@ -11,95 +11,54 @@ class OdooClient:
         self.url = url.rstrip('/')
         self.db = db
         self.login = login
-        # API-key heeft voorrang; password is fallback
+        # API-key OF wachtwoord (beide werken voor /jsonrpc execute_kw)
         self.password = api_key or password
         self.session = requests.Session()
         self.session.headers["Content-Type"] = "application/json"
         self.uid = None
         self._authenticate()
 
-    def _authenticate(self):
-        """JSON-RPC authenticatie. Sets self.uid + cookie."""
-        # Methode 1: /web/session/authenticate (zet ook session cookie)
-        r = self.session.post(
-            f"{self.url}/web/session/authenticate",
-            data=json.dumps({"jsonrpc": "2.0", "params":
-                              {"db": self.db, "login": self.login, "password": self.password}}),
-            timeout=30,
-        )
-        r.raise_for_status()
-        d = r.json()
-        if d.get("result") and d["result"].get("uid"):
-            self.uid = d["result"]["uid"]
-            return
-        # Methode 2: fallback via common/authenticate (XML-RPC equivalent in JSON)
-        r = self.session.post(
-            f"{self.url}/jsonrpc",
-            data=json.dumps({
-                "jsonrpc": "2.0", "method": "call",
-                "params": {"service": "common", "method": "authenticate",
-                           "args": [self.db, self.login, self.password, {}]}
-            }),
-            timeout=30,
-        )
-        r.raise_for_status()
-        d = r.json()
-        uid = d.get("result")
-        if not uid:
-            raise RuntimeError(f"Odoo auth failed: {d}")
-        self.uid = uid
-
-    def call(self, model: str, method: str, args: list = None, kwargs: dict = None) -> Any:
-        """Roept Odoo model.method aan. Ondersteunt zowel API-key als session-based auth."""
-        args = args or []
-        kwargs = kwargs or {}
-        # /web/dataset/call_kw (gebruikt session cookie)
+    def _jsonrpc(self, service: str, method: str, args: list, retry=True):
+        """Low-level JSON-RPC call via /jsonrpc."""
         try:
             r = self.session.post(
-                f"{self.url}/web/dataset/call_kw",
+                f"{self.url}/jsonrpc",
                 data=json.dumps({"jsonrpc": "2.0", "method": "call",
-                                  "params": {"model": model, "method": method,
-                                             "args": args, "kwargs": kwargs}}),
+                                  "params": {"service": service,
+                                             "method": method, "args": args}}),
                 timeout=120,
             )
             r.raise_for_status()
             d = r.json()
             if "error" in d:
-                # Session expired? Probeer opnieuw te authenticeren + retry
-                err = d.get("error", {})
-                msg = json.dumps(err)[:300]
-                if "session" in msg.lower() or "expired" in msg.lower() or err.get("code") == 100:
-                    self._authenticate()
-                    r = self.session.post(
-                        f"{self.url}/web/dataset/call_kw",
-                        data=json.dumps({"jsonrpc": "2.0", "method": "call",
-                                          "params": {"model": model, "method": method,
-                                                     "args": args, "kwargs": kwargs}}),
-                        timeout=120,
-                    )
-                    r.raise_for_status()
-                    d = r.json()
-                if "error" in d:
-                    raise RuntimeError(f"Odoo error: {json.dumps(d['error'])[:300]}")
+                raise RuntimeError(f"Odoo error: {json.dumps(d['error'])[:500]}")
             return d.get("result")
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.Timeout) as e:
-            # Force nieuwe sessie + retry 1x
-            self.session = requests.Session()
-            self.session.headers["Content-Type"] = "application/json"
-            self._authenticate()
-            r = self.session.post(
-                f"{self.url}/web/dataset/call_kw",
-                data=json.dumps({"jsonrpc": "2.0", "method": "call",
-                                  "params": {"model": model, "method": method,
-                                             "args": args, "kwargs": kwargs}}),
-                timeout=120,
+            if retry:
+                # Refresh session + retry 1x
+                self.session = requests.Session()
+                self.session.headers["Content-Type"] = "application/json"
+                return self._jsonrpc(service, method, args, retry=False)
+            raise
+
+    def _authenticate(self):
+        uid = self._jsonrpc("common", "authenticate",
+                             [self.db, self.login, self.password, {}])
+        if not uid:
+            raise RuntimeError(
+                f"Odoo auth failed: uid=False voor login={self.login} (verkeerde credentials?)"
             )
-            r.raise_for_status()
-            d = r.json()
-            if "error" in d:
-                raise RuntimeError(f"Odoo error after retry: {json.dumps(d['error'])[:300]}")
-            return d.get("result")
+        self.uid = uid
+
+    def call(self, model: str, method: str, args: list = None, kwargs: dict = None) -> Any:
+        """Roept Odoo model.method aan via execute_kw (XML-RPC equivalent over JSON)."""
+        args = args or []
+        kwargs = kwargs or {}
+        return self._jsonrpc(
+            "object", "execute_kw",
+            [self.db, self.uid, self.password, model, method, args, kwargs]
+        )
 
     def search_read(self, model: str, domain: list, fields: list, limit: int = 100, order: str = None) -> list:
         kwargs = {"limit": limit}
