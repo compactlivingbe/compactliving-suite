@@ -28,6 +28,11 @@ def get_odoo():
 
 
 odoo = get_odoo()
+ODOO_URL = os.environ.get("ODOO_URL", "https://compactliving.odoo.com").rstrip("/")
+
+
+def odoo_product_url(tmpl_id):
+    return f"{ODOO_URL}/odoo/inventory/products/{tmpl_id}"
 
 
 def fmt_eur(n):
@@ -127,7 +132,19 @@ with tab_view:
                         if cheapest else "—"
                     ),
                     "# Lev.": len(sups),
+                    "Odoo": odoo_product_url(tmpl["id"]),
                 }
+
+            # Gemeenschappelijke column config met clickable Odoo link
+            COL_CFG = {
+                "Inkoop": st.column_config.NumberColumn(format="€ %.2f"),
+                "Verkoop": st.column_config.NumberColumn(format="€ %.2f"),
+                "Voorraad": st.column_config.NumberColumn(format="%d"),
+                "Odoo": st.column_config.LinkColumn(
+                    "Odoo", help="Open product in Odoo",
+                    display_text="🔗 Open"
+                ),
+            }
 
             if view_mode == "📋 Per groep (alle leden zichtbaar)":
                 # Eén tabel per groep, gestapeld, sortable
@@ -145,11 +162,7 @@ with tab_view:
                                    key=lambda r: r["Inkoop"] or 0)
                     st.dataframe(
                         pd.DataFrame(rows), hide_index=True, use_container_width=True,
-                        column_config={
-                            "Inkoop": st.column_config.NumberColumn(format="€ %.2f"),
-                            "Verkoop": st.column_config.NumberColumn(format="€ %.2f"),
-                            "Voorraad": st.column_config.NumberColumn(format="%d"),
-                        }
+                        column_config=COL_CFG,
                     )
                 if shown == 0:
                     st.info("Geen producten in groepen. Voeg toe via tab 'Beheer'.")
@@ -198,11 +211,7 @@ with tab_view:
                     st.caption(f"{len(df)} rijen")
                     st.dataframe(df.sort_values(["Groep", "Inkoop"]),
                                   hide_index=True, use_container_width=True,
-                                  column_config={
-                                      "Inkoop": st.column_config.NumberColumn(format="€ %.2f"),
-                                      "Verkoop": st.column_config.NumberColumn(format="€ %.2f"),
-                                      "Voorraad": st.column_config.NumberColumn(format="%d"),
-                                  })
+                                  column_config=COL_CFG)
                 else:
                     st.info("Geen producten in groepen.")
         else:
@@ -256,6 +265,7 @@ with tab_view:
                             if cheapest_sup else "—"
                         ),
                         "Alle leveranciers": sup_str,
+                        "Odoo": odoo_product_url(t["id"]),
                         "_id": t["id"],
                     })
                 df = pd.DataFrame(rows)
@@ -275,6 +285,8 @@ with tab_view:
                                  "Inkoop": st.column_config.NumberColumn(format="€ %.2f"),
                                  "Verkoop": st.column_config.NumberColumn(format="€ %.2f"),
                                  "Voorraad": st.column_config.NumberColumn(format="%d"),
+                                 "Odoo": st.column_config.LinkColumn(
+                                     "Odoo", help="Open in Odoo", display_text="🔗 Open"),
                              })
                 # Visual: bar chart van inkoopprijzen
                 if len(df) > 1:
