@@ -175,7 +175,30 @@ with st.expander(f"📋 Skip-list bekijken / bewerken ({SKIP_LIST_PATH.name})", 
 
 
 # ============ DATA SOURCE ============
-def load_cached_data():
+def gh_pull_data():
+    """Haal data/vbd_products.json live van GitHub (omzeilt Streamlit container cache)."""
+    if not GH_TOKEN: return None
+    try:
+        r = requests.get(
+            f"https://api.github.com/repos/{GH_REPO}/contents/data/vbd_products.json",
+            headers={"Authorization": f"Bearer {GH_TOKEN}",
+                      "Accept": "application/vnd.github+json"},
+            params={"ref": GH_BRANCH}, timeout=20)
+        if r.status_code == 200:
+            content = base64.b64decode(r.json()["content"]).decode("utf-8")
+            DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+            DATA_PATH.write_text(content, encoding="utf-8")
+            return r.json().get("sha", "")[:7]
+    except Exception as e:
+        st.warning(f"GitHub data-pull faalde: {e}")
+    return None
+
+
+def load_cached_data(force_pull=False):
+    """Lees gecachete VBD data. Pull eerst van GitHub als token beschikbaar (altijd verse data)."""
+    if GH_TOKEN and (force_pull or "_vbd_data_pulled" not in st.session_state):
+        gh_pull_data()
+        st.session_state["_vbd_data_pulled"] = True
     if not DATA_PATH.exists():
         return None
     try:
@@ -200,7 +223,7 @@ def trigger_github_workflow():
 cached = load_cached_data()
 
 st.markdown("### 📊 Databron")
-src_col1, src_col2 = st.columns([3, 2])
+src_col1, src_col2, src_col3 = st.columns([3, 1, 1])
 with src_col1:
     if cached:
         scraped_at = cached.get("scraped_at", "?")
@@ -209,12 +232,18 @@ with src_col1:
     else:
         st.warning("⚠ Nog geen gecachete data — trigger eerst een scrape via GitHub Actions.")
 with src_col2:
-    if st.button("🔄 Trigger nieuwe scrape via GitHub Actions",
-                  type="primary", use_container_width=True):
+    if st.button("⟳ Refresh", use_container_width=True,
+                  help="Haal laatste data live van GitHub op (na GH Actions run)."):
+        st.session_state.pop("_vbd_data_pulled", None)
+        load_cached_data(force_pull=True)
+        st.rerun()
+with src_col3:
+    if st.button("🔄 GH Actions", type="primary", use_container_width=True,
+                  help="Trigger nieuwe scrape via GitHub Actions."):
         ok, info = trigger_github_workflow()
         if ok:
-            st.success(f"✓ Workflow gestart — duurt ±2-3 min. Refresh pagina daarna. "
-                        f"Bekijk: https://github.com/{GH_REPO}/actions")
+            st.success(f"✓ Workflow gestart — duurt ±2 min, klik daarna **⟳ Refresh**. "
+                        f"https://github.com/{GH_REPO}/actions")
         else:
             st.error(f"Trigger faalde: {info}")
 
