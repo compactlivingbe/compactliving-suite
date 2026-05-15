@@ -8,7 +8,7 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from odoo_client import OdooClient
-from vbd_scraper import fetch_all, compare_with_odoo, DEFAULT_CATEGORIES, BASE
+from vbd_scraper import fetch_all, fetch_full_description, compare_with_odoo, DEFAULT_CATEGORIES, BASE
 
 st.set_page_config(page_title="VBD Standkachels", page_icon="🔥", layout="wide")
 
@@ -358,7 +358,8 @@ if "_vbd_result" in st.session_state:
                     "price_excl": st.column_config.NumberColumn("Excl BTW (kost)", format="€ %.2f"),
                     "url": st.column_config.LinkColumn("Bekijk"),
                     "image_url": st.column_config.ImageColumn("Foto", width="medium"),
-                    "category": None, "description": None,
+                    "description": st.column_config.TextColumn("Omschrijving", width="large"),
+                    "category": None,
                 },
                 key="vbd_miss_editor",
             )
@@ -376,6 +377,10 @@ if "_vbd_result" in st.session_state:
                     "📷 Productfoto van VBD mee importeren",
                     value=True, key="vbd_include_img",
                     help="Download foto en zet als hoofdafbeelding van het product.")
+                fetch_full_desc = st.checkbox(
+                    "📝 Volledige beschrijving van VBD detail-pagina ophalen",
+                    value=True, key="vbd_fetch_desc",
+                    help="Doet 1 extra GET per geselecteerd product (alleen bij import).")
                 act_col1, act_col2 = st.columns(2)
                 with act_col1:
                     if st.button(f"➕ Voeg {len(sel)} toe in Odoo", key="vbd_add_miss", type="primary"):
@@ -387,6 +392,14 @@ if "_vbd_result" in st.session_state:
                                     sale = float(r["price_incl"])
                                 else:
                                     sale = round(cost * margin, 2)
+                                # Volledige beschrijving ophalen indien gewenst
+                                full_desc = str(r.get("description") or "")
+                                if fetch_full_desc and r.get("url"):
+                                    try:
+                                        fd = fetch_full_description(str(r["url"]))
+                                        if fd: full_desc = fd
+                                    except Exception:
+                                        pass
                                 vals = {
                                     "name": str(r["name"]).strip(),
                                     "default_code": str(r["sku"]).strip(),
@@ -394,7 +407,7 @@ if "_vbd_result" in st.session_state:
                                     "is_storable": True,
                                     "standard_price": cost,
                                     "list_price": sale,
-                                    "description_sale": str(r.get("description") or "")[:1000],
+                                    "description_sale": full_desc[:5000],
                                 }
                                 if include_image and r.get("image_url"):
                                     try:

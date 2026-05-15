@@ -138,7 +138,9 @@ def _parse_card(card):
     price_excl = round(price_incl / (1 + BTW_NL), 2) if price_incl else None
 
     desc_el = card.select_one(".description")
-    desc = desc_el.get_text(" ", strip=True)[:300] if desc_el else ""
+    desc = desc_el.get_text(" ", strip=True) if desc_el else ""
+    # Verwijder kapotte unicode chars (�) uit teaser
+    desc = desc.replace("�", "").strip()
 
     img_el = card.select_one("img.img-first, img.img-responsive")
     img = ""
@@ -222,6 +224,37 @@ def fetch_category(path, log=print, delay=0.4, session=None, referer=None):
             break
         time.sleep(delay)
     return out
+
+
+def fetch_full_description(url, session=None, log=print):
+    """Haal de volledige productbeschrijving op van een detail-pagina."""
+    s = session or _make_session()
+    if session is None:
+        _warmup(s, log=log)
+    try:
+        r = s.get(url, timeout=30, headers={"Referer": BASE + "/"})
+        if r.status_code != 200:
+            return None
+        soup = BeautifulSoup(r.text, "html.parser")
+        # OpenCart detail page: tab-description of #tab-description
+        for sel in ["#tab-description", ".tab-content #tab-description",
+                     "#description", ".product-description"]:
+            el = soup.select_one(sel)
+            if el:
+                # Behoud HTML voor Odoo description_sale (rijke tekst)
+                return str(el).strip()
+        # Fallback: zoek <h2>Beschrijving</h2> blok
+        h2 = soup.find(lambda t: t.name in ("h2", "h3") and
+                        "beschrijving" in t.get_text(strip=True).lower())
+        if h2:
+            parts = []
+            for sib in h2.find_next_siblings():
+                if sib.name in ("h2", "h3"): break
+                parts.append(str(sib))
+            if parts: return "\n".join(parts)
+    except Exception as e:
+        log(f"  detail fetch faalde {url}: {e}")
+    return None
 
 
 def fetch_all(categories=None, log=print, delay=0.4, between_cats=1.5):
