@@ -1,0 +1,48 @@
+name: VBD Services weekly scrape
+
+on:
+  schedule:
+    - cron: "30 5 * * 1"   # maandag 05:30 UTC = ~06-07 Brussel
+  workflow_dispatch:        # handmatig trigger via UI of API
+
+permissions:
+  contents: write           # nodig om data/ te committen
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install requests beautifulsoup4 cloudscraper
+
+      - name: Run VBD scraper
+        run: |
+          mkdir -p data logs
+          python -X utf8 lib/vbd_scrape_cli.py \
+            --out data/vbd_products.json \
+            --delay 0.6 \
+            --between-cats 1.5 \
+            2>&1 | tee logs/vbd_$(date +%Y-%m-%d).log
+
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/vbd_products.json
+          git diff --cached --quiet || git commit -m "VBD: scrape $(date +%Y-%m-%d) ($(jq -r .total data/vbd_products.json) producten)"
+          git push
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vbd-${{ github.run_number }}
+          path: logs/
+          retention-days: 30

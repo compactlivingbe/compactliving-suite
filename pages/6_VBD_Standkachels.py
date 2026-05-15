@@ -1,5 +1,5 @@
 """VBD Services (Autoterm standkachels) prijssync."""
-import os, sys, csv, base64
+import os, sys, csv, base64, json
 from pathlib import Path
 from datetime import datetime
 import streamlit as st
@@ -23,6 +23,8 @@ DEFAULT_MARGIN = 1.32
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKIP_LIST_PATH = REPO_ROOT / "skip_list_vbd.csv"
+DATA_PATH = REPO_ROOT / "data" / "vbd_products.json"
+GH_WORKFLOW = "vbd_weekly.yml"
 
 # ============ GITHUB PERSISTENT STORAGE ============
 GH_TOKEN = os.environ.get("GH_TOKEN", "")
@@ -172,27 +174,82 @@ with st.expander(f"📋 Skip-list bekijken / bewerken ({SKIP_LIST_PATH.name})", 
             st.rerun()
 
 
-# ============ CONFIG ============
-with st.expander("⚙ Categorieën om te scrapen", expanded=False):
-    st.caption("Standaard alle Autoterm-categorieën. Voeg URL-paden toe (één per regel).")
+# ============ DATA SOURCE ============
+def load_cached_data():
+    if not DATA_PATH.exists():
+        return None
+    try:
+        return json.loads(DATA_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def trigger_github_workflow():
+    if not GH_TOKEN:
+        return False, "Geen GH_TOKEN secret"
+    r = requests.post(
+        f"https://api.github.com/repos/{GH_REPO}/actions/workflows/{GH_WORKFLOW}/dispatches",
+        headers={"Authorization": f"Bearer {GH_TOKEN}",
+                  "Accept": "application/vnd.github+json"},
+        json={"ref": GH_BRANCH}, timeout=15)
+    if r.status_code == 204:
+        return True, "OK"
+    return False, f"HTTP {r.status_code}: {r.text[:200]}"
+
+
+cached = load_cached_data()
+
+st.markdown("### 📊 Databron")
+src_col1, src_col2 = st.columns([3, 2])
+with src_col1:
+    if cached:
+        scraped_at = cached.get("scraped_at", "?")
+        n_cached = cached.get("total", 0)
+        st.success(f"✓ Gecachete scrape — **{n_cached} producten** (van {scraped_at})")
+    else:
+        st.warning("⚠ Nog geen gecachete data — trigger eerst een scrape via GitHub Actions.")
+with src_col2:
+    if st.button("🔄 Trigger nieuwe scrape via GitHub Actions",
+                  type="primary", use_container_width=True):
+        ok, info = trigger_github_workflow()
+        if ok:
+            st.success(f"✓ Workflow gestart — duurt ±2-3 min. Refresh pagina daarna. "
+                        f"Bekijk: https://github.com/{GH_REPO}/actions")
+        else:
+            st.error(f"Trigger faalde: {info}")
+
+with st.expander("⚙ Categorieën / live scrape (alleen bij IP-toegang)", expanded=False):
+    st.caption("Categorieën die door GitHub Actions gescraped worden (default = alle Autoterm). "
+                "Pas DEFAULT_CATEGORIES in lib/vbd_scraper.py aan voor permanente wijziging.")
     cats_text = st.text_area("Categorie-paden", value="\n".join(DEFAULT_CATEGORIES),
-                              height=200, key="vbd_cats")
+                              height=150, key="vbd_cats")
     selected_cats = [c.strip() for c in cats_text.splitlines() if c.strip()]
-    st.caption(f"{len(selected_cats)} categorieën geselecteerd.")
+    st.caption(f"{len(selected_cats)} categorieën — gebruikt door 'Live scrape nu' knop.")
+    lc1, lc2, lc3 = st.columns([2, 2, 1])
+    with lc1:
+        delay = st.slider("Delay tussen pagina's (sec)", 0.0, 3.0, 0.6, 0.1)
+    with lc2:
+        between_cats = st.slider("Pauze tussen categorieën (sec)", 0.5, 5.0, 1.5, 0.5)
+    with lc3:
+        live_run = st.button("▶ Live scrape nu", use_container_width=True,
+                              help="Werkt enkel als jouw IP niet geblokkeerd is door VBD's WAF (Streamlit Cloud meestal wel geblokt).")
 
 
-col1, col2, col3 = st.columns([2, 2, 1])
-with col1:
-    delay = st.slider("Delay tussen pagina's (sec)", 0.0, 3.0, 0.6, 0.1)
-with col2:
-    between_cats = st.slider("Pauze tussen categorieën (sec)", 0.5, 5.0, 1.5, 0.5,
-                              help="Hoger = minder kans op anti-bot 403's.")
-with col3:
-    run_btn = st.button("▶ Scrape + analyseren", type="primary", use_container_width=True)
+# ============ ANALYSE ============
+analyze = st.button("📊 Analyseer (vergelijk gecachete data met Odoo)",
+                     type="primary", use_container_width=True,
+                     disabled=not cached)
 
+if analyze and cached:
+    products = cached["products"]
+    with st.spinner("Vergelijken met Odoo..."):
+        odoo = get_odoo()
+        result = compare_with_odoo(odoo, VBD_PARTNER_ID, products,
+                                     log=lambda m: None)
+    st.session_state["_vbd_result"] = result
+    st.session_state["_vbd_products"] = products
 
-# ============ SCRAPE ============
-if run_btn:
+if live_run:
     log_box = st.empty()
     log_lines = []
 
@@ -200,16 +257,17 @@ if run_btn:
         log_lines.append(str(msg))
         log_box.code("\n".join(log_lines[-30:]), language=None)
 
-    with st.spinner("VBD productlijst ophalen..."):
+    with st.spinner("Live scrape..."):
         products = fetch_all(selected_cats, log=log, delay=delay, between_cats=between_cats)
-    st.success(f"✓ {len(products)} unieke producten gevonden op VBD")
-
-    with st.spinner("Vergelijken met Odoo..."):
-        odoo = get_odoo()
-        result = compare_with_odoo(odoo, VBD_PARTNER_ID, products, log=log)
-
-    st.session_state["_vbd_result"] = result
-    st.session_state["_vbd_products"] = products
+    if products:
+        st.success(f"✓ {len(products)} unieke producten")
+        with st.spinner("Vergelijken met Odoo..."):
+            odoo = get_odoo()
+            result = compare_with_odoo(odoo, VBD_PARTNER_ID, products, log=log)
+        st.session_state["_vbd_result"] = result
+        st.session_state["_vbd_products"] = products
+    else:
+        st.error("Geen producten — vermoedelijk WAF geblokkeerd. Gebruik GitHub Actions ipv live scrape.")
 
 
 # ============ RESULTAAT ============
