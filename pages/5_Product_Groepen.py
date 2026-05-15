@@ -383,6 +383,9 @@ with tab_ai:
     st.caption("ℹ️ Tip: dit veld is `product_tag_ids` op product.template in Odoo. "
                 "Je kan groepen ook direct in Odoo bewerken op de productpagina (sectie 'Algemene info' → tags).")
 
+    skip_tagged = st.checkbox("⏭ Skip producten die al in een groep zitten", value=True,
+                                help="Voorkomt dubbele groepen met dezelfde items")
+
     if st.button("🔍 Analyseer met Claude", type="primary"):
         domain = []
         if categ_filter:
@@ -391,8 +394,15 @@ with tab_ai:
             tmpls = odoo.search_read("product.template", domain,
                                        ["id", "name", "default_code", "product_tag_ids", "seller_ids"],
                                        int(limit), "name")
+        if skip_tagged:
+            n_before = len(tmpls)
+            tmpls = [t for t in tmpls if not t.get("product_tag_ids")]
+            n_skipped = n_before - len(tmpls)
+            if n_skipped:
+                st.caption(f"⏭ {n_skipped} producten overgeslagen (al in een groep). "
+                           f"{len(tmpls)} blijven over voor analyse.")
         if not tmpls:
-            st.warning("Geen producten gevonden voor deze filter.")
+            st.warning("Geen producten gevonden voor deze filter (mogelijk allen al gegroepeerd).")
         else:
             # Resolve suppliers per template
             with st.spinner("Leveranciers ophalen..."):
@@ -505,18 +515,34 @@ Producten:
         groups = st.session_state["_ai_groups"]
         tmpls = st.session_state["_ai_tmpls"]
         name_to_id = {t["name"]: t["id"] for t in tmpls}
+        # Bestaande groepen ophalen voor overlap-detectie
+        existing_tags = {t["name"].lower(): t["id"]
+                          for t in odoo.search_read("product.tag", [], ["id", "name"], 500)}
         for i, g in enumerate(groups):
-            with st.expander(f"📦 {g['groep_naam']} ({len(g['producten'])} producten)", expanded=False):
+            already_exists = g["groep_naam"].lower() in existing_tags
+            badge = " ⚠ groep met deze naam bestaat al" if already_exists else ""
+            with st.expander(f"📦 {g['groep_naam']} ({len(g['producten'])} producten){badge}",
+                              expanded=False):
                 matched_ids = [name_to_id[n] for n in g["producten"] if n in name_to_id]
                 st.write(g["producten"])
-                if st.button(f"➕ Maak deze groep aan in Odoo", key=f"ai_create_{i}"):
+                if already_exists:
+                    st.warning(f"⚠ Een groep met naam '{g['groep_naam']}' bestaat al in Odoo. "
+                               f"Producten worden eraan toegevoegd ipv nieuwe groep maken.")
+                if st.button(f"➕ {'Voeg toe aan bestaande' if already_exists else 'Maak deze groep aan'}",
+                              key=f"ai_create_{i}"):
                     if not matched_ids:
                         st.error("Geen producten gematcht in Odoo (namen kloppen niet exact)")
                     else:
-                        tid = odoo.create("product.tag", {"name": g["groep_naam"]})
+                        tid = (existing_tags[g["groep_naam"].lower()] if already_exists
+                               else odoo.create("product.tag", {"name": g["groep_naam"]}))
+                        added = 0
                         for pid in matched_ids:
                             cur = odoo.read("product.template", [pid], ["product_tag_ids"])[0]
+                            if tid in cur["product_tag_ids"]:
+                                continue  # al in deze groep
                             new_tags = list(set(cur["product_tag_ids"] + [tid]))
                             odoo.write("product.template", [pid],
                                        {"product_tag_ids": [(6, 0, new_tags)]})
-                        st.success(f"✓ Groep '{g['groep_naam']}' aangemaakt met {len(matched_ids)} producten")
+                            added += 1
+                        st.success(f"✓ Groep '{g['groep_naam']}': {added} nieuwe producten toegevoegd "
+                                   f"(van {len(matched_ids)} suggesties)")
