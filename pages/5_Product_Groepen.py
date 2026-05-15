@@ -386,21 +386,41 @@ with tab_ai:
     st.markdown("### 🤖 AI suggereert mogelijke groepen")
     st.caption("Claude scant productnamen en stelt groepen voor van gelijkaardige producten.")
 
+    # Laad alle categorieën met aantal producten erin (cache via session)
+    if "_cats_with_count" not in st.session_state:
+        with st.spinner("Categorieën ophalen..."):
+            cats = odoo.search_read("product.category", [],
+                                     ["id", "complete_name"], 500, "complete_name")
+            counts = {}
+            for c in cats:
+                n = odoo.call("product.template", "search_count",
+                               [[("categ_id", "child_of", c["id"])]])
+                counts[c["id"]] = n
+            st.session_state["_cats_with_count"] = [
+                {**c, "count": counts.get(c["id"], 0)} for c in cats if counts.get(c["id"], 0) > 0
+            ]
+    cats_data = st.session_state["_cats_with_count"]
+
+    st.markdown("##### Selecteer categorieën om te scannen")
+    cat_labels = {f"{c['complete_name']} ({c['count']})": c["id"] for c in cats_data}
+    selected_cat_labels = st.multiselect(
+        "Categorieën (multi-select)", list(cat_labels.keys()),
+        help="Lege selectie = scan alle producten. Per categorie scannen voorkomt rate limits."
+    )
+    selected_cat_ids = [cat_labels[l] for l in selected_cat_labels]
+
     col1, col2, col3 = st.columns(3)
     with col1:
-        categ_filter = st.text_input("Beperk tot categorie (bv. 'Victron'):", value="")
+        limit = st.number_input("Max producten scannen", min_value=20, max_value=2000, value=80, step=20,
+                                  help="Lager = sneller, minder tokens. Default 80 past in 1 batch.")
     with col2:
-        limit = st.number_input("Max producten scannen", min_value=20, max_value=2000, value=150, step=20,
-                                  help="Hoger = vollediger maar duurt langer + meer API-tokens")
-    with col3:
         model_choice = st.selectbox("Model",
                                      ["claude-haiku-4-5", "claude-sonnet-4-6"],
                                      index=0,
-                                     help="Haiku = sneller + minder tokens. Sonnet = preciezer.")
-    batch_size = st.slider("Batch grootte (producten per Claude-call)",
-                            min_value=30, max_value=200, value=80,
-                            help="Lagere batch = vermijdt rate limit (30k tokens/min). "
-                                 "Bij rate-limit error: zet lager.")
+                                     help="Haiku = sneller + 5x goedkoper. Sonnet = preciezer.")
+    with col3:
+        batch_size = st.number_input("Batch grootte", min_value=20, max_value=200, value=60, step=10,
+                                       help="Producten per Claude-call. Lager = veiliger tegen rate limit.")
 
     st.caption("ℹ️ Tip: dit veld is `product_tag_ids` op product.template in Odoo. "
                 "Je kan groepen ook direct in Odoo bewerken op de productpagina (sectie 'Algemene info' → tags).")
@@ -410,8 +430,8 @@ with tab_ai:
 
     if st.button("🔍 Analyseer met Claude", type="primary"):
         domain = []
-        if categ_filter:
-            domain.append(("categ_id.complete_name", "ilike", categ_filter))
+        if selected_cat_ids:
+            domain.append(("categ_id", "child_of", selected_cat_ids))
         with st.spinner("Producten ophalen uit Odoo..."):
             tmpls = odoo.search_read("product.template", domain,
                                        ["id", "name", "default_code", "product_tag_ids", "seller_ids"],
