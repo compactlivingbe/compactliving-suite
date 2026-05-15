@@ -72,31 +72,139 @@ with tab_view:
         sel = st.selectbox("Kies groep", ["(alle groepen overzicht)"] + list(tag_options.keys()))
 
         if sel == "(alle groepen overzicht)":
-            # Overzicht: alle tags met aantal producten + prijsbereik
-            rows = []
-            for t in tags:
-                tmpls = odoo.search_read(
+            view_mode = st.radio(
+                "Weergave:",
+                ["📋 Per groep (alle leden zichtbaar)", "📊 Samenvattende tabel", "🌐 Flat tabel (alles in 1)"],
+                horizontal=True, label_visibility="collapsed",
+            )
+
+            # Eénmaal alle data ophalen
+            with st.spinner("Producten + leveranciers ophalen..."):
+                # Alle templates met minstens één tag
+                all_tag_ids = [t["id"] for t in tags]
+                all_tmpls = odoo.search_read(
                     "product.template",
-                    [("product_tag_ids", "in", [t["id"]])],
-                    ["id", "name", "list_price", "standard_price"], 100
+                    [("product_tag_ids", "in", all_tag_ids)],
+                    ["id", "name", "default_code", "list_price", "standard_price",
+                     "qty_available", "categ_id", "product_tag_ids", "seller_ids"], 1000
                 )
-                if not tmpls: continue
-                prices_in = [p["standard_price"] for p in tmpls if p["standard_price"]]
-                prices_out = [p["list_price"] for p in tmpls if p["list_price"]]
-                rows.append({
-                    "Groep": t["name"],
-                    "# producten": len(tmpls),
-                    "Inkoop laagst": fmt_eur(min(prices_in)) if prices_in else "—",
-                    "Inkoop hoogst": fmt_eur(max(prices_in)) if prices_in else "—",
-                    "Verkoop laagst": fmt_eur(min(prices_out)) if prices_out else "—",
-                    "Verkoop hoogst": fmt_eur(max(prices_out)) if prices_out else "—",
-                    "Marge spread": f"{((max(prices_out)-min(prices_in))/min(prices_in)*100):.0f}%"
-                                     if prices_in and prices_out and min(prices_in) > 0 else "—",
-                })
-            if rows:
-                st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
-            else:
-                st.info("Geen producten in groepen.")
+                # Supplier info per template
+                all_si_ids = sum((t["seller_ids"] for t in all_tmpls), [])
+                sis = odoo.search_read("product.supplierinfo",
+                                        [("id", "in", all_si_ids)],
+                                        ["product_tmpl_id", "partner_id",
+                                         "product_code", "price", "delay"]
+                                        ) if all_si_ids else []
+                sup_per_tmpl = {}
+                for s in sis:
+                    tid = s["product_tmpl_id"][0] if s["product_tmpl_id"] else None
+                    if tid:
+                        sup_per_tmpl.setdefault(tid, []).append(s)
+
+            # Group templates per tag
+            tmpls_per_tag = {t["id"]: [] for t in tags}
+            for tmpl in all_tmpls:
+                for tid in tmpl.get("product_tag_ids", []):
+                    if tid in tmpls_per_tag:
+                        tmpls_per_tag[tid].append(tmpl)
+
+            def _row_for(tmpl):
+                sups = sup_per_tmpl.get(tmpl["id"], [])
+                cheapest = min(sups, key=lambda s: s.get("price") or 9e9) if sups else None
+                marge = ""
+                if tmpl["standard_price"] and tmpl["list_price"]:
+                    marge = f"{((tmpl['list_price']-tmpl['standard_price'])/tmpl['standard_price']*100):.0f}%"
+                return {
+                    "Code": tmpl.get("default_code") or "—",
+                    "Product": tmpl["name"],
+                    "Categorie": tmpl["categ_id"][1].split(" / ")[-1] if tmpl.get("categ_id") else "",
+                    "Inkoop": tmpl["standard_price"],
+                    "Verkoop": tmpl["list_price"],
+                    "Marge": marge,
+                    "Voorraad": int(tmpl.get("qty_available") or 0),
+                    "Goedkoopste": (
+                        f"{cheapest['partner_id'][1]}: {fmt_eur(cheapest['price'])}"
+                        if cheapest else "—"
+                    ),
+                    "# Lev.": len(sups),
+                }
+
+            if view_mode == "📋 Per groep (alle leden zichtbaar)":
+                # Eén tabel per groep, gestapeld, sortable
+                shown = 0
+                for t in tags:
+                    members = tmpls_per_tag.get(t["id"], [])
+                    if not members: continue
+                    shown += 1
+                    prices_in = [m["standard_price"] for m in members if m["standard_price"]]
+                    spread = ""
+                    if prices_in and len(prices_in) > 1 and min(prices_in) > 0:
+                        spread = f" — spread {((max(prices_in)-min(prices_in))/min(prices_in)*100):.0f}%"
+                    st.markdown(f"#### 🔗 {t['name']} ({len(members)} producten{spread})")
+                    rows = sorted([_row_for(m) for m in members],
+                                   key=lambda r: r["Inkoop"] or 0)
+                    st.dataframe(
+                        pd.DataFrame(rows), hide_index=True, use_container_width=True,
+                        column_config={
+                            "Inkoop": st.column_config.NumberColumn(format="€ %.2f"),
+                            "Verkoop": st.column_config.NumberColumn(format="€ %.2f"),
+                            "Voorraad": st.column_config.NumberColumn(format="%d"),
+                        }
+                    )
+                if shown == 0:
+                    st.info("Geen producten in groepen. Voeg toe via tab 'Beheer'.")
+
+            elif view_mode == "📊 Samenvattende tabel":
+                rows = []
+                for t in tags:
+                    members = tmpls_per_tag.get(t["id"], [])
+                    if not members: continue
+                    prices_in = [m["standard_price"] for m in members if m["standard_price"]]
+                    prices_out = [m["list_price"] for m in members if m["list_price"]]
+                    rows.append({
+                        "Groep": t["name"],
+                        "# producten": len(members),
+                        "Inkoop laag": fmt_eur(min(prices_in)) if prices_in else "—",
+                        "Inkoop hoog": fmt_eur(max(prices_in)) if prices_in else "—",
+                        "Verkoop laag": fmt_eur(min(prices_out)) if prices_out else "—",
+                        "Verkoop hoog": fmt_eur(max(prices_out)) if prices_out else "—",
+                        "Marge spread": f"{((max(prices_out)-min(prices_in))/min(prices_in)*100):.0f}%"
+                                         if prices_in and prices_out and min(prices_in) > 0 else "—",
+                    })
+                if rows:
+                    st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+                else:
+                    st.info("Geen producten in groepen.")
+
+            else:  # Flat tabel
+                tag_name_by_id = {t["id"]: t["name"] for t in tags}
+                rows = []
+                for tmpl in all_tmpls:
+                    base = _row_for(tmpl)
+                    tag_names = ", ".join(tag_name_by_id.get(tid, "?")
+                                          for tid in tmpl.get("product_tag_ids", []))
+                    rows.append({"Groep": tag_names, **base})
+                if rows:
+                    df = pd.DataFrame(rows)
+                    # Filter
+                    flt = st.text_input("🔍 Filter (groep, product, code, leverancier)",
+                                         placeholder="bv. switch, victron, top systems")
+                    if flt:
+                        mask = df.apply(
+                            lambda r: flt.lower() in " ".join(str(v) for v in r.values).lower(),
+                            axis=1
+                        )
+                        df = df[mask]
+                    st.caption(f"{len(df)} rijen")
+                    st.dataframe(df.sort_values(["Groep", "Inkoop"]),
+                                  hide_index=True, use_container_width=True,
+                                  column_config={
+                                      "Inkoop": st.column_config.NumberColumn(format="€ %.2f"),
+                                      "Verkoop": st.column_config.NumberColumn(format="€ %.2f"),
+                                      "Voorraad": st.column_config.NumberColumn(format="%d"),
+                                  })
+                else:
+                    st.info("Geen producten in groepen.")
         else:
             tag_id = tag_options[sel]
             tag = next(t for t in tags if t["id"] == tag_id)
