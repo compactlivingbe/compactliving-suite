@@ -114,6 +114,13 @@ with c2:
         st.caption("AI suggereert automatisch mogelijke groepen.")
         st.page_link("pages/5_Product_Groepen.py", label="Open →", icon="🔗")
 
+    with st.container(border=True):
+        st.markdown("#### 🔥 VBD Standkachels")
+        st.write("Scrape vbdservices.nl (Autoterm + accessoires) → vergelijk met Odoo. "
+                 "Importeer ontbrekende producten, update kost- en verkoopprijzen.")
+        st.caption("Openbare prijzen incl BTW; kost = excl BTW (NL 21%).")
+        st.page_link("pages/6_VBD_Standkachels.py", label="Open →", icon="🔥")
+
 st.divider()
 
 # Quick links
