@@ -21,3 +21,16 @@ VBD A 0019,TENERE PERFORMA 3D60 WATER HEATER 12V,niet nodig,2026-05-15
 VBD RS,RS Jachttechniek G12+ Longlife koelvloeistof 5 Liter MM-F,niet nodig,2026-05-15
 VBD M 0004,Koelwaterslang 16mm,niet nodig,2026-05-15
 VBD M 0005,Koelwaterslang 19mm,niet nodig,2026-05-15
+VBD AT 0027/0028,AUTOTERM Flow 14d-PU-27,niet nodig,2026-05-15
+VBD P 0028,Warm waterset 3ltr/2d/230V/500W,niet nodig,2026-05-15
+VBD P 0021,Warm waterset 6ltr/2d/230V/500W,niet nodig,2026-05-15
+VBD P 0023,Warm waterset 9ltr/2d/230V/500W,niet nodig,2026-05-15
+VBD AT 0034/0035,Autoterm Flow 5d 12V/24V losse kachel,niet nodig,2026-05-15
+VBD W 0012,Thermostaat aan/uit voor Flow 5d,niet nodig,2026-05-15
+VBD MA 0001,RVS warmtewisselaar met 10 platen 22KW,niet nodig,2026-05-15
+VBD A 0022,Convector zonder ventilator 1m lang,niet nodig,2026-05-15
+VBD A 0037,"Convector zonder ventilator 1,5m lang",niet nodig,2026-05-15
+VBD A 0104,ventilatorsnelheidsregelaar Autoterm FC9,niet nodig,2026-05-15
+VBD A 0105,thermische ventilatorcontroller Autoterm CHM36,niet nodig,2026-05-15
+VBD MA 0004,Warmtewisselaar van rvs 20 platen max. 115 kW platenwarmtewisselaar RVS,niet nodig,2026-05-15
+VBD MA 0003,Warmtewisselaar van rvs 30 platen max. 66 kW platenwarmtewisselaar RVS,niet nodig,2026-05-15
