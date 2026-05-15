@@ -46,8 +46,25 @@ tab_view, tab_manage, tab_ai = st.tabs([
 
 # ============ TAB 1: VIEW ============
 with tab_view:
-    # Load all tags
-    tags = odoo.search_read("product.tag", [], ["id", "name"], 500, "name")
+    # Load all tags - probeer verschillende model namen voor verschillende Odoo versies
+    tags = []
+    last_err = None
+    for model in ["product.tag", "product.template.tag", "product.category"]:
+        try:
+            tags = odoo.search_read(model, [], ["id", "name"], 500, "name")
+            if model != "product.tag":
+                st.warning(f"⚠ Model 'product.tag' werkt niet in deze Odoo. Gebruikt fallback: '{model}'.")
+            st.session_state["_tag_model"] = model
+            break
+        except Exception as e:
+            last_err = e
+            continue
+    if not tags and last_err:
+        st.error(f"Kan geen product groepen ophalen. Last error: {last_err}")
+        st.caption("Mogelijk: model 'product.tag' bestaat niet in deze Odoo versie, "
+                   "of de API user heeft geen rechten. Open Odoo → Apps → installeer 'Product Tags' "
+                   "of stel een andere user in via ODOO_LOGIN.")
+        st.stop()
     if not tags:
         st.info("Nog geen product groepen aangemaakt. Ga naar tabblad **Beheer** om er een te maken.")
     else:
