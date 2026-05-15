@@ -30,29 +30,103 @@ def get_odoo():
 
 
 # ============ SKIP LIST ============
+def _read_skip_rows():
+    """Returns (rows, header_lines). rows = list of dicts with code/description/reason/date_added."""
+    if not SKIP_LIST_PATH.exists():
+        return [], ["code,description,reason,date_added"]
+    text = SKIP_LIST_PATH.read_text(encoding="utf-8")
+    rows, header_lines = [], []
+    for ln in text.splitlines():
+        s = ln.strip()
+        if not s or s.startswith("#") or s.startswith("code,"):
+            header_lines.append(ln)
+            continue
+        # CSV parse — backwards compat: oude lijst had code,reason,date_added (3 kolommen)
+        parts = next(csv.reader([ln]))
+        if len(parts) >= 4:
+            code, desc, reason, dt = parts[0], parts[1], parts[2], parts[3]
+        elif len(parts) == 3:
+            # oude formaat: code,reason,date
+            code, desc, reason, dt = parts[0], "", parts[1], parts[2]
+        elif len(parts) == 2:
+            code, desc, reason, dt = parts[0], "", parts[1], ""
+        else:
+            code, desc, reason, dt = parts[0], "", "", ""
+        rows.append({"code": code, "description": desc, "reason": reason, "date_added": dt})
+    return rows, header_lines
+
+
+def _write_skip_rows(rows, header_lines=None):
+    lines = list(header_lines or ["code,description,reason,date_added"])
+    # Vervang oude header door nieuwe als die niet aanwezig is
+    if not any(ln.startswith("code,") for ln in lines):
+        lines.insert(0, "code,description,reason,date_added")
+    # Verwijder eventuele oude header
+    lines = [ln for ln in lines if not ln.startswith("code,reason,date_added")]
+    if not any(ln.startswith("code,description") for ln in lines):
+        lines.insert(0, "code,description,reason,date_added")
+    out = "\n".join(lines) + "\n"
+    buf = []
+    w = csv.writer(_StringWriter(buf))
+    for r in rows:
+        w.writerow([r["code"], r["description"], r["reason"], r["date_added"]])
+    out += "".join(buf)
+    SKIP_LIST_PATH.write_text(out, encoding="utf-8")
+
+
+class _StringWriter:
+    def __init__(self, buf): self.buf = buf
+    def write(self, s): self.buf.append(s)
+
+
 with st.expander(f"📋 Skip-list bekijken / bewerken ({SKIP_LIST_PATH.name})", expanded=False):
     st.caption("Codes in deze lijst worden NIET als 'missing' Victron product behandeld.")
-    if SKIP_LIST_PATH.exists():
-        current = SKIP_LIST_PATH.read_text(encoding="utf-8")
-        n_codes = sum(1 for ln in current.splitlines()
-                      if ln.strip() and not ln.strip().startswith("#") and not ln.startswith("code,"))
-        st.info(f"📊 {n_codes} codes in skip-list")
-    else:
-        current = "code,reason,date_added\n"
-    edited_skip = st.text_area("Bewerk skip-list", value=current, height=200, key="skiplist_edit")
-    if st.button("💾 Opslaan skip-list", key="save_skip"):
-        SKIP_LIST_PATH.write_text(edited_skip, encoding="utf-8")
-        st.success(f"✓ Opgeslagen ({n_codes if SKIP_LIST_PATH.exists() else 0} codes)")
-        st.rerun()
+    skip_rows, skip_headers = _read_skip_rows()
+    st.info(f"📊 {len(skip_rows)} codes in skip-list")
+    if skip_rows:
+        skip_df = pd.DataFrame(skip_rows)
+        skip_df.insert(0, "Verwijder", False)
+        edited_skip = st.data_editor(
+            skip_df, hide_index=True, use_container_width=True,
+            disabled=["code", "date_added"],
+            column_config={
+                "Verwijder": st.column_config.CheckboxColumn(width="small"),
+                "code": st.column_config.TextColumn(width="small"),
+                "description": st.column_config.TextColumn("Beschrijving", width="large"),
+                "reason": st.column_config.TextColumn("Reden"),
+                "date_added": st.column_config.TextColumn("Toegevoegd", width="small"),
+            },
+            key="skiplist_table",
+        )
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("💾 Wijzigingen opslaan", key="save_skip"):
+                kept = [r for _, r in edited_skip.iterrows() if not r["Verwijder"]]
+                _write_skip_rows([{"code": r["code"], "description": r["description"],
+                                    "reason": r["reason"], "date_added": r["date_added"]}
+                                   for r in kept], skip_headers)
+                st.success(f"✓ Opgeslagen ({len(kept)} codes)")
+                st.rerun()
+        with c2:
+            n_del = int(edited_skip["Verwijder"].sum()) if not edited_skip.empty else 0
+            st.caption(f"{n_del} aangevinkt om te verwijderen")
+    # Raw editor als fallback
+    with st.expander("Raw CSV bewerken", expanded=False):
+        raw = SKIP_LIST_PATH.read_text(encoding="utf-8") if SKIP_LIST_PATH.exists() else ""
+        new_raw = st.text_area("CSV", value=raw, height=200, key="skiplist_raw")
+        if st.button("💾 Raw opslaan", key="save_skip_raw"):
+            SKIP_LIST_PATH.write_text(new_raw, encoding="utf-8")
+            st.success("✓ Opgeslagen")
+            st.rerun()
 
 
-def add_to_skip_list(code, reason=""):
-    cur = SKIP_LIST_PATH.read_text(encoding="utf-8") if SKIP_LIST_PATH.exists() else "code,reason,date_added\n"
-    if code in cur:
-        return False  # al aanwezig
-    today = datetime.now().strftime("%Y-%m-%d")
-    cur += f"{code},{reason},{today}\n"
-    SKIP_LIST_PATH.write_text(cur, encoding="utf-8")
+def add_to_skip_list(code, reason="", description=""):
+    rows, headers = _read_skip_rows()
+    if any(r["code"] == code for r in rows):
+        return False
+    rows.append({"code": code, "description": description, "reason": reason,
+                  "date_added": datetime.now().strftime("%Y-%m-%d")})
+    _write_skip_rows(rows, headers)
     return True
 
 
@@ -200,7 +274,8 @@ if st.session_state.get("_ts_analyzed") or any(REPORTS_DIR.glob("missing_*.csv")
                     if st.button(f"🚫 Voeg {len(sel)} toe aan skip-list", key="skip_miss"):
                         added = 0
                         for _, r in sel.iterrows():
-                            if add_to_skip_list(str(r["code"]), reason):
+                            desc = str(r.get("description", "")).strip()
+                            if add_to_skip_list(str(r["code"]), reason, desc):
                                 added += 1
                         st.success(f"✓ {added} codes toegevoegd aan skip-list")
                         st.rerun()
