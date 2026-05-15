@@ -1,9 +1,10 @@
 """Top Systems Victron prijssync — interactief rapport."""
-import os, sys, subprocess, tempfile, urllib.request, json, csv
+import os, sys, subprocess, tempfile, urllib.request, json, csv, base64
 from pathlib import Path
 from datetime import datetime
 import streamlit as st
 import pandas as pd
+import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from odoo_client import OdooClient
@@ -22,6 +23,72 @@ REPORTS_DIR = REPO_ROOT / "reports"
 REPORTS_DIR.mkdir(exist_ok=True)
 TS_PARTNER_ID = 690  # Top Systems BV
 DEFAULT_MARGIN = 1.32  # 32% marge default voor verkoopprijs
+
+# ============ GITHUB PERSISTENT STORAGE ============
+GH_TOKEN = os.environ.get("GH_TOKEN", "")
+GH_REPO = os.environ.get("GH_REPO", "compactlivingbe/compactliving-suite")
+GH_BRANCH = os.environ.get("GH_BRANCH", "main")
+GH_FILE_PATH = "skip_list.csv"
+
+
+def gh_pull_skip_list():
+    """Haal de actuele skip_list.csv op van GitHub (laatst gecommitte versie).
+    Schrijft naar lokaal bestand zodat we altijd met de echte source-of-truth werken."""
+    if not GH_TOKEN:
+        return None
+    try:
+        r = requests.get(
+            f"https://api.github.com/repos/{GH_REPO}/contents/{GH_FILE_PATH}",
+            headers={"Authorization": f"Bearer {GH_TOKEN}",
+                      "Accept": "application/vnd.github+json"},
+            params={"ref": GH_BRANCH}, timeout=15,
+        )
+        if r.status_code == 200:
+            d = r.json()
+            content = base64.b64decode(d["content"]).decode("utf-8")
+            SKIP_LIST_PATH.write_text(content, encoding="utf-8")
+            return d["sha"]
+    except Exception as e:
+        st.warning(f"GitHub pull faalde: {e}")
+    return None
+
+
+def gh_push_skip_list(commit_msg):
+    """Push lokale skip_list.csv naar GitHub via Contents API."""
+    if not GH_TOKEN:
+        return False, "Geen GH_TOKEN secret ingesteld"
+    try:
+        # Eerst sha ophalen
+        r = requests.get(
+            f"https://api.github.com/repos/{GH_REPO}/contents/{GH_FILE_PATH}",
+            headers={"Authorization": f"Bearer {GH_TOKEN}",
+                      "Accept": "application/vnd.github+json"},
+            params={"ref": GH_BRANCH}, timeout=15,
+        )
+        sha = r.json()["sha"] if r.status_code == 200 else None
+        content = SKIP_LIST_PATH.read_text(encoding="utf-8")
+        body = {"message": commit_msg,
+                "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+                "branch": GH_BRANCH}
+        if sha:
+            body["sha"] = sha
+        r = requests.put(
+            f"https://api.github.com/repos/{GH_REPO}/contents/{GH_FILE_PATH}",
+            headers={"Authorization": f"Bearer {GH_TOKEN}",
+                      "Accept": "application/vnd.github+json"},
+            json=body, timeout=20,
+        )
+        if r.status_code in (200, 201):
+            return True, r.json()["commit"]["sha"][:7]
+        return False, f"HTTP {r.status_code}: {r.text[:200]}"
+    except Exception as e:
+        return False, str(e)
+
+
+# Pull-on-load: zodat container-restarts altijd actuele lijst hebben
+if GH_TOKEN and "_skip_pulled" not in st.session_state:
+    gh_pull_skip_list()
+    st.session_state["_skip_pulled"] = True
 
 
 def get_odoo():
@@ -81,6 +148,11 @@ class _StringWriter:
 
 with st.expander(f"📋 Skip-list bekijken / bewerken ({SKIP_LIST_PATH.name})", expanded=False):
     st.caption("Codes in deze lijst worden NIET als 'missing' Victron product behandeld.")
+    if GH_TOKEN:
+        st.success(f"☁ Persistent opslag actief — wijzigingen worden gepusht naar `{GH_REPO}` ({GH_BRANCH})")
+    else:
+        st.warning("⚠ Geen `GH_TOKEN` secret ingesteld — wijzigingen gaan verloren bij container restart. "
+                    "Stel een GitHub fine-grained PAT in (repo Contents: write) als `GH_TOKEN` in Streamlit secrets.")
     skip_rows, skip_headers = _read_skip_rows()
     st.info(f"📊 {len(skip_rows)} codes in skip-list")
     if skip_rows:
@@ -102,10 +174,17 @@ with st.expander(f"📋 Skip-list bekijken / bewerken ({SKIP_LIST_PATH.name})", 
         with c1:
             if st.button("💾 Wijzigingen opslaan", key="save_skip"):
                 kept = [r for _, r in edited_skip.iterrows() if not r["Verwijder"]]
+                n_removed = len(skip_rows) - len(kept)
                 _write_skip_rows([{"code": r["code"], "description": r["description"],
                                     "reason": r["reason"], "date_added": r["date_added"]}
                                    for r in kept], skip_headers)
-                st.success(f"✓ Opgeslagen ({len(kept)} codes)")
+                if GH_TOKEN:
+                    ok, info = gh_push_skip_list(
+                        f"Skip-list update: {len(kept)} codes (-{n_removed}) via Streamlit")
+                    if ok: st.success(f"✓ Opgeslagen + gepusht naar GitHub ({info})")
+                    else: st.error(f"Lokaal opgeslagen maar GitHub push faalde: {info}")
+                else:
+                    st.success(f"✓ Lokaal opgeslagen ({len(kept)} codes) — NB: niet persistent zonder GH_TOKEN")
                 st.rerun()
         with c2:
             n_del = int(edited_skip["Verwijder"].sum()) if not edited_skip.empty else 0
@@ -116,7 +195,12 @@ with st.expander(f"📋 Skip-list bekijken / bewerken ({SKIP_LIST_PATH.name})", 
         new_raw = st.text_area("CSV", value=raw, height=200, key="skiplist_raw")
         if st.button("💾 Raw opslaan", key="save_skip_raw"):
             SKIP_LIST_PATH.write_text(new_raw, encoding="utf-8")
-            st.success("✓ Opgeslagen")
+            if GH_TOKEN:
+                ok, info = gh_push_skip_list("Skip-list raw edit via Streamlit")
+                if ok: st.success(f"✓ Opgeslagen + gepusht naar GitHub ({info})")
+                else: st.error(f"Lokaal opgeslagen maar GitHub push faalde: {info}")
+            else:
+                st.success("✓ Lokaal opgeslagen (niet persistent zonder GH_TOKEN)")
             st.rerun()
 
 
@@ -277,7 +361,14 @@ if st.session_state.get("_ts_analyzed") or any(REPORTS_DIR.glob("missing_*.csv")
                             desc = str(r.get("description", "")).strip()
                             if add_to_skip_list(str(r["code"]), reason, desc):
                                 added += 1
-                        st.success(f"✓ {added} codes toegevoegd aan skip-list")
+                        if GH_TOKEN and added:
+                            ok, info = gh_push_skip_list(
+                                f"Skip-list: +{added} codes via Streamlit ({reason})")
+                            if ok: st.success(f"✓ {added} toegevoegd + gepusht naar GitHub ({info})")
+                            else: st.error(f"{added} lokaal toegevoegd maar GitHub push faalde: {info}")
+                        else:
+                            st.success(f"✓ {added} codes toegevoegd aan skip-list"
+                                        + ("" if GH_TOKEN else " (niet persistent zonder GH_TOKEN)"))
                         st.rerun()
 
     # --------- TAB 2: COST DIFFS ---------
