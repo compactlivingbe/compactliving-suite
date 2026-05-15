@@ -1,5 +1,8 @@
-"""Odoo XML-RPC client - werkt met API-key (anders dan JSON-RPC sessie-auth)."""
+"""Odoo XML-RPC client - werkt met API-key (anders dan JSON-RPC sessie-auth).
+Auto-recovery van http.client.CannotSendRequest (cached connectie kapot na onderbroken call).
+"""
 import xmlrpc.client
+import http.client
 from typing import Any
 
 
@@ -9,16 +12,29 @@ class OdooClient:
         self.db = db
         self.login = login
         self.api_key = api_key
+        self._reconnect()
+
+    def _reconnect(self):
+        """(Her)maak XMLRPC proxies + authenticate."""
         self.common = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/common", allow_none=True)
         self.models = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/object", allow_none=True)
-        self.uid = self.common.authenticate(db, login, api_key, {})
+        self.uid = self.common.authenticate(self.db, self.login, self.api_key, {})
         if not self.uid:
-            raise RuntimeError(f"Auth failed (uid=False) for {login}@{db}")
+            raise RuntimeError(f"Auth failed (uid=False) for {self.login}@{self.db}")
 
     def call(self, model: str, method: str, args: list = None, kwargs: dict = None) -> Any:
         args = args or []
         kwargs = kwargs or {}
-        return self.models.execute_kw(self.db, self.uid, self.api_key, model, method, args, kwargs)
+        try:
+            return self.models.execute_kw(self.db, self.uid, self.api_key, model, method, args, kwargs)
+        except (http.client.CannotSendRequest, http.client.ResponseNotReady,
+                ConnectionError, BrokenPipeError, OSError) as e:
+            # Connectie kapot -> herverbind + retry 1x
+            try:
+                self._reconnect()
+            except Exception:
+                raise e
+            return self.models.execute_kw(self.db, self.uid, self.api_key, model, method, args, kwargs)
 
     def search_read(self, model: str, domain: list, fields: list, limit: int = 100, order: str = None) -> list:
         kwargs = {"limit": limit}
@@ -41,7 +57,6 @@ class OdooClient:
             res = self.search_read("res.partner", [("vat", "=", vat)], ["id", "name", "vat"], 5)
             if res:
                 return res[0]
-        # Fallback op naam (leveranciers met supplier_rank > 0)
         res = self.search_read(
             "res.partner",
             [("supplier_rank", ">", 0), ("name", "ilike", name)],
