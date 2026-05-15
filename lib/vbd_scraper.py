@@ -80,7 +80,12 @@ def _parse_card(card):
     desc = desc_el.get_text(" ", strip=True)[:300] if desc_el else ""
 
     img_el = card.select_one("img.img-first, img.img-responsive")
-    img = img_el.get("src", "") if img_el else ""
+    img = ""
+    if img_el:
+        # Probeer hogere resolutie uit srcset (2x = 500x500)
+        srcset = img_el.get("srcset", "")
+        m = re.search(r"(https?://\S+?)\s+2x", srcset)
+        img = m.group(1) if m else img_el.get("src", "")
 
     return {
         "sku": sku, "name": name, "brand": brand,

@@ -259,7 +259,8 @@ if "_vbd_result" in st.session_state:
                     "price_incl": st.column_config.NumberColumn("Incl BTW", format="€ %.2f"),
                     "price_excl": st.column_config.NumberColumn("Excl BTW (kost)", format="€ %.2f"),
                     "url": st.column_config.LinkColumn("Bekijk"),
-                    "image_url": None, "category": None, "description": None,
+                    "image_url": st.column_config.ImageColumn("Foto", width="small"),
+                    "category": None, "description": None,
                 },
                 key="vbd_miss_editor",
             )
@@ -273,6 +274,10 @@ if "_vbd_result" in st.session_state:
                     "Gebruik VBD incl-BTW prijs als verkoopprijs (i.p.v. kost × marge)",
                     value=False, key="vbd_use_incl",
                     help="Aanvinken als jullie dezelfde verkoopprijs willen aanhouden als VBD.")
+                include_image = st.checkbox(
+                    "📷 Productfoto van VBD mee importeren",
+                    value=True, key="vbd_include_img",
+                    help="Download foto en zet als hoofdafbeelding van het product.")
                 act_col1, act_col2 = st.columns(2)
                 with act_col1:
                     if st.button(f"➕ Voeg {len(sel)} toe in Odoo", key="vbd_add_miss", type="primary"):
@@ -284,7 +289,7 @@ if "_vbd_result" in st.session_state:
                                     sale = float(r["price_incl"])
                                 else:
                                     sale = round(cost * margin, 2)
-                                tid = odoo.create("product.template", {
+                                vals = {
                                     "name": str(r["name"]).strip(),
                                     "default_code": str(r["sku"]).strip(),
                                     "type": "consu",
@@ -292,7 +297,16 @@ if "_vbd_result" in st.session_state:
                                     "standard_price": cost,
                                     "list_price": sale,
                                     "description_sale": str(r.get("description") or "")[:1000],
-                                })
+                                }
+                                if include_image and r.get("image_url"):
+                                    try:
+                                        img_r = requests.get(str(r["image_url"]), timeout=15,
+                                                              headers={"User-Agent": "Mozilla/5.0"})
+                                        if img_r.status_code == 200 and img_r.content:
+                                            vals["image_1920"] = base64.b64encode(img_r.content).decode("ascii")
+                                    except Exception as ie:
+                                        st.warning(f"  {r['sku']}: foto download faalde ({ie})")
+                                tid = odoo.create("product.template", vals)
                                 odoo.create("product.supplierinfo", {
                                     "partner_id": VBD_PARTNER_ID,
                                     "product_tmpl_id": tid,
