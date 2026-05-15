@@ -13,6 +13,31 @@ require_auth()
 st.title("💰 Top Systems Victron prijssync")
 st.caption("Vergelijk Top Systems XML productlijst met Odoo + update Victron prijzen.")
 
+# Skip-list management
+SKIP_LIST_PATH = Path(__file__).resolve().parent.parent / "skip_list.csv"
+with st.expander(f"📋 Skip-list bekijken / bewerken ({SKIP_LIST_PATH.name})", expanded=False):
+    st.caption("Codes in deze lijst worden NIET geïmporteerd als 'missing' Victron product. "
+               "Eerste regel = headers, # = commentaar.")
+    if SKIP_LIST_PATH.exists():
+        current = SKIP_LIST_PATH.read_text(encoding="utf-8")
+        n_codes = sum(1 for ln in current.splitlines()
+                      if ln.strip() and not ln.strip().startswith("#") and not ln.startswith("code,"))
+        st.info(f"📊 {n_codes} codes in skip-list")
+    else:
+        current = "code,reason,date_added\n"
+        st.warning("skip_list.csv bestaat niet — wordt aangemaakt bij opslag.")
+    edited = st.text_area("Bewerk skip-list", value=current, height=300, key="skiplist_edit")
+    sk_col1, sk_col2 = st.columns([1, 4])
+    with sk_col1:
+        if st.button("💾 Opslaan", key="save_skip"):
+            SKIP_LIST_PATH.write_text(edited, encoding="utf-8")
+            st.success(f"✓ Opgeslagen ({SKIP_LIST_PATH})")
+            st.caption("⚠ Op Streamlit Cloud: tijdelijk tot redeploy. Voor permanent: commit + push naar Git.")
+            st.rerun()
+    with sk_col2:
+        st.caption("Op Streamlit Cloud blijven wijzigingen alleen in deze sessie. "
+                    "Voor permanent: edit het bestand in GitHub of run lokaal + commit.")
+
 xml_url_env = os.environ.get("TOPSYSTEMS_XML_URL", "")
 col1, col2 = st.columns([3, 1])
 with col1:
