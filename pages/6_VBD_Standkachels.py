@@ -176,19 +176,21 @@ with st.expander(f"📋 Skip-list bekijken / bewerken ({SKIP_LIST_PATH.name})", 
 
 # ============ DATA SOURCE ============
 def gh_pull_data():
-    """Haal data/vbd_products.json live van GitHub (omzeilt Streamlit container cache)."""
+    """Haal data/vbd_products.json live van GitHub via raw-endpoint (werkt voor alle groottes)."""
     if not GH_TOKEN: return None
     try:
         r = requests.get(
             f"https://api.github.com/repos/{GH_REPO}/contents/data/vbd_products.json",
             headers={"Authorization": f"Bearer {GH_TOKEN}",
-                      "Accept": "application/vnd.github+json"},
-            params={"ref": GH_BRANCH}, timeout=20)
-        if r.status_code == 200:
-            content = base64.b64decode(r.json()["content"]).decode("utf-8")
+                      "Accept": "application/vnd.github.raw"},
+            params={"ref": GH_BRANCH}, timeout=30)
+        if r.status_code == 200 and r.text.strip().startswith("{"):
             DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
-            DATA_PATH.write_text(content, encoding="utf-8")
-            return r.json().get("sha", "")[:7]
+            DATA_PATH.write_text(r.text, encoding="utf-8")
+            return "ok"
+        else:
+            st.warning(f"GitHub data-pull: HTTP {r.status_code} ({len(r.text)} bytes, "
+                        f"start: {r.text[:80]!r})")
     except Exception as e:
         st.warning(f"GitHub data-pull faalde: {e}")
     return None
@@ -235,7 +237,10 @@ with src_col2:
     if st.button("⟳ Refresh", use_container_width=True,
                   help="Haal laatste data live van GitHub op (na GH Actions run)."):
         st.session_state.pop("_vbd_data_pulled", None)
-        load_cached_data(force_pull=True)
+        result = gh_pull_data()
+        if result:
+            new = load_cached_data()
+            st.success(f"✓ Gepulld: {new.get('total','?')} producten van {new.get('scraped_at','?')}")
         st.rerun()
 with src_col3:
     if st.button("🔄 GH Actions", type="primary", use_container_width=True,
