@@ -1,0 +1,4 @@
+sku,description,reason,date_added
+# Plaats hier VBD Services SKU's die NIET als ontbrekend product behandeld mogen worden.
+# Voorbeeld:
+# VBD P 0001,APK luchtslang 60mm,niet nodig,2026-05-15
