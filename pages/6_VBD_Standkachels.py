@@ -176,8 +176,12 @@ with st.expander(f"📋 Skip-list bekijken / bewerken ({SKIP_LIST_PATH.name})", 
 
 # ============ DATA SOURCE ============
 def gh_pull_data():
-    """Haal data/vbd_products.json live van GitHub via raw-endpoint (werkt voor alle groottes)."""
-    if not GH_TOKEN: return None
+    """Haal data/vbd_products.json live van GitHub via raw-endpoint.
+    Returnt (success, message). Schrijft message ook naar session_state."""
+    if not GH_TOKEN:
+        msg = "Geen GH_TOKEN secret"
+        st.session_state["_vbd_pull_msg"] = ("warn", msg)
+        return False, msg
     try:
         r = requests.get(
             f"https://api.github.com/repos/{GH_REPO}/contents/data/vbd_products.json",
@@ -187,13 +191,21 @@ def gh_pull_data():
         if r.status_code == 200 and r.text.strip().startswith("{"):
             DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
             DATA_PATH.write_text(r.text, encoding="utf-8")
-            return "ok"
-        else:
-            st.warning(f"GitHub data-pull: HTTP {r.status_code} ({len(r.text)} bytes, "
-                        f"start: {r.text[:80]!r})")
+            try:
+                d = json.loads(r.text)
+                msg = f"Pull OK: {d.get('total','?')} producten · {d.get('scraped_at','?')}"
+                st.session_state["_vbd_pull_msg"] = ("ok", msg)
+                return True, msg
+            except Exception:
+                pass
+        msg = (f"HTTP {r.status_code} · {len(r.text)} bytes · "
+                f"begint met: {r.text[:120]!r}")
+        st.session_state["_vbd_pull_msg"] = ("warn", msg)
+        return False, msg
     except Exception as e:
-        st.warning(f"GitHub data-pull faalde: {e}")
-    return None
+        msg = f"Exception: {e}"
+        st.session_state["_vbd_pull_msg"] = ("warn", msg)
+        return False, msg
 
 
 def load_cached_data(force_pull=False):
@@ -237,11 +249,16 @@ with src_col2:
     if st.button("⟳ Refresh", use_container_width=True,
                   help="Haal laatste data live van GitHub op (na GH Actions run)."):
         st.session_state.pop("_vbd_data_pulled", None)
-        result = gh_pull_data()
-        if result:
-            new = load_cached_data()
-            st.success(f"✓ Gepulld: {new.get('total','?')} producten van {new.get('scraped_at','?')}")
+        gh_pull_data()  # message → session_state
         st.rerun()
+
+# Toon laatste pull-resultaat (overleeft de rerun)
+if "_vbd_pull_msg" in st.session_state:
+    kind, msg = st.session_state["_vbd_pull_msg"]
+    if kind == "ok":
+        st.success(f"✓ {msg}")
+    else:
+        st.error(f"✗ Refresh faalde — {msg}")
 with src_col3:
     if st.button("🔄 GH Actions", type="primary", use_container_width=True,
                   help="Trigger nieuwe scrape via GitHub Actions."):
