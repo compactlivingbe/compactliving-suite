@@ -386,11 +386,21 @@ with tab_ai:
     st.markdown("### 🤖 AI suggereert mogelijke groepen")
     st.caption("Claude scant productnamen en stelt groepen voor van gelijkaardige producten.")
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         categ_filter = st.text_input("Beperk tot categorie (bv. 'Victron'):", value="")
     with col2:
-        limit = st.number_input("Max producten scannen", min_value=20, max_value=2000, value=200, step=20)
+        limit = st.number_input("Max producten scannen", min_value=20, max_value=2000, value=150, step=20,
+                                  help="Hoger = vollediger maar duurt langer + meer API-tokens")
+    with col3:
+        model_choice = st.selectbox("Model",
+                                     ["claude-haiku-4-5", "claude-sonnet-4-6"],
+                                     index=0,
+                                     help="Haiku = sneller + minder tokens. Sonnet = preciezer.")
+    batch_size = st.slider("Batch grootte (producten per Claude-call)",
+                            min_value=30, max_value=200, value=80,
+                            help="Lagere batch = vermijdt rate limit (30k tokens/min). "
+                                 "Bij rate-limit error: zet lager.")
 
     st.caption("ℹ️ Tip: dit veld is `product_tag_ids` op product.template in Odoo. "
                 "Je kan groepen ook direct in Odoo bewerken op de productpagina (sectie 'Algemene info' → tags).")
@@ -428,69 +438,74 @@ with tab_ai:
                     pname = s["partner_id"][1] if s["partner_id"] else "?"
                     if tid:
                         sup_per_tmpl.setdefault(tid, set()).add(pname)
-            st.info(f"{len(tmpls)} producten geladen. Claude bezig...")
+            st.info(f"{len(tmpls)} producten geladen. Claude bezig (batch {batch_size})...")
             try:
+                import time as _time
                 from anthropic import Anthropic
                 client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-                # Bouw lijst MET supplier per regel
-                product_list = "\n".join(
-                    f"- {t['name']}  [leveranciers: {', '.join(sorted(sup_per_tmpl.get(t['id'], {'?'})))}]"
-                    for t in tmpls
-                )
-                prompt = f"""Lijst Odoo-producten Compact Living (camper-accessoires) met hun leveranciers tussen [].
+                all_groups = []
+                progress = st.progress(0, text="Batch 1...")
+                # Process in batches
+                for batch_idx, start in enumerate(range(0, len(tmpls), batch_size)):
+                    batch = tmpls[start:start + batch_size]
+                    product_list = "\n".join(
+                        f"- {t['name']}  [{', '.join(sorted(sup_per_tmpl.get(t['id'], {'?'})))}]"
+                        for t in batch
+                    )
+                    prompt = f"""Lijst Odoo-producten Compact Living (camper-accessoires) met leveranciers tussen [].
 
-Identificeer **groepen van gelijkaardige producten van VERSCHILLENDE leveranciers** (zelfde functie, andere bron).
+Identificeer **groepen van gelijkaardige producten van VERSCHILLENDE leveranciers**.
 
-Strikte regels:
+Regels:
 - Min 2 producten per groep
-- Producten in een groep MOETEN VERSCHILLENDE leveranciers hebben (anders geen echte alternatieven)
+- Producten MOETEN VERSCHILLENDE leveranciers hebben
 - Korte groep_naam (max 50 karakters)
-- Gebruik EXACT de productnaam zoals in lijst (zonder de leverancier annotatie)
-- Sla over: producten waar alle alternatieven dezelfde leverancier hebben
-- Output ALLEEN valid JSON, GEEN commentaar voor of na
+- Gebruik EXACT de productnaam (zonder leverancier annotatie)
+- Output ALLEEN valid JSON, geen commentaar
 
-Format:
-[{{"groep_naam":"naam","producten":["prod1","prod2"]}}]
+Format: [{{"groep_naam":"naam","producten":["prod1","prod2"]}}]
 
 Producten:
 {product_list}
 """
-                resp = client.messages.create(
-                    model=os.environ.get("CLAUDE_MODEL", "claude-sonnet-4-6"),
-                    max_tokens=8000,
-                    messages=[{"role": "user", "content": prompt}]
-                )
-                txt = resp.content[0].text.strip()
-                # Robust JSON extraction + repair
-                import json, re
-                # Strip markdown code fences
-                txt = re.sub(r'^```(?:json)?\s*', '', txt)
-                txt = re.sub(r'\s*```$', '', txt)
-                # Find first [ to last ]
-                start = txt.find('[')
-                end = txt.rfind(']')
-                if start >= 0 and end > start:
-                    txt = txt[start:end+1]
-                groups = None
-                try:
-                    groups = json.loads(txt)
-                except json.JSONDecodeError as e:
-                    # Try repair: remove trailing comma, truncated last entry
-                    repaired = re.sub(r',\s*([\]\}])', r'\1', txt)
                     try:
-                        groups = json.loads(repaired)
-                    except Exception:
-                        # Last resort: parse object-by-object via regex
-                        groups = []
-                        for m in re.finditer(r'\{[^{}]*"groep_naam"[^{}]*"producten"\s*:\s*\[[^\]]+\][^{}]*\}', txt):
-                            try:
-                                obj = json.loads(m.group(0))
-                                groups.append(obj)
-                            except: pass
-                        if not groups:
-                            st.error(f"AI antwoord niet parseerbaar. Eerste 500 chars:\n```\n{txt[:500]}\n```")
-                            st.caption(f"JSON error: {e}")
-                            raise RuntimeError("JSON parse failed")
+                        resp = client.messages.create(
+                            model=model_choice,
+                            max_tokens=4000,
+                            messages=[{"role": "user", "content": prompt}]
+                        )
+                    except Exception as api_err:
+                        if "rate_limit" in str(api_err).lower() or "429" in str(api_err):
+                            st.warning(f"Rate limit batch {batch_idx+1}, wacht 60s...")
+                            _time.sleep(60)
+                            resp = client.messages.create(
+                                model=model_choice, max_tokens=4000,
+                                messages=[{"role": "user", "content": prompt}]
+                            )
+                        else:
+                            raise
+                    txt = resp.content[0].text.strip()
+                    # Parse this batch
+                    import re as _re, json as _json
+                    txt_clean = _re.sub(r'^```(?:json)?\s*', '', txt)
+                    txt_clean = _re.sub(r'\s*```$', '', txt_clean)
+                    s_idx, e_idx = txt_clean.find('['), txt_clean.rfind(']')
+                    if s_idx >= 0 and e_idx > s_idx:
+                        try:
+                            batch_groups = _json.loads(txt_clean[s_idx:e_idx+1])
+                            all_groups.extend(batch_groups)
+                        except: pass
+                    pct = int((batch_idx + 1) / max(1, (len(tmpls) // batch_size + 1)) * 100)
+                    progress.progress(min(pct, 100), text=f"Batch {batch_idx+1} klaar ({len(all_groups)} groepen tot nu)")
+                    # Pacing: 30k tokens/min ≈ 500 tokens/sec, 80 producten ≈ ~3000 tokens
+                    # Wacht 6s tussen calls om binnen rate limit te blijven
+                    if start + batch_size < len(tmpls):
+                        _time.sleep(6)
+                progress.empty()
+                groups = all_groups
+                if not groups:
+                    st.error("AI gaf geen geldige groepen terug.")
+                    raise RuntimeError("Geen groepen geparseerd")
                 # Sanity filter
                 groups = [g for g in groups if isinstance(g, dict)
                           and g.get("groep_naam") and len(g.get("producten", [])) >= 2]
