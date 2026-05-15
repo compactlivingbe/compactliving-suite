@@ -3,3 +3,6 @@ sku,description,reason,date_added
 # Voorbeeld:
 # VBD P 0001,APK luchtslang 60mm,niet nodig,2026-05-15
 VBD P 0000,APK luchtslang 75mm,niet nodig,2026-05-15
+VBD P 0040,PUNDMANN mobiele standkachel,niet nodig,2026-05-15
+VBD AT 0046/0047,AUTOTERM Flow 5d,niet nodig,2026-05-15
+VBD AT 0044/0045,Autoterm Air 9d 8kW,niet nodig,2026-05-15
