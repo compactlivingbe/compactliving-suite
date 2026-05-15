@@ -1,40 +1,105 @@
-"""Odoo XML-RPC client - werkt met API-key (anders dan JSON-RPC sessie-auth).
-Auto-recovery van http.client.CannotSendRequest (cached connectie kapot na onderbroken call).
+"""Odoo JSON-RPC client (vervangt XML-RPC) - werkt met API-key OF wachtwoord.
+Gebruikt requests.Session, robuuster onder Streamlit Cloud (geen XML-RPC state issues).
 """
-import xmlrpc.client
-import http.client
+import json
+import requests
 from typing import Any
 
 
 class OdooClient:
-    def __init__(self, url: str, db: str, login: str, api_key: str):
+    def __init__(self, url: str, db: str, login: str, api_key: str = None, password: str = None):
         self.url = url.rstrip('/')
         self.db = db
         self.login = login
-        self.api_key = api_key
-        self._reconnect()
+        # API-key heeft voorrang; password is fallback
+        self.password = api_key or password
+        self.session = requests.Session()
+        self.session.headers["Content-Type"] = "application/json"
+        self.uid = None
+        self._authenticate()
 
-    def _reconnect(self):
-        """(Her)maak XMLRPC proxies + authenticate."""
-        self.common = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/common", allow_none=True)
-        self.models = xmlrpc.client.ServerProxy(f"{self.url}/xmlrpc/2/object", allow_none=True)
-        self.uid = self.common.authenticate(self.db, self.login, self.api_key, {})
-        if not self.uid:
-            raise RuntimeError(f"Auth failed (uid=False) for {self.login}@{self.db}")
+    def _authenticate(self):
+        """JSON-RPC authenticatie. Sets self.uid + cookie."""
+        # Methode 1: /web/session/authenticate (zet ook session cookie)
+        r = self.session.post(
+            f"{self.url}/web/session/authenticate",
+            data=json.dumps({"jsonrpc": "2.0", "params":
+                              {"db": self.db, "login": self.login, "password": self.password}}),
+            timeout=30,
+        )
+        r.raise_for_status()
+        d = r.json()
+        if d.get("result") and d["result"].get("uid"):
+            self.uid = d["result"]["uid"]
+            return
+        # Methode 2: fallback via common/authenticate (XML-RPC equivalent in JSON)
+        r = self.session.post(
+            f"{self.url}/jsonrpc",
+            data=json.dumps({
+                "jsonrpc": "2.0", "method": "call",
+                "params": {"service": "common", "method": "authenticate",
+                           "args": [self.db, self.login, self.password, {}]}
+            }),
+            timeout=30,
+        )
+        r.raise_for_status()
+        d = r.json()
+        uid = d.get("result")
+        if not uid:
+            raise RuntimeError(f"Odoo auth failed: {d}")
+        self.uid = uid
 
     def call(self, model: str, method: str, args: list = None, kwargs: dict = None) -> Any:
+        """Roept Odoo model.method aan. Ondersteunt zowel API-key als session-based auth."""
         args = args or []
         kwargs = kwargs or {}
+        # /web/dataset/call_kw (gebruikt session cookie)
         try:
-            return self.models.execute_kw(self.db, self.uid, self.api_key, model, method, args, kwargs)
-        except (http.client.CannotSendRequest, http.client.ResponseNotReady,
-                ConnectionError, BrokenPipeError, OSError) as e:
-            # Connectie kapot -> herverbind + retry 1x
-            try:
-                self._reconnect()
-            except Exception:
-                raise e
-            return self.models.execute_kw(self.db, self.uid, self.api_key, model, method, args, kwargs)
+            r = self.session.post(
+                f"{self.url}/web/dataset/call_kw",
+                data=json.dumps({"jsonrpc": "2.0", "method": "call",
+                                  "params": {"model": model, "method": method,
+                                             "args": args, "kwargs": kwargs}}),
+                timeout=120,
+            )
+            r.raise_for_status()
+            d = r.json()
+            if "error" in d:
+                # Session expired? Probeer opnieuw te authenticeren + retry
+                err = d.get("error", {})
+                msg = json.dumps(err)[:300]
+                if "session" in msg.lower() or "expired" in msg.lower() or err.get("code") == 100:
+                    self._authenticate()
+                    r = self.session.post(
+                        f"{self.url}/web/dataset/call_kw",
+                        data=json.dumps({"jsonrpc": "2.0", "method": "call",
+                                          "params": {"model": model, "method": method,
+                                                     "args": args, "kwargs": kwargs}}),
+                        timeout=120,
+                    )
+                    r.raise_for_status()
+                    d = r.json()
+                if "error" in d:
+                    raise RuntimeError(f"Odoo error: {json.dumps(d['error'])[:300]}")
+            return d.get("result")
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout) as e:
+            # Force nieuwe sessie + retry 1x
+            self.session = requests.Session()
+            self.session.headers["Content-Type"] = "application/json"
+            self._authenticate()
+            r = self.session.post(
+                f"{self.url}/web/dataset/call_kw",
+                data=json.dumps({"jsonrpc": "2.0", "method": "call",
+                                  "params": {"model": model, "method": method,
+                                             "args": args, "kwargs": kwargs}}),
+                timeout=120,
+            )
+            r.raise_for_status()
+            d = r.json()
+            if "error" in d:
+                raise RuntimeError(f"Odoo error after retry: {json.dumps(d['error'])[:300]}")
+            return d.get("result")
 
     def search_read(self, model: str, domain: list, fields: list, limit: int = 100, order: str = None) -> list:
         kwargs = {"limit": limit}
@@ -52,7 +117,6 @@ class OdooClient:
         return self.call(model, "read", [ids, fields])
 
     def find_partner(self, name: str, vat: str = None):
-        """Zoek leverancier op naam of BTW-nummer. Return partner record of None."""
         if vat:
             res = self.search_read("res.partner", [("vat", "=", vat)], ["id", "name", "vat"], 5)
             if res:
