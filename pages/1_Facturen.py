@@ -81,7 +81,6 @@ from matcher import find_partner, find_product_candidates
 from bill_matcher import match_invoice_to_pos, create_bills_from_matches
 
 
-@st.cache_resource
 def get_odoo():
     return OdooClient(
         url=os.environ["ODOO_URL"], db=os.environ["ODOO_DB"],

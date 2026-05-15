@@ -134,7 +134,6 @@ Max 10 lijnen per bestelling (Reimo Schnellbestellung limit) — meer wordt gesp
 """)
 
 
-@st.cache_resource
 def get_odoo():
     return OdooClient(
         url=os.environ["ODOO_URL"], db=os.environ["ODOO_DB"],

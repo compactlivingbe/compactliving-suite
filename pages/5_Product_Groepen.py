@@ -20,7 +20,6 @@ st.title("🔗 Product groepen — vergelijk gelijkaardige producten")
 st.caption("Markeer producten met dezelfde functie als groep, zie alle prijzen naast elkaar.")
 
 
-@st.cache_resource
 def get_odoo():
     return OdooClient(
         url=os.environ["ODOO_URL"], db=os.environ["ODOO_DB"],
