@@ -38,6 +38,16 @@ if missing:
 
 tab_run, tab_test, tab_history = st.tabs(["▶ Scrape draaien", "🔍 Test 1 artikel", "📜 Geschiedenis"])
 
+
+@st.cache_data(ttl=300)
+def load_categories(url, db, login, password):
+    o = Odoo(url, db, login, password, log=lambda *_: None)
+    o.authenticate()
+    cats = o.call("product.category", "search_read",
+                  [[], ["id", "complete_name"]], {"order": "complete_name"})
+    return [(c["id"], c["complete_name"]) for c in cats]
+
+
 with tab_run:
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -46,6 +56,20 @@ with tab_run:
         delay = st.number_input("Delay tussen artikelen (sec)", min_value=0.0, value=0.7, step=0.1)
     with col3:
         include_archived = st.checkbox("Inclusief gearchiveerde", value=False)
+
+    # Categorie selectie
+    try:
+        cats = load_categories(cfg["odoo_url"], cfg["odoo_db"], cfg["odoo_login"], cfg["odoo_password"])
+        cat_labels = {f"{name} (#{cid})": cid for cid, name in cats}
+        selected_labels = st.multiselect(
+            "Categorieën (leeg = alle)",
+            options=list(cat_labels.keys()),
+            help="Filter producten per Odoo categorie. Leeg laten = alle producten met Reimo leverancier.",
+        )
+        selected_categ_ids = [cat_labels[l] for l in selected_labels]
+    except Exception as e:
+        st.warning(f"Kon categorieën niet laden: {e}")
+        selected_categ_ids = []
 
     if st.button("▶ Start scrape", type="primary", use_container_width=True):
         progress = st.progress(0, text="Verbinden...")
@@ -60,7 +84,7 @@ with tab_run:
         try:
             o = Odoo(cfg["odoo_url"], cfg["odoo_db"], cfg["odoo_login"], cfg["odoo_password"], log=log)
             o.authenticate()
-            codes = o.find_codes([66], [], include_archived=include_archived, only_with_code=True)
+            codes = o.find_codes([66], selected_categ_ids, include_archived=include_archived, only_with_code=True)
             if max_articles:
                 codes = codes[:max_articles]
             log(f"Te scrapen: {len(codes)} codes")
