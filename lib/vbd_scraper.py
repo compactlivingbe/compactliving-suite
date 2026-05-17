@@ -304,6 +304,23 @@ def compare_with_odoo(odoo, partner_id, vbd_products, log=print):
                        ["id", "name", "standard_price", "list_price"]) if tmpl_ids else []
     tmpl_by_id = {t["id"]: t for t in tmpls}
 
+    vbd_skus = {p["sku"] for p in vbd_products}
+    discontinued = []
+    for code, si in by_code.items():
+        if code in vbd_skus:
+            continue
+        tid = si["product_tmpl_id"][0] if si.get("product_tmpl_id") else None
+        tmpl = tmpl_by_id.get(tid, {})
+        discontinued.append({
+            "sku": code,
+            "odoo_name": tmpl.get("name", ""),
+            "odoo_supplier_price": float(si.get("price") or 0),
+            "odoo_standard_price": float(tmpl.get("standard_price") or 0),
+            "odoo_list_price": float(tmpl.get("list_price") or 0),
+            "supplierinfo_id": si["id"],
+            "template_id": tid,
+        })
+
     missing, cost_diffs, sale_diffs, matches = [], [], [], []
     for p in vbd_products:
         sku = p["sku"]
@@ -357,6 +374,8 @@ def compare_with_odoo(odoo, partner_id, vbd_products, log=print):
         "cost_diffs": cost_diffs,
         "sale_diffs": sale_diffs,
         "matches": matches,
+        "discontinued": discontinued,
         "total_vbd": len(vbd_products),
         "total_matched": len(vbd_products) - len(missing),
+        "total_odoo_vbd": len(by_code),
     }

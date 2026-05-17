@@ -342,12 +342,14 @@ if "_vbd_result" in st.session_state:
     cost_df = pd.DataFrame(result["cost_diffs"])
     sale_df = pd.DataFrame(result["sale_diffs"])
     match_df = pd.DataFrame(result.get("matches", []))
+    disc_df = pd.DataFrame(result.get("discontinued", []))
 
     tabs = st.tabs([
         f"❓ Ontbrekend ({len(miss_df)})",
         f"📥 Kostprijs ({len(cost_df)})",
         f"📤 Verkoopprijs ({len(sale_df)})",
         f"✓ Matches ({len(match_df)})",
+        f"⚠ Verdwenen bij VBD ({len(disc_df)})",
     ])
 
     odoo = get_odoo()
@@ -609,3 +611,92 @@ if "_vbd_result" in st.session_state:
                     if r["template_id"]:
                         link = f"{odoo_url}/odoo/inventory/products/{int(r['template_id'])}"
                         st.markdown(f"- [{r['sku']} — {r['odoo_name'] or r['name']}]({link})")
+
+    # ----- TAB 5: DISCONTINUED -----
+    with tabs[4]:
+        if disc_df.empty:
+            st.success("Alle VBD-supplier producten in Odoo komen nog voor op VBD 🎉")
+        else:
+            st.caption(f"Producten met VBD als leverancier in Odoo (partner_id={VBD_PARTNER_ID}) "
+                        f"die NIET (meer) voorkomen in de huidige VBD scrape "
+                        f"({result.get('total_odoo_vbd', '?')} totaal in Odoo, "
+                        f"{len(disc_df)} verdwenen).")
+            d_search = st.text_input("🔍 Filter op SKU/naam", key="vbd_disc_search")
+            df = disc_df.copy()
+            if d_search:
+                mask = df.apply(
+                    lambda r: d_search.lower() in " ".join(str(v) for v in r.values).lower(),
+                    axis=1)
+                df = df[mask]
+            df.insert(0, "Selecteer", False)
+            edited_d = st.data_editor(
+                df, hide_index=True, use_container_width=True,
+                disabled=[c for c in df.columns if c != "Selecteer"],
+                column_config={
+                    "sku": st.column_config.TextColumn("VBD SKU", width="small"),
+                    "odoo_name": st.column_config.TextColumn("Odoo naam"),
+                    "odoo_supplier_price": st.column_config.NumberColumn("Kost (sup)", format="€ %.2f"),
+                    "odoo_standard_price": st.column_config.NumberColumn("Standard", format="€ %.2f"),
+                    "odoo_list_price": st.column_config.NumberColumn("Verkoop", format="€ %.2f"),
+                    "supplierinfo_id": None,
+                    "template_id": None,
+                },
+                key="vbd_disc_editor",
+            )
+            sel_d = edited_d[edited_d["Selecteer"]]
+            st.markdown(f"**{len(sel_d)} geselecteerd**")
+            if not sel_d.empty:
+                msg_text = st.text_input(
+                    "Waarschuwingstekst (sale_line_warn_msg op template)",
+                    value="⚠ Niet meer beschikbaar bij VBD Services",
+                    key="vbd_disc_msg")
+                ac1, ac2, ac3 = st.columns(3)
+                with ac1:
+                    if st.button(f"⚠ Zet verkoop-waarschuwing op {len(sel_d)} templates",
+                                  type="primary", key="vbd_disc_warn"):
+                        ok = err = 0
+                        for _, r in sel_d.iterrows():
+                            try:
+                                odoo.write("product.template", [int(r["template_id"])],
+                                            {"sale_line_warn_msg": msg_text,
+                                             "sale_line_warn": "warning"})
+                                ok += 1
+                            except Exception as e:
+                                err += 1
+                                st.error(f"{r['sku']}: {e}")
+                        st.success(f"✓ {ok} templates bijgewerkt · {err} fout")
+                with ac2:
+                    if st.button(f"🗑 Verwijder VBD supplierinfo (×{len(sel_d)})",
+                                  key="vbd_disc_unlink"):
+                        ok = err = 0
+                        for _, r in sel_d.iterrows():
+                            try:
+                                odoo.call("product.supplierinfo", "unlink",
+                                           [[int(r["supplierinfo_id"])]])
+                                ok += 1
+                            except Exception as e:
+                                err += 1
+                                st.error(f"{r['sku']}: {e}")
+                        st.success(f"✓ {ok} supplierinfo verwijderd · {err} fout "
+                                    f"(template + verkooporders blijven)")
+                with ac3:
+                    if st.button(f"📦 Archiveer {len(sel_d)} templates",
+                                  key="vbd_disc_archive",
+                                  help="Zet active=False zodat product niet meer verkoopbaar is."):
+                        ok = err = 0
+                        for _, r in sel_d.iterrows():
+                            try:
+                                odoo.write("product.template", [int(r["template_id"])],
+                                            {"active": False})
+                                ok += 1
+                            except Exception as e:
+                                err += 1
+                                st.error(f"{r['sku']}: {e}")
+                        st.success(f"✓ {ok} templates gearchiveerd · {err} fout")
+
+            odoo_url = os.environ.get("ODOO_URL", "https://compactliving.odoo.com").rstrip("/")
+            with st.expander("🔗 Direct naar Odoo product"):
+                for _, r in df.head(50).iterrows():
+                    if r["template_id"]:
+                        link = f"{odoo_url}/odoo/inventory/products/{int(r['template_id'])}"
+                        st.markdown(f"- [{r['sku']} — {r['odoo_name']}]({link})")
