@@ -105,7 +105,7 @@ def create_product_with_supplier(
         vals["default_code"] = default_code
     if uom_id:
         vals["uom_id"] = int(uom_id)
-        vals["uom_po_id"] = int(uom_id)
+        # Odoo SaaS 19+: uom_po_id is verwijderd, alleen uom_id blijft
     if categ_id:
         vals["categ_id"] = int(categ_id)
     # Maak template via product.product (Odoo schaalt naar template)
