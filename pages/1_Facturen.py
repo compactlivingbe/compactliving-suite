@@ -21,7 +21,7 @@ st.set_page_config(
     page_title="Factuur Automatisering — Compact Living",
     page_icon="📄",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto"
 )
 from auth import require_auth
 require_auth()

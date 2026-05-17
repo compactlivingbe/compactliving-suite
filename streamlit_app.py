@@ -22,7 +22,7 @@ st.set_page_config(
     page_title="Compact Living Suite",
     page_icon="⚡",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",
 )
 
 # Map secrets → env (zodat alle modules werken zonder st.secrets dependency)
