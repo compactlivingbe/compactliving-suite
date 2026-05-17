@@ -1,0 +1,4 @@
+partner_id,name,reason,date_added
+# Plaats hier res.partner IDs van leveranciers waarvoor je GEEN PO wil aanmaken
+# vanuit Peppol Bills. Eén per regel. Voorbeeld:
+# 123,Voorbeeld BV,direct kostprijs zonder PO,2026-05-17

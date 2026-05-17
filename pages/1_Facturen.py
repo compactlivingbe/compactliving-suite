@@ -8,11 +8,13 @@ Cloud-versie voor Streamlit Community Cloud.
 import os
 import sys
 import json
+import csv
 import base64
 import tempfile
 from pathlib import Path
 from datetime import datetime
 
+import requests
 import streamlit as st
 import pandas as pd
 
@@ -510,22 +512,190 @@ with tab_ontvangst:
 
 
 # ============ TAB: PEPPOL BILL → PO ============
+PEPPOL_EXCLUDE_PATH = Path(__file__).resolve().parent.parent / "peppol_exclude.csv"
+_GH_TOKEN = os.environ.get("GH_TOKEN", "")
+_GH_REPO = os.environ.get("GH_REPO", "compactlivingbe/compactliving-suite")
+_GH_BRANCH = os.environ.get("GH_BRANCH", "main")
+_GH_PEPPOL_PATH = "peppol_exclude.csv"
+
+
+def _peppol_gh_pull():
+    if not _GH_TOKEN: return None
+    try:
+        r = requests.get(
+            f"https://api.github.com/repos/{_GH_REPO}/contents/{_GH_PEPPOL_PATH}",
+            headers={"Authorization": f"Bearer {_GH_TOKEN}",
+                      "Accept": "application/vnd.github.raw"},
+            params={"ref": _GH_BRANCH}, timeout=15)
+        if r.status_code == 200:
+            PEPPOL_EXCLUDE_PATH.write_text(r.text, encoding="utf-8")
+            return True
+    except Exception: pass
+    return False
+
+
+def _peppol_gh_push(msg):
+    if not _GH_TOKEN: return False, "Geen GH_TOKEN"
+    try:
+        r = requests.get(
+            f"https://api.github.com/repos/{_GH_REPO}/contents/{_GH_PEPPOL_PATH}",
+            headers={"Authorization": f"Bearer {_GH_TOKEN}",
+                      "Accept": "application/vnd.github+json"},
+            params={"ref": _GH_BRANCH}, timeout=15)
+        sha = r.json().get("sha") if r.status_code == 200 else None
+        content = PEPPOL_EXCLUDE_PATH.read_text(encoding="utf-8")
+        body = {"message": msg,
+                "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+                "branch": _GH_BRANCH}
+        if sha: body["sha"] = sha
+        r = requests.put(
+            f"https://api.github.com/repos/{_GH_REPO}/contents/{_GH_PEPPOL_PATH}",
+            headers={"Authorization": f"Bearer {_GH_TOKEN}",
+                      "Accept": "application/vnd.github+json"},
+            json=body, timeout=20)
+        return (r.status_code in (200, 201)), r.json().get("commit", {}).get("sha", "")[:7] or r.text[:120]
+    except Exception as e:
+        return False, str(e)
+
+
+def _peppol_read():
+    if _GH_TOKEN and "_peppol_excl_pulled" not in st.session_state:
+        _peppol_gh_pull()
+        st.session_state["_peppol_excl_pulled"] = True
+    if not PEPPOL_EXCLUDE_PATH.exists(): return [], []
+    rows, headers = [], []
+    for ln in PEPPOL_EXCLUDE_PATH.read_text(encoding="utf-8").splitlines():
+        s = ln.strip()
+        if not s or s.startswith("#") or s.startswith("partner_id,"):
+            headers.append(ln); continue
+        parts = next(csv.reader([ln]))
+        if len(parts) >= 4:
+            rows.append({"partner_id": int(parts[0]) if parts[0].isdigit() else 0,
+                          "name": parts[1], "reason": parts[2], "date_added": parts[3]})
+    return rows, headers
+
+
+def _peppol_write(rows, headers):
+    lines = [ln for ln in (headers or []) if not ln.startswith("partner_id,")]
+    lines.insert(0, "partner_id,name,reason,date_added")
+    out = "\n".join(lines) + "\n"
+    for r in rows:
+        out += f'{r["partner_id"]},{r["name"]},{r["reason"]},{r["date_added"]}\n'
+    PEPPOL_EXCLUDE_PATH.write_text(out, encoding="utf-8")
+
+
+def _peppol_add(partner_id, name, reason=""):
+    rows, headers = _peppol_read()
+    if any(r["partner_id"] == int(partner_id) for r in rows):
+        return False
+    rows.append({"partner_id": int(partner_id), "name": name,
+                  "reason": reason, "date_added": datetime.now().strftime("%Y-%m-%d")})
+    _peppol_write(rows, headers)
+    return True
+
+
 with tab_peppol:
     st.markdown("### 📨 Peppol Bills → Purchase Order")
     st.caption("Voor Bills die binnen kwamen via Peppol/email zonder gekoppelde PO. "
                "Match elke lijn aan een product (bestaand / nieuw / bewerken), maak dan PO.")
+
+    # ============ EXCLUDE LIST ============
+    excl_rows, excl_headers = _peppol_read()
+    excluded_ids = {r["partner_id"] for r in excl_rows}
+    with st.expander(f"🚫 Exclude-list leveranciers ({len(excl_rows)})", expanded=False):
+        st.caption("Leveranciers in deze lijst worden NIET getoond in de Peppol → PO flow.")
+        if _GH_TOKEN:
+            st.success(f"☁ Persistent — commits naar `{_GH_REPO}`")
+        else:
+            st.warning("⚠ Geen `GH_TOKEN` — wijzigingen verloren bij container restart.")
+        if excl_rows:
+            edf = pd.DataFrame(excl_rows)
+            edf.insert(0, "Verwijder", False)
+            edited_excl = st.data_editor(
+                edf, hide_index=True, use_container_width=True,
+                disabled=["partner_id", "name", "date_added"],
+                column_config={
+                    "Verwijder": st.column_config.CheckboxColumn(width="small"),
+                    "partner_id": st.column_config.NumberColumn("Partner ID", width="small"),
+                    "name": st.column_config.TextColumn("Naam"),
+                    "reason": st.column_config.TextColumn("Reden"),
+                    "date_added": st.column_config.TextColumn("Toegevoegd", width="small"),
+                },
+                key="peppol_excl_table",
+            )
+            if st.button("💾 Wijzigingen opslaan", key="peppol_excl_save"):
+                kept = [{"partner_id": int(r["partner_id"]), "name": r["name"],
+                          "reason": r["reason"], "date_added": r["date_added"]}
+                         for _, r in edited_excl.iterrows() if not r["Verwijder"]]
+                _peppol_write(kept, excl_headers)
+                if _GH_TOKEN:
+                    ok, info = _peppol_gh_push(f"Peppol exclude-list: {len(kept)} suppliers via Streamlit")
+                    if ok: st.success(f"✓ Opgeslagen + GitHub push ({info})")
+                    else: st.error(f"Lokaal opgeslagen, push faalde: {info}")
+                else:
+                    st.success(f"✓ Opgeslagen ({len(kept)})")
+                st.rerun()
+
+        # Add new supplier
+        st.markdown("**Leverancier toevoegen aan exclude-list:**")
+        ac1, ac2, ac3 = st.columns([3, 2, 1])
+        search_term = ac1.text_input("Zoek leverancier op naam", key="peppol_excl_search",
+                                       placeholder="bijv. Reimo")
+        excl_reason = ac2.text_input("Reden", value="geen PO via Peppol",
+                                       key="peppol_excl_reason")
+        if search_term and len(search_term) >= 2:
+            try:
+                odoo_tmp = get_odoo()
+                cands = odoo_tmp.search_read(
+                    "res.partner",
+                    [("supplier_rank", ">", 0), ("name", "ilike", search_term)],
+                    ["id", "name", "vat"], 15, "name")
+                if cands:
+                    opts = [f"[{c['id']}] {c['name']}" + (f" ({c['vat']})" if c.get('vat') else "")
+                             for c in cands]
+                    sel = ac1.selectbox("Kandidaat", ["(kies)"] + opts, key="peppol_excl_pick",
+                                          label_visibility="collapsed")
+                    if sel != "(kies)":
+                        chosen = cands[opts.index(sel)]
+                        if ac3.button("➕ Toevoegen", key="peppol_excl_add"):
+                            if _peppol_add(chosen["id"], chosen["name"], excl_reason):
+                                if _GH_TOKEN:
+                                    ok, info = _peppol_gh_push(
+                                        f"Peppol exclude: +{chosen['name']} ({chosen['id']})")
+                                    st.success(f"✓ Toegevoegd + GitHub ({info})" if ok
+                                                else f"Toegevoegd, push faalde: {info}")
+                                else:
+                                    st.success("✓ Toegevoegd (niet persistent)")
+                                st.rerun()
+                            else:
+                                st.warning(f"{chosen['name']} stond al in exclude-list.")
+                else:
+                    ac1.caption("Geen kandidaten gevonden.")
+            except Exception as e:
+                st.error(f"Zoekfout: {e}")
 
     try:
         odoo = get_odoo()
         from verwerk import get_unlinked_draft_bills, create_po_from_bill, validate_receipts_for_pos, auto_create_product
 
         with st.spinner("Bills zonder PO-link zoeken..."):
-            unlinked = get_unlinked_draft_bills(odoo, limit=30)
+            unlinked_all = get_unlinked_draft_bills(odoo, limit=30)
+
+        # Filter via exclude-list
+        unlinked = [b for b in unlinked_all
+                    if not (b.get("partner_id") and b["partner_id"][0] in excluded_ids)]
+        n_excl = len(unlinked_all) - len(unlinked)
 
         if not unlinked:
-            st.info("🎉 Geen losse draft Bills — alles is gelinkt aan een PO.")
+            if n_excl:
+                st.info(f"🎉 Geen Bills te tonen ({n_excl} verborgen door exclude-list).")
+            else:
+                st.info("🎉 Geen losse draft Bills — alles is gelinkt aan een PO.")
         else:
-            st.caption(f"{len(unlinked)} draft Bill(s) zonder PO-link")
+            cap = f"{len(unlinked)} draft Bill(s) zonder PO-link"
+            if n_excl:
+                cap += f" · {n_excl} verborgen door exclude-list"
+            st.caption(cap)
             for b in unlinked:
                 with st.container(border=True):
                     cols = st.columns([3, 2, 2, 2])
