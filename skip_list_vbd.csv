@@ -96,3 +96,193 @@ VBD A 0237,Luchtpomp Flow 5d/24V,niet nodig,2026-05-15
 VBD A 0247,Montagebeugel met schokdempers 5d,niet nodig,2026-05-15
 VBD A 0239,Rechte connector voor vloeistofuitgang Flow 5d,niet nodig,2026-05-15
 VBD A 0248,Spanklem voor sensoren 5d,niet nodig,2026-05-15
+VBD M 0007,2 laags polyester luchtslang met stalen spiraal 75mm,niet nodig,2026-05-17
+VBD C 0000,Afdichtingstape aluminium 10 meter,niet nodig,2026-05-17
+VBD A 0252,Smalle Diffuser 45° 60mm,niet nodig,2026-05-17
+VBD A 0119,Autoterm draaibaar uitblaasrooster Ø90mm of Ø75mm,niet nodig,2026-05-17
+VBD A 0095,Adapter 75mm voor de Autoterm uitblaasroosters 90mm,niet nodig,2026-05-17
+VBD S 0008,Open uitblaasrooster 60mm Webasto,niet nodig,2026-05-17
+VBD S 0009,Open uitblaasrooster 60mm wit Webasto,niet nodig,2026-05-17
+VBD S 0050,Uitblaasrooster 60mm 45° Webasto,niet nodig,2026-05-17
+VBD S 0002,Afsluitbaar uitblaasrooster  Ø60mm Webasto,niet nodig,2026-05-17
+VBD S 0003,Afsluitbaar uitblaasrooster  Ø60mm wit Webasto,niet nodig,2026-05-17
+VBD S 0012,Adapter 60mm Webasto,niet nodig,2026-05-17
+VBD S 0010,Open uitblaasrooster 90mm Webasto,niet nodig,2026-05-17
+VBD S 0011,Open uitblaasrooster 90mm wit Webasto,niet nodig,2026-05-17
+VBD S 0051,Uitblaasrooster 90mm  45° Webasto,niet nodig,2026-05-17
+VBD S 0006,Afsluitbaar uitblaasrooster 90mm Webasto,niet nodig,2026-05-17
+VBD S 0007,Afsluitbaar uitblaasrooster 90mm wit Webasto,niet nodig,2026-05-17
+VBD S 0013,Adapter 90mm Webasto,niet nodig,2026-05-17
+VBD S 0014,Uitblaasrooster draaibaar 45° 60mm Webasto,niet nodig,2026-05-17
+VBD S 0015,Uitblaasrooster hoog model 60mm,niet nodig,2026-05-17
+VBD S 0017,Uitblaasrooster hoog model 90mm,niet nodig,2026-05-17
+VBD A 0080,Uitblaasrooster open 75mm,niet nodig,2026-05-17
+VBD P 0087,"Diffusor smal 25 cm FI 60 mm, rechte uitloop met opschroefbaar zeskantdeksel",niet nodig,2026-05-17
+VBD A 0271,Verloop 90-3x60-rond,niet nodig,2026-05-17
+VBD A 0270,Verloop 90-3x60-vlak,niet nodig,2026-05-17
+VBD A 0244,Connector ring 75mm,niet nodig,2026-05-17
+VBD A 0065,Y stuk 60x60x60 goedkope uitvoering OP IS OP!,niet nodig,2026-05-17
+VBD A 0132,Y stuk 75x75x75,niet nodig,2026-05-17
+VBD S 0020,Y stuk 100x100x100,niet nodig,2026-05-17
+VBD A 0253,verdeelstuk 75x75x75,niet nodig,2026-05-17
+VBD S 0026,Verloop 90x75X75,niet nodig,2026-05-17
+VBD S 0027,Verloop 90x80x80,niet nodig,2026-05-17
+VBD S 0024,Verloop 80x60x60,niet nodig,2026-05-17
+VBD A 0254,verloop 75x60x60,niet nodig,2026-05-17
+VBD A 0144,T-stuk 75x75x75,niet nodig,2026-05-17
+VBD S 0029,T-stuk 60x60x60 met schroefdraad,niet nodig,2026-05-17
+VBD S 0033,T-stuk 90x90x90,niet nodig,2026-05-17
+VBD S 0031,T-stuk 90x60x90 met schroefdraad,niet nodig,2026-05-17
+VBD A 0070,Luchtverdeler met regelklep 60mm,niet nodig,2026-05-17
+VBD S 0044,Luchtverdeler met regelklep 90mm,niet nodig,2026-05-17
+VBD S 0140,Bowdenkabel voor bediening van een regelklep,niet nodig,2026-05-17
+VBD A 0091,Draaiknop bediening voor regelklep 60 en 90mm,niet nodig,2026-05-17
+VBD S 0040,Bocht 90° 60mm,niet nodig,2026-05-17
+VBD A 0008,bocht 90° 80mm,niet nodig,2026-05-17
+VBD S 0141,Bocht 90°lange uitvoering 60mm,niet nodig,2026-05-17
+VBD S 0041,Bocht 90° 90mm,niet nodig,2026-05-17
+VBD A 0001,Verloopstuk  koude lucht aansluiting Autoterm Air 4d 84mmx90mm,niet nodig,2026-05-17
+VBD S 0034,Verloop 100mm naar 90mm,niet nodig,2026-05-17
+VBD S 0037,Verloop 90 naar 60mm,niet nodig,2026-05-17
+VBD S 0038,Verloop 90 naar 75mm,niet nodig,2026-05-17
+VBD S 0039,Verloop 90 naar 80mm,niet nodig,2026-05-17
+VBD S 0036,Verloop 75 naar 60mm,niet nodig,2026-05-17
+VBD S 0035,Verloop 60 naar 55mm,niet nodig,2026-05-17
+VBD A 0255,Adapter inlet Kit ALC,niet nodig,2026-05-17
+VBD A 0256,Adapter outlet Kit AGC,niet nodig,2026-05-17
+VBD A 0136,Koppelstuk luchtslang 75mm,niet nodig,2026-05-17
+VBD A 0005,Control panel PU-5,niet nodig,2026-05-17
+VBD A 0134,Control panel PU-10,niet nodig,2026-05-17
+VBD A 0006,Control panel PU-27,niet nodig,2026-05-17
+VBD A 0009,"Temperatuursensor 2d, 4d, 44d & 9d",niet nodig,2026-05-17
+VBD A 0137,Verlengkabel bedieningspaneel 3 meter,niet nodig,2026-05-17
+VBD A 0131,Verlengkabel kabel bedieningspaneel 5 meter - 6 pins,niet nodig,2026-05-17
+VBD W 0010,Koolmonoxide-alarm,niet nodig,2026-05-17
+VBD A 0238,As PU-5,niet nodig,2026-05-17
+VBD W 0006,"Montagebeugel RVS Autoterm, Webasto en Eberspacher kachels",niet nodig,2026-05-17
+VBD W 0007,"Montagebeugel Autoterm, Webasto en Eberspacher kachels 90°",niet nodig,2026-05-17
+VBD A 0003,Verzinkte montage beugel voor Autoterm Air 2d en 4d,niet nodig,2026-05-17
+VBD A 0109,Universele montagebeugel voor Autoterm Air 2d en 4d,niet nodig,2026-05-17
+VBD A 0266,Kachelradiator Autoterm CHX rvs 24V,niet nodig,2026-05-17
+VBD I 0005,Slangklem rvs A2 16-27mm,niet nodig,2026-05-17
+VBD I 0004,Slangklem 9mm 23-35mm RVS A2,niet nodig,2026-05-17
+VBD A 0231,T-stuk Ø10,niet nodig,2026-05-17
+VBD A 0089,T-stuk Ø16-Ø16-Ø16,niet nodig,2026-05-17
+VBD I 0001,Slangklem rvs 10-16,niet nodig,2026-05-17
+VBD A 0024,T-stuk Ø18-Ø18-Ø18,niet nodig,2026-05-17
+VBD A 0025,T-stuk Ø20-Ø16-Ø20,niet nodig,2026-05-17
+VBD A 0026,T-stuk Ø20-Ø20-Ø20,niet nodig,2026-05-17
+VBD A 0027,Y-stuk Ø16-Ø16-Ø16,niet nodig,2026-05-17
+VBD M 0001,Y-verbinding 16x16x16,niet nodig,2026-05-17
+VBD A 0028,Haakse verbinding Ø16-Ø16,niet nodig,2026-05-17
+VBD A 0029,Haakse verbinding Ø20-Ø20,niet nodig,2026-05-17
+VBD A 0230,Slangverbinder  Ø10,niet nodig,2026-05-17
+VBD A 0030,Slangverbinder  Ø16-Ø16,niet nodig,2026-05-17
+VBD A 0031,Slangverbinder  Ø16-Ø16  met ontluchtingsnippel,niet nodig,2026-05-17
+VBD A 0032,Slangverbinder  Ø18-Ø16,niet nodig,2026-05-17
+VBD A 0033,Slangverbinder  Ø20-Ø16,niet nodig,2026-05-17
+VBD A 0034,Slangverbinder  Ø20-Ø20,niet nodig,2026-05-17
+VBD I 104,"Teflon tape 0,1mm - 12m",niet nodig,2026-05-17
+VBD I 107,"Stalen lassok, zwart, binnendraad,  ½""",niet nodig,2026-05-17
+VBD I 108,"Stalen lassok, zwart, binnendraad, ¾""",niet nodig,2026-05-17
+VBD A 0116,"Kogelkraan ½""",niet nodig,2026-05-17
+VBD W 0101,"Messing plug, zeskant, 1x buitendraad, 1½""",niet nodig,2026-05-17
+VBD W 0102,"Messing plug, zeskant, 1x buitendraad, ½""",niet nodig,2026-05-17
+VBD W 0103,"Messing slangtule, 1x binnendraad, ½"" x 10 mm",niet nodig,2026-05-17
+VBD M 0009,"Slangtule 1/2""x 10mm buitendraad",niet nodig,2026-05-17
+VBD M 0010,"Slangtule 1/2""x 13mm binnendraad",niet nodig,2026-05-17
+VBD M 0011,"Slangtule 1/2""x 13mm buitendraad",niet nodig,2026-05-17
+VBD TN 102,"Slangtule 1/2""x 15mm binnendraad",niet nodig,2026-05-17
+VBD M 0013,"Slangtule 1/2""x 16mm buitendraad",niet nodig,2026-05-17
+VBD TN 104,"Slangtule 1/2""x 18mm binnendraad",niet nodig,2026-05-17
+VBD M 0015,"Slangtule 1/2""x 20mm buitendraad",niet nodig,2026-05-17
+VBD TN 106,"Slangtule 3/4""x 13mm buitendraad",niet nodig,2026-05-17
+VBD TN 107,"Slangtule 3/4""x 16mm buitendraad",niet nodig,2026-05-17
+VBD TN 108,"Slangtule 3/4""x 20mm buitendraad",niet nodig,2026-05-17
+VBD I 109,"Slangpilaar MS 20mm x bi.3/4""",niet nodig,2026-05-17
+VBD TN 109,"Slangtule 1""x 20mm buitendraad",niet nodig,2026-05-17
+VBD I 110,"Verloopstuk 3/4""x1""",niet nodig,2026-05-17
+VBD TN 110,MESSING T STUK BI 1/4,niet nodig,2026-05-17
+VBD TN 111,Messing T Stuk Bi 3/8,niet nodig,2026-05-17
+VBD M 0017,Messing T Stuk Bi 1/2,niet nodig,2026-05-17
+VBD M 0018,Messing T Stuk Bi 3/4,niet nodig,2026-05-17
+VBD M 0019,Messing T Stuk Bi 1,niet nodig,2026-05-17
+VBD M 0020,"MESSING NIPPEL 1/2""",niet nodig,2026-05-17
+VBD M 0021,"MESSING NIPPEL 3/4""",niet nodig,2026-05-17
+VBD M 0022,"MESSING NIPPEL 1""",niet nodig,2026-05-17
+VBD M 0023,"MESSING SOK 1/2""",niet nodig,2026-05-17
+VBD M 0024,"MESSING SOK 3/4""",niet nodig,2026-05-17
+VBD M 0025,"MESSING SOK 1""",niet nodig,2026-05-17
+VBD A 0014,Expansietank,niet nodig,2026-05-17
+VBD EP 0003,Expansietank roestvast staal 10 liter,niet nodig,2026-05-17
+VBD EP 0004,Expansietank roestvast staal 24 liter,niet nodig,2026-05-17
+VBD EP 0002,Expansietank roestvast staal 5 liter,niet nodig,2026-05-17
+VBD EP 0001,Expansietank roestvast staal 6liter,niet nodig,2026-05-17
+VBD E 0002,Expansietank staal 24 liter,niet nodig,2026-05-17
+VBD I 0021,Peilglas met temperatuurmeter voor rvs expansietank 24 liter,niet nodig,2026-05-17
+VBD I 0020,Peilglas met temperatuurmeter-10,niet nodig,2026-05-17
+VBD ST 0002,"4-kant/vierkant plug/stop RVS 316 + BSP buitendraad/ 3/4""-DN 20",niet nodig,2026-05-17
+VBD ST 0001,"RVS 316 slangpilaar 3/4""/19 mm/DN 20xBSP buitendraad 3/4""",niet nodig,2026-05-17
+VBD ST 0003,"RVS 316 Verloopnippel/Reducer/BSP/buitendraad/1""x3/4""",niet nodig,2026-05-17
+VBD A 0052,"Lange luchtinlaatslang met filter 1,5m.",niet nodig,2026-05-17
+VBD I 0007,Zware RVS Slangklem 40-43mm voor uitlaatslang 38mm,niet nodig,2026-05-17
+VBD A 0261,Huiddoorvoer door vloer of wand 28 mm  voor Wallas en Safire,niet nodig,2026-05-17
+VBD A 0044,Uitlaatslang rvs 38mm,niet nodig,2026-05-17
+VBD A 0146,verloop uitlaat 24-38mm,niet nodig,2026-05-17
+VBD A 0086,Isolatie kous 30mm fiberglas,niet nodig,2026-05-17
+VBD A 0093,Isolatie kous 50mm fiberglas,niet nodig,2026-05-17
+VBD A 0048,Isolatie kous 38mm 1 meter,niet nodig,2026-05-17
+VBD A 0049,Isolatieband. Breedte 60 mm,niet nodig,2026-05-17
+VBD A 0050,Isolatieband. Breedte 75 mm,niet nodig,2026-05-17
+VBD A 0078,Extra stille uitlaatdemper 38mm RVS,niet nodig,2026-05-17
+VBD A 0053,RVS Demper met uitlaatslang 24mm,niet nodig,2026-05-17
+VBD A 0085,Uitlaatdemper inclusief isolatie 24mm,niet nodig,2026-05-17
+VBD A 0055,RVS Demper met uitlaatslang 38mm,niet nodig,2026-05-17
+VBD A 0092,Haakse bocht 24mm aluminium,niet nodig,2026-05-17
+VBD EP 0006,Aluminium brandstoftank 10 liter,niet nodig,2026-05-17
+VBD R 0002,"Brandstoftank-buitenboordmotortank11,3liter",niet nodig,2026-05-17
+VBD I 0022,"Mini kogelkraan 1/4"" female x male",niet nodig,2026-05-17
+VBD I 0023,"Slangpilaar 6mm x 1/4""",niet nodig,2026-05-17
+VBD R 0001,Tankdop met inhoudsmeter 170mm voor 12 liter tank,niet nodig,2026-05-17
+VBD I 0012,RVS Mini slangklem 9mm 9-11mm,niet nodig,2026-05-17
+VBD I 0015,Slangklem 12-22mm,niet nodig,2026-05-17
+VBD I 0016,Slangklem 8-12mm,niet nodig,2026-05-17
+VBD I 0010,Mini slangklem 9mm 13-15mm,niet nodig,2026-05-17
+VBD I 0014,RVS Slangklem 32-50mm,niet nodig,2026-05-17
+VBD A 0112,Stille brandstofpomp 24V-4.4ml voor de 2d+Flow5d,niet nodig,2026-05-17
+VBD A 0113,Stille brandstofpomp 24V-6.8ml voor de 4d+9d+14d.,niet nodig,2026-05-17
+VBD A 0054,Dieselfilter,niet nodig,2026-05-17
+VBD A 0135,Zuigbuis Autoterm 5d,niet nodig,2026-05-17
+VBD S 0042,T stuk 5x5x5,niet nodig,2026-05-17
+VBD S 0047,T stuk 6x5x6,niet nodig,2026-05-17
+VBD A 0082,T stuk 8x5x8,niet nodig,2026-05-17
+VBD S 0046,T stuk 10x5x10,niet nodig,2026-05-17
+VBD A 0097,Handmatige afsluitklep voor brandstoftank,niet nodig,2026-05-17
+VBD A 0170,Clip 2d & 4d,niet nodig,2026-05-17
+VBD A 0258,Gloeibougie 2d/24V,niet nodig,2026-05-17
+VBD A 0115,Glow plug screen 2d 4d,niet nodig,2026-05-17
+VBD A 0175,Keramische pakking 2d,niet nodig,2026-05-17
+VBD A 0162,Luchtpomp 12V 2d,niet nodig,2026-05-17
+VBD A 0163,Luchtpomp 24V 2d,niet nodig,2026-05-17
+VBD A 0171,Opsteeksluiting Starlock 2d,niet nodig,2026-05-17
+VBD A 0169,Printplaat 24V 2d met hoogte sensor tot 4200 Meter,niet nodig,2026-05-17
+VBD A 0172,Rubberen afdichting/houder voor brandstofleiding 2d,niet nodig,2026-05-17
+VBD A 0174,Afstandsmoer voor verbrandingskamerscherm 2d,niet nodig,2026-05-17
+VBD A 0234,Bovenste deel behuizing 2d,niet nodig,2026-05-17
+VBD A 0233,Onderste deel behuizing 2d,niet nodig,2026-05-17
+VBD A 0232,Uit en inblaasrooster 2d,niet nodig,2026-05-17
+VBD A 0120,Pakking voor 2d,niet nodig,2026-05-17
+VBD A 0179,Pakking verbrandingskamer 2d,niet nodig,2026-05-17
+VBD A 0124,Pakking gloeibougie 2d,niet nodig,2026-05-17
+VBD A 0148,Pakking gloeibougiebus 4d & Flow5,niet nodig,2026-05-17
+VBD A 0203,"5-pins connector voor verlengkabel bedieningspaneel 2d, 4d, 9d & 5d",niet nodig,2026-05-17
+VBD A 0202,Losse 5-pins connector voor verlengkabel  bedieningspaneel,niet nodig,2026-05-17
+VBD A 0177,Montageafdichting verwarming 2D,niet nodig,2026-05-17
+VBD A 0125,Rubberen afdichting,niet nodig,2026-05-17
+VBD A 0126,Pakking 4d,niet nodig,2026-05-17
+VBD A 0180,Adapter voor luchtinlaat 4d,niet nodig,2026-05-17
+VBD A 0183,Bovenste deel behuizing 4d,niet nodig,2026-05-17
+VBD A 0204,Luchtpomp 24V 4d,niet nodig,2026-05-17
+VBD A 0178,Montageafdichting verwarming 4D,niet nodig,2026-05-17
+VBD A 0182,Onderste deel behuizing 4d,niet nodig,2026-05-17
+VBD A 0145,Glow plug screen voor Air 9d en Flow 14d,niet nodig,2026-05-17
