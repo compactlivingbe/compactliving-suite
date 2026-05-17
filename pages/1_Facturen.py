@@ -676,7 +676,7 @@ with tab_peppol:
 
     try:
         odoo = get_odoo()
-        from verwerk import get_unlinked_draft_bills, create_po_from_bill, validate_receipts_for_pos, auto_create_product
+        from verwerk import get_unlinked_draft_bills, create_po_from_bill, validate_receipts_for_pos, auto_create_product, create_product_with_supplier
 
         with st.spinner("Bills zonder PO-link zoeken..."):
             unlinked_all = get_unlinked_draft_bills(odoo, limit=30)
@@ -783,19 +783,115 @@ with tab_peppol:
                                     st.success(f"✓ Gekoppeld aan {chosen['name']}")
                                     st.session_state.pop(cand_key, None)
                                     st.rerun()
-                                if cc[4].button("➕ Nieuw", key=f"{key}_new",
-                                                help="Maak nieuw product met deze beschrijving + prijs"):
-                                    new = auto_create_product(
-                                        odoo,
-                                        beschrijving=ln.get("name") or f"Nieuw product {lid}",
-                                        artikelnr=None,
-                                        prijs=ln.get("price_unit") or 0.0,
-                                    )
-                                    odoo.call("account.move.line", "write",
-                                              [[lid], {"product_id": new["id"]}])
-                                    st.success(f"✓ Nieuw product **{new['name']}** aangemaakt + gekoppeld.")
-                                    st.session_state.pop(cand_key, None)
-                                    st.rerun()
+                                # ➕ Nieuw product — popover met volledige form
+                                with cc[4].popover("➕ Nieuw", use_container_width=True):
+                                    bill_partner = b.get("partner_id") or [None, "?"]
+                                    bill_partner_id = bill_partner[0]
+                                    cost_default = float(ln.get("price_unit") or 0)
+                                    qty_default = float(ln.get("quantity") or 1)
+                                    name_default = (ln.get("name") or "")[:200]
+
+                                    st.markdown(f"**Nieuw product voor:** _{name_default[:80]}_")
+                                    st.caption(f"Bron: Bill van **{bill_partner[1]}** · {qty_default}× @ € {cost_default:.2f}")
+
+                                    # Cache UoM + categorieën
+                                    if "_uoms" not in st.session_state:
+                                        try:
+                                            st.session_state["_uoms"] = odoo.search_read(
+                                                "uom.uom", [], ["id", "name", "category_id"], 50, "name")
+                                        except Exception:
+                                            st.session_state["_uoms"] = []
+                                    if "_pcats" not in st.session_state:
+                                        try:
+                                            st.session_state["_pcats"] = odoo.search_read(
+                                                "product.category", [], ["id", "complete_name"],
+                                                200, "complete_name")
+                                        except Exception:
+                                            st.session_state["_pcats"] = []
+                                    uoms = st.session_state["_uoms"]
+                                    pcats = st.session_state["_pcats"]
+
+                                    # ----- product velden -----
+                                    new_name = st.text_input("Naam", value=name_default,
+                                                              key=f"{key}_new_name")
+                                    new_code = st.text_input("Interne referentie (optioneel)",
+                                                              value="", key=f"{key}_new_code")
+                                    fc1, fc2 = st.columns(2)
+                                    with fc1:
+                                        uom_labels = [f"{u['name']}" for u in uoms]
+                                        # Default Units
+                                        default_uom_idx = next(
+                                            (i for i, u in enumerate(uoms) if u["name"].lower() in ("units", "stuks", "stuk", "pieces", "piece")),
+                                            0 if uoms else 0)
+                                        uom_sel = st.selectbox("Eenheid (UoM)",
+                                                                ["(geen)"] + uom_labels,
+                                                                index=default_uom_idx + 1 if uoms else 0,
+                                                                key=f"{key}_new_uom")
+                                        uom_id = uoms[uom_labels.index(uom_sel)]["id"] if uom_sel != "(geen)" else None
+                                    with fc2:
+                                        cat_labels = [c["complete_name"] for c in pcats]
+                                        cat_sel = st.selectbox("Productcategorie",
+                                                                ["(geen)"] + cat_labels,
+                                                                key=f"{key}_new_cat")
+                                        cat_id = pcats[cat_labels.index(cat_sel)]["id"] if cat_sel != "(geen)" else None
+
+                                    fc3, fc4 = st.columns(2)
+                                    with fc3:
+                                        new_cost = st.number_input("Kostprijs (excl BTW)",
+                                                                     min_value=0.0, value=cost_default,
+                                                                     step=0.5, key=f"{key}_new_cost")
+                                    with fc4:
+                                        margin = st.number_input("Marge ×", min_value=1.0,
+                                                                   value=1.32, step=0.05,
+                                                                   key=f"{key}_new_margin")
+                                    new_sale = st.number_input("Verkoopprijs (auto = kost × marge)",
+                                                                 min_value=0.0,
+                                                                 value=round(new_cost * margin, 2),
+                                                                 step=0.5, key=f"{key}_new_sale")
+
+                                    # ----- inkoop / supplier sectie -----
+                                    st.markdown("**📥 Inkoop info (auto-ingevuld uit Bill):**")
+                                    sc1, sc2 = st.columns(2)
+                                    with sc1:
+                                        st.text(f"Leverancier: {bill_partner[1]}")
+                                        sup_code = st.text_input("Leveranciers­productcode",
+                                                                   value="", key=f"{key}_new_supcode",
+                                                                   help="Optioneel: artikelnr bij leverancier")
+                                    with sc2:
+                                        sup_qty = st.number_input("Min. bestel-aantal",
+                                                                    min_value=0.0, value=qty_default,
+                                                                    step=1.0, key=f"{key}_new_supqty")
+                                        sup_price = st.number_input("Inkoopprijs leverancier",
+                                                                      min_value=0.0, value=cost_default,
+                                                                      step=0.5, key=f"{key}_new_supprice")
+                                    sup_name_full = st.text_input(
+                                        "Leveranciers­productnaam",
+                                        value=name_default, key=f"{key}_new_supname",
+                                        help="Naam zoals op leveranciersfactuur")
+
+                                    if st.button("✓ Aanmaken + koppelen",
+                                                  type="primary", key=f"{key}_new_create",
+                                                  use_container_width=True):
+                                        try:
+                                            new = create_product_with_supplier(
+                                                odoo,
+                                                name=new_name, default_code=new_code or None,
+                                                cost=new_cost, sale_price=new_sale,
+                                                uom_id=uom_id, categ_id=cat_id,
+                                                partner_id=bill_partner_id,
+                                                supplier_code=sup_code or None,
+                                                supplier_name=sup_name_full or None,
+                                                supplier_qty=sup_qty,
+                                                supplier_price=sup_price,
+                                            )
+                                            odoo.call("account.move.line", "write",
+                                                       [[lid], {"product_id": new["id"]}])
+                                            si_msg = f" + supplierinfo voor {bill_partner[1]}" if new.get("supplier_info_id") else ""
+                                            st.success(f"✓ **{new['name']}** aangemaakt{si_msg}, gekoppeld aan lijn.")
+                                            st.session_state.pop(cand_key, None)
+                                            st.rerun()
+                                        except Exception as e:
+                                            st.error(f"Fout: {e}")
                     else:
                         # Toon read-only preview
                         with st.expander(f"📋 {len(bill_lines)} lijnen (alle gematcht)", expanded=False):

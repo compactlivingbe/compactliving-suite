@@ -76,6 +76,71 @@ def get_odoo_client() -> OdooClient:
     )
 
 
+def create_product_with_supplier(
+    odoo: OdooClient, name: str, default_code: str = None,
+    cost: float = 0.0, sale_price: float = 0.0,
+    uom_id: int = None, categ_id: int = None,
+    is_dienst: bool = False,
+    partner_id: int = None, supplier_code: str = None,
+    supplier_name: str = None, supplier_qty: float = 1.0,
+    supplier_price: float = None,
+) -> dict:
+    """Maak nieuw product.template + (optioneel) product.supplierinfo voor leverancier.
+
+    Voor de Peppol Bills → Nieuw product flow: vul leverancier-info automatisch in
+    op basis van de bill regel (partner van Bill, ARTNR / naam / aantal / prijs)."""
+    vals = {
+        "name": (name or "Onbekend product")[:200],
+        "purchase_ok": True,
+        "sale_ok": True,
+        "list_price": float(sale_price or 0),
+        "standard_price": float(cost or 0),
+    }
+    if is_dienst:
+        vals["type"] = "service"
+    else:
+        vals["type"] = "consu"
+        vals["is_storable"] = True
+    if default_code:
+        vals["default_code"] = default_code
+    if uom_id:
+        vals["uom_id"] = int(uom_id)
+        vals["uom_po_id"] = int(uom_id)
+    if categ_id:
+        vals["categ_id"] = int(categ_id)
+    # Maak template via product.product (Odoo schaalt naar template)
+    new_product_id = odoo.create("product.product", vals)
+    # Haal template_id op
+    pp = odoo.read("product.product", [new_product_id], ["product_tmpl_id"])[0]
+    tmpl_id = pp["product_tmpl_id"][0]
+    # Optionele supplierinfo
+    supplier_info_id = None
+    if partner_id:
+        si_vals = {
+            "partner_id": int(partner_id),
+            "product_tmpl_id": tmpl_id,
+            "min_qty": float(supplier_qty or 1),
+            "price": float(supplier_price if supplier_price is not None else cost or 0),
+            "delay": 3,
+        }
+        if supplier_code:
+            si_vals["product_code"] = supplier_code
+        if supplier_name:
+            si_vals["product_name"] = supplier_name[:200]
+        supplier_info_id = odoo.create("product.supplierinfo", si_vals)
+    return {
+        "id": new_product_id,
+        "template_id": tmpl_id,
+        "name": vals["name"],
+        "default_code": default_code or "",
+        "list_price": vals["list_price"],
+        "standard_price": vals["standard_price"],
+        "supplier_info_id": supplier_info_id,
+        "match_method": "auto_created_with_supplier",
+        "score": None,
+    }
+
+
 def auto_create_product(odoo: OdooClient, beschrijving: str, artikelnr: str,
                         prijs: float, is_dienst: bool = False) -> dict:
     """Maak een nieuw product in Odoo voor een ongematchte factuurlijn."""
