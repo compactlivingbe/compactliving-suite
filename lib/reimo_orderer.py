@@ -15,6 +15,7 @@ Gebruik:
     # aunr = "1707127" (Reimo bestelnummer)
 """
 import re
+import time
 import requests
 from datetime import date
 from bs4 import BeautifulSoup
@@ -314,15 +315,10 @@ class ReimoOrderer:
             })
         return items
 
-    def update_cart(self, updates):
-        """Update qty van bestaande items en/of mark for delete.
-        updates: list of {pos, qty (int) of None om te verwijderen}
-        Doet PREIS_VERFUEG (recalc) wat ook qty changes opslaat.
-        """
-        self.goto_schnellbestellung()
+    def _collect_form_data(self):
+        """Verzamel alle form inputs van de huidige Bestellübersicht."""
         soup = BeautifulSoup(self.last_response_html, "html.parser")
-        # Verzamel alle huidige form inputs
-        form = (soup.find("form", attrs={"name": re.compile(r"schnellbest|artikelanzeige", re.I)}) or
+        form = (soup.find("form", attrs={"name": re.compile(r"bestelluebersicht|schnellbest|artikelanzeige", re.I)}) or
                 soup.find("form"))
         data = {}
         if form:
@@ -330,32 +326,77 @@ class ReimoOrderer:
                 name = inp.get("name")
                 if name:
                     data[name] = inp.get("value", "")
-        # Apply updates
-        for u in updates:
-            pos = u["pos"]
-            qty = u.get("qty")
-            if qty is None:
-                # Verwijder via LOESCHEN vinkje of MENGE leeg
-                data[f"LOESCHEN{pos}"] = "J"
-                data[f"MENGE{pos}"] = " "
-            else:
-                data[f"MENGE{pos}"] = str(int(qty))
-        # Force fields die bij PREIS_VERFUEG horen
-        data["AKTION"] = "PREIS_VERFUEG"
+            for sel in form.find_all("select"):
+                name = sel.get("name")
+                if not name: continue
+                opt = sel.find("option", selected=True) or sel.find("option")
+                if opt: data[name] = opt.get("value", "")
+        return data
+
+    def delete_position(self, pos):
+        """Verwijder één positie via AKTION=POS_LOESCHEN (zoals Profiweb GUI).
+        pos: int (1..N). Wordt geformatteerd als 3-digit '001'."""
+        self.goto_schnellbestellung()
+        data = self._collect_form_data()
+        pos_str = f"{int(pos):03d}"
+        data["AKTION"] = "POS_LOESCHEN"
+        data["APOS"] = pos_str
+        # Zorg dat verplichte fields aanwezig zijn
         data["var_schnittstelle"] = data.get("var_schnittstelle") or "000070"
         data["var_folgemaske"] = "reimo_suche_schnellbestellung.html"
         data["var_transaktionsnr"] = self.transaktionsnr or data.get("var_transaktionsnr", "")
         r = self.s.post(CALL_URL, data=data, timeout=60); r.raise_for_status()
         self.last_response_html = r.text
         self._extract_transaktionsnr(r.text)
-        self.log(f"Cart geüpdate: {len(updates)} wijziging(en)")
+        self.log(f"Positie {pos_str} verwijderd uit cart.")
+        return True
 
-    def clear_cart(self):
-        """Verwijder ALLE items uit de winkelmand."""
+    def update_cart(self, updates):
+        """Update qty (en/of verwijder) van bestaande items.
+        updates: list of {pos, qty (int) of None om te verwijderen}.
+        Voor verwijderingen wordt POS_LOESCHEN per positie aangeroepen.
+        Voor qty changes wordt 1× PREIS_VERFUEG gepost.
+        """
+        # Eerst deletes (van hoog naar laag, anders schuiven nummers)
+        deletes = sorted([u for u in updates if u.get("qty") is None],
+                          key=lambda u: u["pos"], reverse=True)
+        for u in deletes:
+            self.delete_position(u["pos"])
+            time.sleep(0.3)
+        # Daarna qty updates
+        qty_updates = [u for u in updates if u.get("qty") is not None]
+        if qty_updates:
+            self.goto_schnellbestellung()
+            data = self._collect_form_data()
+            for u in qty_updates:
+                pos = u["pos"]
+                data[f"MENGE{pos}"] = str(int(u["qty"]))
+            data["AKTION"] = "PREIS_VERFUEG"
+            data["var_schnittstelle"] = data.get("var_schnittstelle") or "000070"
+            data["var_folgemaske"] = "reimo_suche_schnellbestellung.html"
+            data["var_transaktionsnr"] = self.transaktionsnr or data.get("var_transaktionsnr", "")
+            r = self.s.post(CALL_URL, data=data, timeout=60); r.raise_for_status()
+            self.last_response_html = r.text
+            self._extract_transaktionsnr(r.text)
+            self.log(f"Cart qty geüpdate ({len(qty_updates)} regels).")
+        self.log(f"Cart geüpdate: {len(updates)} wijziging(en) totaal.")
+
+    def clear_cart(self, max_iter=50):
+        """Verwijder ALLE items uit de winkelmand.
+        Cart hernummert na delete, dus telkens positie 001 wegslaan tot leeg."""
+        deleted = 0
+        for _ in range(max_iter):
+            cart = self.get_cart()
+            if not cart:
+                break
+            # Pak laagste positie
+            pos = min(item["pos"] for item in cart)
+            self.delete_position(pos)
+            deleted += 1
+            time.sleep(0.3)
+        # Final check
         cart = self.get_cart()
-        if not cart:
-            self.log("Cart is al leeg.")
-            return
-        updates = [{"pos": item["pos"], "qty": None} for item in cart]
-        self.update_cart(updates)
-        self.log(f"Cart geleegd ({len(cart)} items verwijderd)")
+        if cart:
+            self.log(f"Cart NIET volledig leeg na {deleted} deletes — {len(cart)} items over.")
+        else:
+            self.log(f"Cart geleegd ({deleted} items verwijderd).")
