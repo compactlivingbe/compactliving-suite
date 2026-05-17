@@ -141,6 +141,41 @@ def create_product_with_supplier(
     }
 
 
+def add_supplierinfo_to_product(
+    odoo: OdooClient, template_id: int, partner_id: int,
+    product_code: str = None, product_name: str = None,
+    min_qty: float = 1.0, price: float = 0.0, delay: int = 3,
+) -> int:
+    """Voeg een product.supplierinfo entry toe aan een bestaand product template.
+
+    Handig voor producten waar één leverancier meerdere verpakkings-varianten verkoopt
+    (bv. per 1m of per 2m). De product UoM blijft hetzelfde — min_qty + product_code
+    onderscheidt de variant."""
+    vals = {
+        "partner_id": int(partner_id),
+        "product_tmpl_id": int(template_id),
+        "min_qty": float(min_qty or 1),
+        "price": float(price or 0),
+        "delay": int(delay),
+    }
+    if product_code:
+        vals["product_code"] = product_code[:64]
+    if product_name:
+        vals["product_name"] = product_name[:200]
+    return odoo.create("product.supplierinfo", vals)
+
+
+def list_supplierinfo_for_template(odoo: OdooClient, template_id: int) -> list:
+    """Lijst van alle bestaande supplierinfo records voor een product template."""
+    return odoo.search_read(
+        "product.supplierinfo",
+        [("product_tmpl_id", "=", int(template_id))],
+        ["id", "partner_id", "product_code", "product_name",
+         "min_qty", "price", "delay"],
+        50, "sequence,min_qty"
+    )
+
+
 def auto_create_product(odoo: OdooClient, beschrijving: str, artikelnr: str,
                         prijs: float, is_dienst: bool = False) -> dict:
     """Maak een nieuw product in Odoo voor een ongematchte factuurlijn."""
