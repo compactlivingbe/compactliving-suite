@@ -829,37 +829,50 @@ with tab_peppol:
                                     )
                                     st.session_state[cand_key] = cands
                                 cands = st.session_state[cand_key]
-                                opts = ["(kies / nieuw / open zoekveld)"] + \
+                                opts = ["(top suggesties — of zoek hieronder)"] + \
                                        [f"[{c.get('default_code') or '—'}] {c['name']}  (€{c.get('standard_price', 0):.2f}, score {c.get('score', 0):.2f})"
                                         for c in cands]
                                 sel_label = cc[1].selectbox("kandidaat", opts, key=f"{key}_sel",
                                                             label_visibility="collapsed")
                                 idx = opts.index(sel_label) if sel_label in opts else 0
-                                # Free-text search
-                                search = cc[2].text_input("of typ naam", key=f"{key}_search",
-                                                          label_visibility="collapsed",
-                                                          placeholder="zoeken...")
+                                # Free-text search — ZOEKT LIVE in heel Odoo (naam OR code)
+                                search = cc[2].text_input(
+                                    "zoek in Odoo", key=f"{key}_search",
+                                    label_visibility="collapsed",
+                                    placeholder="🔍 zoek naam/code in Odoo...")
                                 if search and len(search) >= 2:
+                                    # Multi-term ilike: alle woorden moeten in name OR code voorkomen
+                                    terms = [t for t in search.split() if len(t) >= 2]
+                                    domain = []
+                                    for t in terms:
+                                        domain += ['|', ("name", "ilike", t), ("default_code", "ilike", t)]
+                                    # AND tussen alle terms (default — geen extra operators nodig)
                                     extra = odoo.search_read(
-                                        "product.product",
-                                        ['|', ("name", "ilike", search), ("default_code", "ilike", search)],
-                                        ["id", "name", "default_code", "list_price", "standard_price"], 10
-                                    )
+                                        "product.product", domain,
+                                        ["id", "name", "default_code", "list_price", "standard_price",
+                                          "product_tmpl_id"],
+                                        20, "name")
                                     if extra:
-                                        opts2 = [f"[{e.get('default_code') or '—'}] {e['name']}" for e in extra]
-                                        sel2 = cc[2].selectbox("zoekresultaten", ["(geen)"] + opts2,
-                                                                key=f"{key}_search_sel",
-                                                                label_visibility="collapsed")
-                                        if sel2 != "(geen)":
+                                        cc[2].caption(f"📋 {len(extra)} resultaat(en):")
+                                        opts2 = [f"[{e.get('default_code') or '—'}] {e['name']}  (€{e.get('standard_price') or 0:.2f})"
+                                                  for e in extra]
+                                        sel2 = cc[2].selectbox(
+                                            "zoekresultaten", ["(kies om te koppelen)"] + opts2,
+                                            key=f"{key}_search_sel",
+                                            label_visibility="collapsed")
+                                        if sel2 != "(kies om te koppelen)":
                                             chosen = extra[opts2.index(sel2)]
-                                            if cc[3].button("Koppel", key=f"{key}_link2"):
+                                            if cc[3].button("Koppel", key=f"{key}_link2",
+                                                              type="primary"):
                                                 odoo.call("account.move.line", "write",
                                                           [[lid], {"product_id": chosen["id"]}])
                                                 st.success(f"✓ Gekoppeld aan [{chosen.get('default_code') or '—'}] {chosen['name']}")
                                                 st.session_state.pop(cand_key, None)
                                                 st.rerun()
+                                    else:
+                                        cc[2].caption(f"⚠ Geen Odoo product met '{search}' in naam/code.")
 
-                                # Action buttons
+                                # Action buttons — Koppel knop voor selectie uit eerste dropdown
                                 if idx > 0 and cc[3].button("Koppel", key=f"{key}_link"):
                                     chosen = cands[idx - 1]
                                     odoo.call("account.move.line", "write",
