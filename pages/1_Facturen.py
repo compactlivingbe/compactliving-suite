@@ -794,22 +794,36 @@ with tab_peppol:
                                     st.markdown(f"**Nieuw product voor:** _{name_default[:80]}_")
                                     st.caption(f"Bron: Bill van **{bill_partner[1]}** · {qty_default}× @ € {cost_default:.2f}")
 
-                                    # Cache UoM + categorieën
+                                    # Cache UoM + categorieën (probeer meerdere models)
                                     if "_uoms" not in st.session_state:
-                                        try:
-                                            st.session_state["_uoms"] = odoo.search_read(
-                                                "uom.uom", [], ["id", "name", "category_id"], 50, "name")
-                                        except Exception:
-                                            st.session_state["_uoms"] = []
+                                        uoms_loaded = []
+                                        uom_err = None
+                                        for model in ("uom.uom", "product.uom"):
+                                            try:
+                                                uoms_loaded = odoo.search_read(
+                                                    model, [], ["id", "name"], 100, "name")
+                                                if uoms_loaded:
+                                                    break
+                                            except Exception as e:
+                                                uom_err = f"{model}: {e}"
+                                        st.session_state["_uoms"] = uoms_loaded
+                                        st.session_state["_uoms_err"] = uom_err
                                     if "_pcats" not in st.session_state:
                                         try:
                                             st.session_state["_pcats"] = odoo.search_read(
                                                 "product.category", [], ["id", "complete_name"],
                                                 200, "complete_name")
-                                        except Exception:
+                                        except Exception as e:
                                             st.session_state["_pcats"] = []
+                                            st.warning(f"Categorieën laden faalde: {e}")
                                     uoms = st.session_state["_uoms"]
                                     pcats = st.session_state["_pcats"]
+                                    if not uoms:
+                                        err = st.session_state.get("_uoms_err") or ""
+                                        st.warning(
+                                            "⚠ Geen UoM's gevonden in Odoo. "
+                                            "Schakel 'Units of Measure' in via Instellingen → Inventory → "
+                                            "Operations → Units of Measure." + (f"\n\n_Detail: {err}_" if err else ""))
 
                                     # ----- product velden -----
                                     new_name = st.text_input("Naam", value=name_default,
