@@ -743,6 +743,7 @@ with tab_peppol:
                                         artikelnr=None,
                                         prijs_hint=ln.get("price_unit"),
                                         top_n=10,
+                                        partner_id=(b.get("partner_id") or [None])[0],
                                     )
                                     st.session_state[cand_key] = cands
                                 cands = st.session_state[cand_key]
