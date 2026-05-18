@@ -719,22 +719,36 @@ with tab_peppol:
                     # Per-lijn matcher UI in expander
                     if no_prod_lines:
                         with st.expander(f"⚠ {len(no_prod_lines)} lijn(en) zonder product — koppel hier", expanded=True):
-                            st.caption("Selecteer per regel een bestaand product of maak een nieuw aan.")
+                            # Toon gematchte lijnen als compacte read-only sectie bovenaan
+                            matched = [ln for ln in bill_lines if ln.get("product_id")]
+                            if matched:
+                                with st.container(border=False):
+                                    st.markdown("###### ✓ Reeds gekoppeld")
+                                    for ln in matched:
+                                        mc = st.columns([4, 4, 2])
+                                        mc[0].markdown(f"**{(ln['product_id'] or [None,'?'])[1]}**")
+                                        mc[1].caption(f"_bill: {(ln.get('name') or '')[:60]}_")
+                                        mc[2].caption(f"{ln.get('quantity')}× · €{(ln.get('price_unit') or 0):.2f}")
+                                st.divider()
+
+                            # Header voor ongematchte lijnen
+                            st.markdown("###### ⚠ Te koppelen")
+                            hdr = st.columns([3, 3, 3, 1.3])
+                            hdr[0].caption("**Bill regel**")
+                            hdr[1].caption("**Top suggesties Odoo**")
+                            hdr[2].caption("**Zoek/koppel**")
+                            hdr[3].caption("**Acties**")
+
                             for ln in bill_lines:
                                 if ln.get("product_id"):
-                                    cc = st.columns([3, 2, 1])
-                                    cc[0].markdown(f"✓ **{(ln['product_id'] or [None,'?'])[1]}**")
-                                    cc[1].caption((ln.get("name") or "")[:60])
-                                    cc[2].caption(f"qty {ln.get('quantity')} · €{(ln.get('price_unit') or 0):.2f}")
-                                    continue
-
+                                    continue   # al getoond bovenaan
                                 lid = ln["id"]
                                 key = f"pep_match_{b['id']}_{lid}"
-                                cc = st.columns([2, 3, 2, 1.5, 1.5])
-                                cc[0].caption("Beschrijving")
-                                cc[0].markdown(f"_{(ln.get('name') or '')[:50]}_")
-                                cc[1].caption("Match (Odoo zoeken)")
-                                # Lazy load candidates per line, cached in session
+                                cc = st.columns([3, 3, 3, 1.3])
+                                # ----- col 0: bill regel info (compact) -----
+                                cc[0].markdown(f"**_{(ln.get('name') or '')[:60]}_**")
+                                cc[0].caption(f"{ln.get('quantity')}× · €{(ln.get('price_unit') or 0):.2f}")
+                                # ----- col 1: top suggesties -----
                                 cand_key = f"_cands_{lid}"
                                 if cand_key not in st.session_state:
                                     cands = find_product_candidates(
@@ -747,17 +761,17 @@ with tab_peppol:
                                     )
                                     st.session_state[cand_key] = cands
                                 cands = st.session_state[cand_key]
-                                opts = ["(top suggesties — of zoek hieronder)"] + \
-                                       [f"[{c.get('default_code') or '—'}] {c['name']}  (€{c.get('standard_price', 0):.2f}, score {c.get('score', 0):.2f})"
+                                opts = ["—"] + \
+                                       [f"[{c.get('default_code') or '—'}] {c['name']}  · €{c.get('standard_price', 0):.2f} · {c.get('score', 0):.2f}"
                                         for c in cands]
                                 sel_label = cc[1].selectbox("kandidaat", opts, key=f"{key}_sel",
                                                             label_visibility="collapsed")
                                 idx = opts.index(sel_label) if sel_label in opts else 0
-                                # Free-text search — ZOEKT LIVE in heel Odoo (naam OR code)
+                                # ----- col 2: vrij zoeken in Odoo -----
                                 search = cc[2].text_input(
                                     "zoek in Odoo", key=f"{key}_search",
                                     label_visibility="collapsed",
-                                    placeholder="🔍 zoek naam/code in Odoo...")
+                                    placeholder="🔍 zoek naam/code...")
                                 if search and len(search) >= 2:
                                     # Multi-term ilike: alle woorden moeten in name OR code voorkomen
                                     terms = [t for t in search.split() if len(t) >= 2]
@@ -781,8 +795,9 @@ with tab_peppol:
                                         if sel2 != "(kies om te koppelen)":
                                             chosen = extra[opts2.index(sel2)]
                                             # Knop 1: gewoon koppelen
-                                            if cc[3].button("Koppel", key=f"{key}_link2",
-                                                              type="primary"):
+                                            if cc[2].button("✓ Koppel", key=f"{key}_link2",
+                                                              type="primary",
+                                                              use_container_width=True):
                                                 odoo.call("account.move.line", "write",
                                                           [[lid], {"product_id": chosen["id"]}])
                                                 st.success(f"✓ Gekoppeld aan [{chosen.get('default_code') or '—'}] {chosen['name']}")
@@ -792,7 +807,8 @@ with tab_peppol:
                                             bill_partner_s = b.get("partner_id") or [None, "?"]
                                             bp_id_s = bill_partner_s[0]
                                             key_si = f"pep_si_{b['id']}_{lid}"
-                                            with cc[4].popover("📦 + Variant", use_container_width=True):
+                                            with cc[2].popover("📦 Koppel + Variant",
+                                                                 use_container_width=True):
                                                 from verwerk import list_supplierinfo_for_template, add_supplierinfo_to_product, get_uoms_by_category
                                                 try:
                                                     pp = odoo.read("product.product", [chosen["id"]],
@@ -898,8 +914,11 @@ with tab_peppol:
                                     else:
                                         cc[2].caption(f"⚠ Geen Odoo product met '{search}' in naam/code.")
 
-                                # Action buttons — Koppel knop voor selectie uit eerste dropdown
-                                if idx > 0 and cc[3].button("Koppel", key=f"{key}_link"):
+                                # ----- col 3: actie-kolom -----
+                                # Koppel knop voor selectie uit eerste dropdown
+                                if idx > 0 and cc[3].button("✓ Koppel", key=f"{key}_link",
+                                                              type="primary",
+                                                              use_container_width=True):
                                     chosen = cands[idx - 1]
                                     odoo.call("account.move.line", "write",
                                               [[lid], {"product_id": chosen["id"]}])
@@ -907,7 +926,7 @@ with tab_peppol:
                                     st.session_state.pop(cand_key, None)
                                     st.rerun()
                                 # ➕ Nieuw product — popover met volledige form
-                                with cc[4].popover("➕ Nieuw", use_container_width=True):
+                                with cc[3].popover("➕ Nieuw", use_container_width=True):
                                     bill_partner = b.get("partner_id") or [None, "?"]
                                     bill_partner_id = bill_partner[0]
                                     cost_default = float(ln.get("price_unit") or 0)
