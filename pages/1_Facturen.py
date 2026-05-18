@@ -307,17 +307,26 @@ with tab_verwerk:
                             cols[1].caption(f"Qty: {ln.get('hoeveelheid')}")
                             cols[2].caption(f"Prijs: {fmt_eur(ln.get('eenheidsprijs_excl_btw'))}")
 
-                            options = ["🆕 Nieuw product aanmaken (storable)"]
+                            SKIP_LABEL = "⏭ Overslaan (deze lijn NIET in PO/Bill)"
+                            options = ["🆕 Nieuw product aanmaken (storable)", SKIP_LABEL]
                             for c in cands:
                                 code = f"[{c.get('default_code') or '—'}]"
                                 options.append(f"{code} {c['name'][:60]} (score {c['score']})")
                             choice = st.selectbox(
                                 "Kies product:", options,
                                 key=f"choice_{idx}",
-                                index=1 if cands else 0
+                                index=2 if cands else 0   # default = eerste kandidaat indien aanwezig
                             )
-                            if choice == options[0]:
+                            if choice == SKIP_LABEL:
+                                # Markeer als overslaan
+                                if "skipped_indices" not in st.session_state:
+                                    st.session_state["skipped_indices"] = set()
+                                st.session_state["skipped_indices"].add(idx)
+                                st.caption(f"⏭ Lijn {idx + 1} wordt niet verwerkt in Odoo")
+                            elif choice == options[0]:
                                 # Nieuw aanmaken
+                                if "skipped_indices" in st.session_state:
+                                    st.session_state["skipped_indices"].discard(idx)
                                 cnew = st.columns([2, 1])
                                 new_name = cnew[0].text_input(
                                     "Productnaam", value=ln.get("beschrijving") or "",
@@ -333,8 +342,10 @@ with tab_verwerk:
                                     "is_dienst": ln.get("is_dienst", False),
                                 }
                             else:
-                                # Bestaand kiezen
-                                chosen = cands[options.index(choice) - 1]
+                                if "skipped_indices" in st.session_state:
+                                    st.session_state["skipped_indices"].discard(idx)
+                                # Bestaand kiezen — kandidaten beginnen op index 2 nu
+                                chosen = cands[options.index(choice) - 2]
                                 product_assignments[idx] = chosen["id"]
                                 # Optie: SKU toevoegen aan bestaand product
                                 if ln.get("artikelnummer") and not chosen.get("default_code"):
@@ -361,6 +372,14 @@ with tab_verwerk:
                 from verwerk import maak_purchase_order, confirm_pos, validate_receipts_for_pos, auto_create_product
                 odoo = get_odoo()
                 try:
+                    # Stap 0: filter skipped lijnen uit factuur
+                    skipped = st.session_state.get("skipped_indices", set())
+                    if skipped:
+                        original_lijnen = factuur.get("lijnen", [])
+                        factuur["lijnen"] = [ln for i, ln in enumerate(original_lijnen)
+                                              if i not in skipped]
+                        st.caption(f"⏭ {len(skipped)} lijn(en) overgeslagen — niet in PO/Bill")
+                        st.session_state.pop("skipped_indices", None)
                     # Stap 1: pas updates toe (SKU toevoegen)
                     for k, upd in new_products_to_create.items():
                         if isinstance(k, str) and k.startswith("upd_"):
