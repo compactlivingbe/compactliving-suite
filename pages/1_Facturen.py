@@ -1008,7 +1008,6 @@ with tab_peppol:
                                             try:
                                                 sel_uom = next(u for u in uoms if u["id"] == uom_id)
                                                 # Reload uoms met category info
-                                                from verwerk import get_uoms_by_category
                                                 cat_uoms_n = get_uoms_by_category(
                                                     odoo, (sel_uom.get("category_id") or [None])[0]
                                                 ) if sel_uom.get("category_id") else uoms
