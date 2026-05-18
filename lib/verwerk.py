@@ -323,14 +323,17 @@ def validate_receipts_for_pos(odoo: OdooClient, po_ids: list) -> dict:
 
 
 def create_bill_from_po(odoo: OdooClient, po_id: int, copy_attachments: bool = True,
-                        invoice_date: str = None, ref: str = None) -> dict:
+                        invoice_date: str = None, ref: str = None,
+                        use_ordered_qty: bool = True) -> dict:
     """
     Maak een Vendor Bill van een PO via Odoo's action_create_invoice.
     Kopieert PDF-attachments van PO → Bill als copy_attachments=True.
+    use_ordered_qty: forceer bill-lijn quantity = PO ordered qty (anders gebruikt Odoo
+                     qty_received - qty_invoiced wat 0 is als ontvangst nog niet gedaan).
     Returns: {'bill_id': int, 'bill_name': str, 'attachments_copied': int}
     """
     # Onthoud welke bills al bestonden vóór de actie
-    po_before = odoo.read("purchase.order", [po_id], ["invoice_ids", "name"])[0]
+    po_before = odoo.read("purchase.order", [po_id], ["invoice_ids", "name", "order_line"])[0]
     existing_bill_ids = set(po_before.get("invoice_ids") or [])
 
     # Roep Odoo's standaard action aan
@@ -351,6 +354,30 @@ def create_bill_from_po(odoo: OdooClient, po_id: int, copy_attachments: bool = T
         update_vals["ref"] = ref
     if update_vals:
         odoo.write("account.move", [bill_id], update_vals)
+
+    # Forceer ordered qty op bill-lijnen (anders qty=0 zonder receipt)
+    qty_updated = 0
+    if use_ordered_qty:
+        try:
+            po_lines = odoo.read("purchase.order.line", po_before.get("order_line") or [],
+                                  ["id", "product_id", "product_qty", "qty_invoiced"])
+            qty_by_po_line = {l["id"]: l for l in po_lines}
+            bill = odoo.read("account.move", [bill_id], ["invoice_line_ids"])[0]
+            bill_lines = odoo.read("account.move.line", bill.get("invoice_line_ids") or [],
+                                    ["id", "purchase_line_id", "quantity", "product_id"])
+            for bl in bill_lines:
+                pl_id = (bl.get("purchase_line_id") or [None])[0]
+                if not pl_id or pl_id not in qty_by_po_line:
+                    continue
+                pl = qty_by_po_line[pl_id]
+                # Outstanding qty = ordered - already invoiced
+                outstanding = float(pl.get("product_qty") or 0) - float(pl.get("qty_invoiced") or 0)
+                if outstanding > 0 and abs((bl.get("quantity") or 0) - outstanding) > 0.001:
+                    odoo.write("account.move.line", [bl["id"]], {"quantity": outstanding})
+                    qty_updated += 1
+        except Exception as e:
+            # Niet fataal — bill is gemaakt, alleen qty niet aangepast
+            pass
 
     # Kopieer attachments van PO naar Bill
     n_copied = 0
@@ -379,6 +406,7 @@ def create_bill_from_po(odoo: OdooClient, po_id: int, copy_attachments: bool = T
         "bill_total": bill.get("amount_total"),
         "attachments_copied": n_copied,
         "po_name": po_before["name"],
+        "qty_updated": qty_updated if use_ordered_qty else 0,
     }
 
 
