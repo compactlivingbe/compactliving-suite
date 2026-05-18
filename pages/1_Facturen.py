@@ -969,15 +969,42 @@ with tab_peppol:
                                     if not uoms:
                                         err = st.session_state.get("_uoms_err") or ""
                                         st.warning(
-                                            "⚠ **Geen UoM's gevonden in Odoo.**\n\n"
-                                            "Twee stappen om te fixen:\n\n"
-                                            "1. **Schakel UoMs in:** ga naar **Instellingen → "
-                                            "Inventory → Operations** en vink **'Units of Measure'** aan, klik Opslaan.\n"
-                                            "2. **Geef je API user rechten:** ga naar **Instellingen → Users & Companies → "
-                                            "Users**, open jouw user, scroll naar **'Inventory'** en zet "
-                                            "**'Manage Multiple Units of Measure'** aan.\n\n"
-                                            "Klik daarna op **↻ Herlaad UoM's** hierboven."
+                                            "⚠ **Geen UoM's gevonden in Odoo via API.**\n\n"
+                                            "Klik op **↻ Herlaad UoM's** of de **🔍 Diagnose** knop hieronder."
                                             + (f"\n\n_Detail: {err}_" if err else ""))
+                                        if st.button("🔍 Diagnose Odoo UoM toegang",
+                                                      key=f"{key}_uom_diag"):
+                                            st.markdown("**Diagnostiek:**")
+                                            try:
+                                                cnt = odoo.call("uom.uom", "search_count", [[]])
+                                                st.write(f"`uom.uom` search_count: **{cnt}** records zichtbaar voor API user")
+                                            except Exception as e:
+                                                st.error(f"search_count failed: {e}")
+                                            try:
+                                                raw = odoo.call("uom.uom", "search_read",
+                                                                  [[], ["id", "name"]],
+                                                                  {"limit": 5})
+                                                st.write(f"Eerste 5 records (minimaal):")
+                                                st.json(raw)
+                                            except Exception as e:
+                                                st.error(f"search_read [id, name] failed: {e}")
+                                            try:
+                                                # Probeer ook met category
+                                                raw2 = odoo.call("uom.uom", "search_read",
+                                                                   [[], ["id", "name", "category_id", "factor", "uom_type"]],
+                                                                   {"limit": 5})
+                                                st.write("Met meer velden:")
+                                                st.json(raw2)
+                                            except Exception as e:
+                                                st.error(f"search_read [met category] failed: {e}")
+                                            # Check welke user
+                                            try:
+                                                me = odoo.call("res.users", "read",
+                                                                 [[odoo.uid], ["login", "name", "groups_id"]])
+                                                st.write(f"API user: **{me[0]['login']}** ({me[0]['name']})")
+                                                st.write(f"In {len(me[0]['groups_id'])} groepen")
+                                            except Exception as e:
+                                                st.error(f"user check failed: {e}")
 
                                     # ----- product velden -----
                                     new_name = st.text_input("Naam", value=name_default,
