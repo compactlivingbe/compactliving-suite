@@ -83,7 +83,7 @@ def create_product_with_supplier(
     is_dienst: bool = False,
     partner_id: int = None, supplier_code: str = None,
     supplier_name: str = None, supplier_qty: float = 1.0,
-    supplier_price: float = None,
+    supplier_price: float = None, supplier_uom_id: int = None,
 ) -> dict:
     """Maak nieuw product.template + (optioneel) product.supplierinfo voor leverancier.
 
@@ -127,7 +127,18 @@ def create_product_with_supplier(
             si_vals["product_code"] = supplier_code
         if supplier_name:
             si_vals["product_name"] = supplier_name[:200]
-        supplier_info_id = odoo.create("product.supplierinfo", si_vals)
+        if supplier_uom_id:
+            for uom_field in ("product_uom", "product_uom_id"):
+                try:
+                    supplier_info_id = odoo.create(
+                        "product.supplierinfo", {**si_vals, uom_field: int(supplier_uom_id)})
+                    break
+                except Exception:
+                    supplier_info_id = None
+            if supplier_info_id is None:
+                supplier_info_id = odoo.create("product.supplierinfo", si_vals)
+        else:
+            supplier_info_id = odoo.create("product.supplierinfo", si_vals)
     return {
         "id": new_product_id,
         "template_id": tmpl_id,
@@ -145,12 +156,14 @@ def add_supplierinfo_to_product(
     odoo: OdooClient, template_id: int, partner_id: int,
     product_code: str = None, product_name: str = None,
     min_qty: float = 1.0, price: float = 0.0, delay: int = 3,
+    product_uom_id: int = None,
 ) -> int:
     """Voeg een product.supplierinfo entry toe aan een bestaand product template.
 
-    Handig voor producten waar één leverancier meerdere verpakkings-varianten verkoopt
-    (bv. per 1m of per 2m). De product UoM blijft hetzelfde — min_qty + product_code
-    onderscheidt de variant."""
+    product_uom_id: optioneel — leverancier-UoM (moet in dezelfde category zijn als product UoM).
+    Bv. product per 'm', leverancier verkoopt per 'rol van 2m' → maak UoM 'Rol 2m' in
+    category Length met factor 2.
+    """
     vals = {
         "partner_id": int(partner_id),
         "product_tmpl_id": int(template_id),
@@ -162,7 +175,26 @@ def add_supplierinfo_to_product(
         vals["product_code"] = product_code[:64]
     if product_name:
         vals["product_name"] = product_name[:200]
+    if product_uom_id:
+        # Probeer leverancier-UoM te zetten (afhankelijk van Odoo versie)
+        try:
+            sid = odoo.create("product.supplierinfo", {**vals, "product_uom": int(product_uom_id)})
+            return sid
+        except Exception:
+            try:
+                sid = odoo.create("product.supplierinfo", {**vals, "product_uom_id": int(product_uom_id)})
+                return sid
+            except Exception:
+                pass  # fallback: zonder eigen UoM
     return odoo.create("product.supplierinfo", vals)
+
+
+def get_uoms_by_category(odoo: OdooClient, category_id: int = None) -> list:
+    """Lijst UoM's, optioneel gefilterd op category (om mengen tussen length/weight te vermijden)."""
+    domain = [("category_id", "=", int(category_id))] if category_id else []
+    return odoo.search_read("uom.uom", domain,
+                              ["id", "name", "category_id", "factor", "uom_type"],
+                              100, "name")
 
 
 def list_supplierinfo_for_template(odoo: OdooClient, template_id: int) -> list:

@@ -746,10 +746,23 @@ with tab_peppol:
                                             tmpl_id = None
                                             prod_uom = "?"
                                         if tmpl_id:
-                                            from verwerk import list_supplierinfo_for_template, add_supplierinfo_to_product
+                                            from verwerk import list_supplierinfo_for_template, add_supplierinfo_to_product, get_uoms_by_category
                                             st.markdown(f"**Product:** {pp['name']}")
+                                            # Haal product UoM info + alle UoM's in zelfde category
+                                            prod_uom_id = (pp.get("uom_id") or [None, "?"])[0]
+                                            prod_uom_cat_id = None
+                                            try:
+                                                if prod_uom_id:
+                                                    uom_full = odoo.read("uom.uom", [prod_uom_id],
+                                                                          ["category_id"])[0]
+                                                    prod_uom_cat_id = (uom_full.get("category_id") or [None])[0]
+                                            except Exception: pass
+                                            try:
+                                                cat_uoms = get_uoms_by_category(odoo, prod_uom_cat_id) if prod_uom_cat_id else []
+                                            except Exception:
+                                                cat_uoms = []
                                             st.caption(f"UoM: **{prod_uom}** · "
-                                                        f"Voeg een leveranciers-variant toe (bv. per 1m of per 2m)")
+                                                        f"Voeg een leveranciers-variant toe (bv. per 1m of per 2m of rol)")
 
                                             # Toon bestaande supplierinfo's
                                             try:
@@ -776,25 +789,45 @@ with tab_peppol:
                                                     "Leverancierscode",
                                                     value="", key=f"{key_si}_code",
                                                     placeholder="bv. AB123-2M")
+                                                # UoM dropdown — zelfde category
+                                                if cat_uoms:
+                                                    uom_labels_si = [u["name"] for u in cat_uoms]
+                                                    default_uom_idx_si = next(
+                                                        (i for i, u in enumerate(cat_uoms)
+                                                          if u["id"] == prod_uom_id), 0)
+                                                    sup_uom_sel = st.selectbox(
+                                                        "Leverancier UoM (zelfde category)",
+                                                        uom_labels_si,
+                                                        index=default_uom_idx_si,
+                                                        key=f"{key_si}_uom",
+                                                        help="Bv. product per 'm', maar leverancier verkoopt per 'Rol' of '2m'. "
+                                                              "UoM moet in dezelfde category staan.")
+                                                    sup_uom_id_si = cat_uoms[uom_labels_si.index(sup_uom_sel)]["id"]
+                                                    sup_uom_name = sup_uom_sel
+                                                else:
+                                                    sup_uom_id_si = prod_uom_id
+                                                    sup_uom_name = prod_uom
+                                                    st.caption(f"_UoM blijft: {prod_uom} (geen alternatieven in category)_")
                                                 v_qty = st.number_input(
-                                                    f"Min. qty (in {prod_uom})",
+                                                    f"Min. qty (in {sup_uom_name})",
                                                     min_value=0.0,
                                                     value=float(ln.get("quantity") or 1),
                                                     step=0.5, key=f"{key_si}_qty",
-                                                    help="Hoeveel product-UoM per bestelling/bundel")
+                                                    help="Hoeveel leverancier-UoM per bestelling")
                                             with vc2:
                                                 v_name = st.text_input(
                                                     "Leveranciers­productnaam",
                                                     value=(ln.get("name") or "")[:80],
                                                     key=f"{key_si}_name")
                                                 v_price = st.number_input(
-                                                    "Inkoopprijs (totaal voor de min qty)",
+                                                    f"Inkoopprijs (per {sup_uom_name})",
                                                     min_value=0.0,
                                                     value=float(ln.get("price_unit") or 0),
                                                     step=0.5, key=f"{key_si}_price")
                                             st.caption(
-                                                f"Tip: bij '2m bundel': zet **Min qty = 2** en **Prijs = totale bundel-prijs**. "
-                                                f"Odoo rekent dan automatisch €{(v_price/v_qty if v_qty else 0):.2f}/{prod_uom} bij PO suggesties.")
+                                                f"💡 Tip: heb je geen 'Rol 2m' UoM nog? Maak er één aan in Odoo "
+                                                f"(Instellingen → Inventory → UoMs → Nieuwe in zelfde category als '{prod_uom}', "
+                                                f"factor 2). Anders: blijf op '{prod_uom}', zet **Min qty = 2** en prijs voor 2m.")
                                             if bp_id and st.button("✓ Voeg toe als inkoop-variant",
                                                                      type="primary",
                                                                      key=f"{key_si}_save",
@@ -805,8 +838,9 @@ with tab_peppol:
                                                         partner_id=bp_id,
                                                         product_code=v_code or None,
                                                         product_name=v_name or None,
-                                                        min_qty=v_qty, price=v_price)
-                                                    st.success(f"✓ Inkoop-variant toegevoegd (id={sid})")
+                                                        min_qty=v_qty, price=v_price,
+                                                        product_uom_id=sup_uom_id_si)
+                                                    st.success(f"✓ Inkoop-variant toegevoegd (id={sid}) — UoM: {sup_uom_name}")
                                                     st.rerun()
                                                 except Exception as e:
                                                     st.error(f"Fout: {e}")
@@ -962,19 +996,45 @@ with tab_peppol:
 
                                     # ----- inkoop / supplier sectie -----
                                     st.markdown("**📥 Inkoop info (auto-ingevuld uit Bill):**")
+                                    st.caption(f"Leverancier: **{bill_partner[1]}**")
                                     sc1, sc2 = st.columns(2)
                                     with sc1:
-                                        st.text(f"Leverancier: {bill_partner[1]}")
                                         sup_code = st.text_input("Leveranciers­productcode",
                                                                    value="", key=f"{key}_new_supcode",
                                                                    help="Optioneel: artikelnr bij leverancier")
+                                        # Supplier UoM keuze — zelfde category als product UoM
+                                        if uom_id and uoms:
+                                            # Filter UoM's op zelfde category als gekozen product-UoM
+                                            try:
+                                                sel_uom = next(u for u in uoms if u["id"] == uom_id)
+                                                # Reload uoms met category info
+                                                from verwerk import get_uoms_by_category
+                                                cat_uoms_n = get_uoms_by_category(
+                                                    odoo, (sel_uom.get("category_id") or [None])[0]
+                                                ) if sel_uom.get("category_id") else uoms
+                                            except Exception:
+                                                cat_uoms_n = uoms
+                                            uom_labels_n = [u["name"] for u in cat_uoms_n]
+                                            def_idx_n = next((i for i, u in enumerate(cat_uoms_n)
+                                                                if u["id"] == uom_id), 0)
+                                            sup_uom_sel_n = st.selectbox(
+                                                "Leverancier UoM", uom_labels_n, index=def_idx_n,
+                                                key=f"{key}_new_supuom",
+                                                help="Per welke eenheid factureert de leverancier? (bv. 'Rol 2m' i.p.v. 'm')")
+                                            sup_uom_id_n = cat_uoms_n[uom_labels_n.index(sup_uom_sel_n)]["id"]
+                                            sup_uom_name_n = sup_uom_sel_n
+                                        else:
+                                            sup_uom_id_n = None
+                                            sup_uom_name_n = "stuk"
                                     with sc2:
-                                        sup_qty = st.number_input("Min. bestel-aantal",
-                                                                    min_value=0.0, value=qty_default,
-                                                                    step=1.0, key=f"{key}_new_supqty")
-                                        sup_price = st.number_input("Inkoopprijs leverancier",
-                                                                      min_value=0.0, value=cost_default,
-                                                                      step=0.5, key=f"{key}_new_supprice")
+                                        sup_qty = st.number_input(
+                                            f"Min. bestel-aantal ({sup_uom_name_n})",
+                                            min_value=0.0, value=qty_default,
+                                            step=1.0, key=f"{key}_new_supqty")
+                                        sup_price = st.number_input(
+                                            f"Inkoopprijs (per {sup_uom_name_n})",
+                                            min_value=0.0, value=cost_default,
+                                            step=0.5, key=f"{key}_new_supprice")
                                     sup_name_full = st.text_input(
                                         "Leveranciers­productnaam",
                                         value=name_default, key=f"{key}_new_supname",
@@ -994,6 +1054,7 @@ with tab_peppol:
                                                 supplier_name=sup_name_full or None,
                                                 supplier_qty=sup_qty,
                                                 supplier_price=sup_price,
+                                                supplier_uom_id=sup_uom_id_n,
                                             )
                                             odoo.call("account.move.line", "write",
                                                        [[lid], {"product_id": new["id"]}])
