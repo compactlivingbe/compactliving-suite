@@ -105,12 +105,26 @@ def fmt_eur(n):
 
 
 def show_pdf(pdf_bytes: bytes, height: int = 500):
-    b64 = base64.b64encode(pdf_bytes).decode()
-    st.markdown(
-        f'<iframe src="data:application/pdf;base64,{b64}#zoom=80" '
-        f'style="width:100%; height:{height}px; border:1px solid #DDD; border-radius:6px;"></iframe>',
-        unsafe_allow_html=True
-    )
+    """PDF preview met PDF.js (streamlit-pdf-viewer). Fallback: download button.
+    Chrome/Edge blokkeren sinds ~v117 'data:application/pdf' in iframes, dus PDF.js is robuuster."""
+    try:
+        from streamlit_pdf_viewer import pdf_viewer
+        pdf_viewer(input=pdf_bytes, width="100%", height=height,
+                    render_text=True, key=f"pdfv_{hash(pdf_bytes[:200])}")
+    except Exception as e:
+        # Fallback: object tag + download
+        b64 = base64.b64encode(pdf_bytes).decode()
+        st.markdown(
+            f'<object data="data:application/pdf;base64,{b64}#zoom=80" '
+            f'type="application/pdf" width="100%" height="{height}px" '
+            f'style="border:1px solid #DDD; border-radius:6px;">'
+            f'<p>Browser kan PDF niet inline tonen. Gebruik download-knop hieronder.</p>'
+            f'</object>',
+            unsafe_allow_html=True)
+        st.caption(f"_PDF-viewer niet beschikbaar ({e})_")
+        st.download_button("⬇ Download PDF om te bekijken", pdf_bytes,
+                            file_name="factuur.pdf", mime="application/pdf",
+                            key=f"dlpdf_{hash(pdf_bytes[:200])}")
 
 
 # ============ HEADER ============
