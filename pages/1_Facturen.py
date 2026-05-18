@@ -947,14 +947,11 @@ with tab_peppol:
                                     if "_uoms" not in st.session_state:
                                         uoms_loaded = []
                                         uom_err = None
-                                        for model in ("uom.uom", "product.uom"):
-                                            try:
-                                                uoms_loaded = odoo.search_read(
-                                                    model, [], ["id", "name", "category_id"], 200, "name")
-                                                if uoms_loaded:
-                                                    break
-                                            except Exception as e:
-                                                uom_err = f"{model}: {e}"
+                                        try:
+                                            uoms_loaded = odoo.search_read(
+                                                "uom.uom", [], ["id", "name", "category_id"], 200, "name")
+                                        except Exception as e:
+                                            uom_err = str(e)[:200]
                                         # Sorteer alfabetisch (case-insensitive)
                                         uoms_loaded.sort(key=lambda u: (u.get("name") or "").lower())
                                         st.session_state["_uoms"] = uoms_loaded
@@ -972,9 +969,15 @@ with tab_peppol:
                                     if not uoms:
                                         err = st.session_state.get("_uoms_err") or ""
                                         st.warning(
-                                            "⚠ Geen UoM's gevonden in Odoo. "
-                                            "Schakel 'Units of Measure' in via Instellingen → Inventory → "
-                                            "Operations → Units of Measure." + (f"\n\n_Detail: {err}_" if err else ""))
+                                            "⚠ **Geen UoM's gevonden in Odoo.**\n\n"
+                                            "Twee stappen om te fixen:\n\n"
+                                            "1. **Schakel UoMs in:** ga naar **Instellingen → "
+                                            "Inventory → Operations** en vink **'Units of Measure'** aan, klik Opslaan.\n"
+                                            "2. **Geef je API user rechten:** ga naar **Instellingen → Users & Companies → "
+                                            "Users**, open jouw user, scroll naar **'Inventory'** en zet "
+                                            "**'Manage Multiple Units of Measure'** aan.\n\n"
+                                            "Klik daarna op **↻ Herlaad UoM's** hierboven."
+                                            + (f"\n\n_Detail: {err}_" if err else ""))
 
                                     # ----- product velden -----
                                     new_name = st.text_input("Naam", value=name_default,
