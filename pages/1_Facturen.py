@@ -1204,6 +1204,15 @@ with tab_peppol:
                                     f"state={res['po_state']}) · {res['n_lines']} lijnen · "
                                     f"{res['n_linked_back']} bill-lijnen terug-gelinkt"
                                 )
+                                n_ship = res.get("shipping_lines_kept", 0)
+                                if n_ship:
+                                    n_linked = res.get("shipping_linked_to_product", 0)
+                                    msg = f"🚚 {n_ship} verzendkost-lijn(en) NIET in PO opgenomen, blijven op Bill"
+                                    if n_linked:
+                                        msg += f" (gekoppeld aan 'Transport en verzendkosten')"
+                                    else:
+                                        msg += " — let op: product 'Transport en verzendkosten' niet gevonden in Odoo, koppel handmatig"
+                                    st.info(msg)
                                 if pep_received:
                                     st.caption("📦 Receipt gevalideerd → voorraad +")
                                 st.link_button("🔗 Open PO in Odoo",

@@ -438,19 +438,41 @@ def get_unlinked_draft_bills(odoo: OdooClient, limit: int = 30) -> list:
     return result
 
 
+def _find_shipping_product(odoo: OdooClient) -> int:
+    """Zoek het 'Transport en verzendkosten' product in Odoo (of varianten).
+    Returns product.product id of None."""
+    candidates = [
+        ("default_code", "=", "VERZEND"),
+        ("name", "=", "Transport en verzendkosten"),
+        ("name", "ilike", "transport en verzend"),
+        ("name", "ilike", "verzendkost"),
+    ]
+    for dom in candidates:
+        try:
+            res = odoo.search_read("product.product", [dom],
+                                     ["id", "name"], 1)
+            if res:
+                return res[0]["id"]
+        except Exception:
+            continue
+    return None
+
+
 def create_po_from_bill(odoo: OdooClient, bill_id: int,
                         link_back: bool = True,
                         confirm: bool = False,
                         validate_receipt: bool = False,
-                        analytic_id: int = None) -> dict:
+                        analytic_id: int = None,
+                        skip_shipping_from_po: bool = True) -> dict:
     """
     Maak een Purchase Order van een bestaande (Peppol-)Bill.
     Lines worden 1-op-1 overgenomen; producten met product_id direct gebruikt.
-    Lines zonder product_id krijgen geen product (manueel later).
 
-    link_back: na PO-creatie, update bill-lines met purchase_line_id zodat
-               qty_invoiced correct telt en audit-trail klopt.
+    skip_shipping_from_po: verzendkost-lijnen worden NIET in de PO opgenomen
+        (blijven op de Bill, gekoppeld aan 'Transport en verzendkosten' product
+        indien aanwezig in Odoo).
     """
+    from matcher import is_shipping
     bill = odoo.read("account.move", [bill_id],
                      ["partner_id", "invoice_date", "ref", "name", "invoice_line_ids"])[0]
     if not bill.get("partner_id"):
@@ -460,15 +482,38 @@ def create_po_from_bill(odoo: OdooClient, bill_id: int,
                            ["id", "product_id", "name", "quantity", "price_unit",
                             "purchase_line_id", "display_type"])
     # Filter: hou alleen ECHTE productlijnen (skip section/note/tax/payment).
-    # In Odoo SaaS 19 kan display_type ook 'product' zijn (truthy) - die WEL meenemen.
     SKIP_TYPES = {"line_section", "line_note", "tax", "payment_term", "rounding"}
     bill_lines = [bl for bl in bill_lines
                   if (bl.get("display_type") or "") not in SKIP_TYPES
                   and (bl.get("quantity") or 0) > 0]
 
-    po_lines_vals = []
-    line_mapping = []  # [(bill_line_id, index_in_po_lines)]
+    # Detecteer verzendkost-lijnen en separeer
+    shipping_lines = []
+    product_lines = []
     for bl in bill_lines:
+        if skip_shipping_from_po and is_shipping(bl.get("name") or ""):
+            shipping_lines.append(bl)
+        else:
+            product_lines.append(bl)
+
+    # Op de Bill: koppel verzendlijnen aan het 'Transport en verzendkosten' product
+    n_shipping_linked = 0
+    if shipping_lines:
+        shipping_prod_id = _find_shipping_product(odoo)
+        if shipping_prod_id:
+            for sl in shipping_lines:
+                # Niet overschrijven als al een product gekoppeld is
+                if not sl.get("product_id"):
+                    try:
+                        odoo.write("account.move.line", [sl["id"]],
+                                    {"product_id": shipping_prod_id})
+                        n_shipping_linked += 1
+                    except Exception:
+                        pass
+
+    po_lines_vals = []
+    line_mapping = []  # bill_line_id per index in PO lines
+    for bl in product_lines:
         line_vals = {
             "name": bl.get("name") or "",
             "product_qty": bl.get("quantity") or 1,
@@ -482,7 +527,9 @@ def create_po_from_bill(odoo: OdooClient, bill_id: int,
         line_mapping.append(bl["id"])
 
     if not po_lines_vals:
-        return {"po_id": None, "error": "Geen lijnen op de Bill"}
+        return {"po_id": None,
+                "error": "Geen productlijnen op de Bill (alleen verzendkosten?)",
+                "shipping_lines_kept": len(shipping_lines)}
 
     po_vals = {
         "partner_id": bill["partner_id"][0],
@@ -529,6 +576,8 @@ def create_po_from_bill(odoo: OdooClient, bill_id: int,
         "n_lines": len(po_lines_vals),
         "n_linked_back": n_linked,
         "bill_id": bill_id,
+        "shipping_lines_kept": len(shipping_lines),
+        "shipping_linked_to_product": n_shipping_linked,
     }
 
 
