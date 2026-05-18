@@ -189,12 +189,46 @@ def add_supplierinfo_to_product(
     return odoo.create("product.supplierinfo", vals)
 
 
-def get_uoms_by_category(odoo: OdooClient, category_id: int = None) -> list:
-    """Lijst UoM's, optioneel gefilterd op category (om mengen tussen length/weight te vermijden)."""
-    domain = [("category_id", "=", int(category_id))] if category_id else []
-    return odoo.search_read("uom.uom", domain,
-                              ["id", "name", "category_id", "factor", "uom_type"],
-                              100, "name")
+def _safe_uom_fields(odoo: OdooClient) -> list:
+    """Return field-list dat veilig leesbaar is op uom.uom (versie-onafhankelijk)."""
+    base = ["id", "name"]
+    # Probeer optionele velden — afhankelijk van Odoo versie
+    try:
+        all_fields = odoo.call("uom.uom", "fields_get", [], {"attributes": ["type"]})
+    except Exception:
+        return base
+    for opt in ("category_id", "relative_uom_id", "related_uom_ids",
+                 "factor", "relative_factor", "uom_type", "parent_path"):
+        if opt in all_fields:
+            base.append(opt)
+    return base
+
+
+def get_uoms_by_category(odoo: OdooClient, category_id=None, related_to_uom_id: int = None) -> list:
+    """Lijst UoM's, beperkt tot één 'category' = set conversie-compatible UoM's.
+
+    Odoo 17/18: filter op `category_id` (one2many naar uom.category).
+    Odoo SaaS 19.1+: geen category_id meer; gebruik `related_uom_ids` van de basis-UoM.
+    """
+    fields = _safe_uom_fields(odoo)
+    # Oude versies: category_id bestaat
+    if "category_id" in fields and category_id:
+        return odoo.search_read("uom.uom",
+                                  [("category_id", "=", int(category_id))],
+                                  fields, 200, "name")
+    # Nieuwe versie (19.1+): related_uom_ids lookup
+    if related_to_uom_id and "related_uom_ids" in fields:
+        try:
+            rec = odoo.call("uom.uom", "read",
+                              [[int(related_to_uom_id)], ["related_uom_ids"]])
+            ids = (rec[0].get("related_uom_ids") or []) + [int(related_to_uom_id)]
+            if ids:
+                return odoo.search_read("uom.uom", [("id", "in", ids)],
+                                          fields, 200, "name")
+        except Exception:
+            pass
+    # Fallback: alles
+    return odoo.search_read("uom.uom", [], fields, 200, "name")
 
 
 def list_supplierinfo_for_template(odoo: OdooClient, template_id: int) -> list:

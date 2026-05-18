@@ -822,16 +822,21 @@ with tab_peppol:
                                                 if tmpl_id:
                                                     st.markdown(f"**Product:** {pp['name']}")
                                                     st.caption(f"UoM: **{prod_uom}** — voeg leveranciers-variant toe (bv. /2m)")
-                                                    # UoM's in zelfde category
+                                                    # UoM's in zelfde category (Odoo 17/18) of related (SaaS 19.1+)
                                                     prod_uom_cat_id = None
                                                     try:
                                                         if prod_uom_id:
-                                                            uom_full = odoo.read("uom.uom", [prod_uom_id],
-                                                                                  ["category_id"])[0]
-                                                            prod_uom_cat_id = (uom_full.get("category_id") or [None])[0]
+                                                            try:
+                                                                uom_full = odoo.read("uom.uom", [prod_uom_id],
+                                                                                      ["category_id"])[0]
+                                                                prod_uom_cat_id = (uom_full.get("category_id") or [None])[0]
+                                                            except Exception:
+                                                                pass  # SaaS 19.1: geen category_id
                                                     except Exception: pass
                                                     try:
-                                                        cat_uoms = get_uoms_by_category(odoo, prod_uom_cat_id) if prod_uom_cat_id else []
+                                                        cat_uoms = get_uoms_by_category(
+                                                            odoo, category_id=prod_uom_cat_id,
+                                                            related_to_uom_id=prod_uom_id)
                                                     except Exception:
                                                         cat_uoms = []
                                                     # Bestaande supplierinfo's tonen
@@ -947,11 +952,19 @@ with tab_peppol:
                                     if "_uoms" not in st.session_state:
                                         uoms_loaded = []
                                         uom_err = None
-                                        try:
-                                            uoms_loaded = odoo.search_read(
-                                                "uom.uom", [], ["id", "name", "category_id"], 200, "name")
-                                        except Exception as e:
-                                            uom_err = str(e)[:200]
+                                        # Odoo 17/18: heeft category_id ; SaaS 19.1+: niet meer
+                                        # Probeer eerst zonder optionele velden — werkt altijd
+                                        for fields_try in (
+                                            ["id", "name", "category_id"],   # oude Odoo
+                                            ["id", "name"],                  # SaaS 19.1+
+                                        ):
+                                            try:
+                                                uoms_loaded = odoo.search_read(
+                                                    "uom.uom", [], fields_try, 200, "name")
+                                                if uoms_loaded:
+                                                    break
+                                            except Exception as e:
+                                                uom_err = str(e)[:200]
                                         # Sorteer alfabetisch (case-insensitive)
                                         uoms_loaded.sort(key=lambda u: (u.get("name") or "").lower())
                                         st.session_state["_uoms"] = uoms_loaded
@@ -1014,9 +1027,11 @@ with tab_peppol:
                                     fc1, fc2 = st.columns(2)
                                     with fc1:
                                         # Toon ALLE UoM's met category als suffix voor herkenning
-                                        uom_labels = [f"{u['name']} ({(u.get('category_id') or [None,'?'])[1]})"
-                                                        if u.get('category_id') else u['name']
-                                                        for u in uoms]
+                                        uom_labels = [
+                                            (f"{u['name']} ({(u.get('category_id') or [None,'?'])[1]})"
+                                              if u.get('category_id') else u['name'])
+                                            for u in uoms
+                                        ]
                                         st.caption(f"📐 {len(uoms)} UoM's beschikbaar · "
                                                     "klik dropdown, typ om te filteren (leeg = alle)")
                                         # Default Units / Stuks / Pieces — exacte match prioriteit
@@ -1059,15 +1074,13 @@ with tab_peppol:
                                         sup_code = st.text_input("Leveranciers­productcode",
                                                                    value="", key=f"{key}_new_supcode",
                                                                    help="Optioneel: artikelnr bij leverancier")
-                                        # Supplier UoM keuze — zelfde category als product UoM
+                                        # Supplier UoM keuze — zelfde category/related als product UoM
                                         if uom_id and uoms:
-                                            # Filter UoM's op zelfde category als gekozen product-UoM
                                             try:
-                                                sel_uom = next(u for u in uoms if u["id"] == uom_id)
-                                                # Reload uoms met category info
+                                                sel_uom = next((u for u in uoms if u["id"] == uom_id), None)
+                                                cat_id = (sel_uom.get("category_id") or [None])[0] if sel_uom and sel_uom.get("category_id") else None
                                                 cat_uoms_n = get_uoms_by_category(
-                                                    odoo, (sel_uom.get("category_id") or [None])[0]
-                                                ) if sel_uom.get("category_id") else uoms
+                                                    odoo, category_id=cat_id, related_to_uom_id=uom_id)
                                             except Exception:
                                                 cat_uoms_n = uoms
                                             uom_labels_n = [u["name"] for u in cat_uoms_n]
