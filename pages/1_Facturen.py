@@ -937,17 +937,26 @@ with tab_peppol:
                                     st.caption(f"Bron: Bill van **{bill_partner[1]}** · {qty_default}× @ € {cost_default:.2f}")
 
                                     # Cache UoM + categorieën (probeer meerdere models)
+                                    refresh_col = st.columns([4, 1])
+                                    if refresh_col[1].button("↻ Herlaad UoM's",
+                                                              key=f"{key}_uom_refresh",
+                                                              help="Laad UoM lijst opnieuw uit Odoo"):
+                                        st.session_state.pop("_uoms", None)
+                                        st.session_state.pop("_uoms_err", None)
+                                        st.session_state.pop("_pcats", None)
                                     if "_uoms" not in st.session_state:
                                         uoms_loaded = []
                                         uom_err = None
                                         for model in ("uom.uom", "product.uom"):
                                             try:
                                                 uoms_loaded = odoo.search_read(
-                                                    model, [], ["id", "name"], 100, "name")
+                                                    model, [], ["id", "name", "category_id"], 200, "name")
                                                 if uoms_loaded:
                                                     break
                                             except Exception as e:
                                                 uom_err = f"{model}: {e}"
+                                        # Sorteer alfabetisch (case-insensitive)
+                                        uoms_loaded.sort(key=lambda u: (u.get("name") or "").lower())
                                         st.session_state["_uoms"] = uoms_loaded
                                         st.session_state["_uoms_err"] = uom_err
                                     if "_pcats" not in st.session_state:
@@ -974,10 +983,16 @@ with tab_peppol:
                                                               value="", key=f"{key}_new_code")
                                     fc1, fc2 = st.columns(2)
                                     with fc1:
-                                        uom_labels = [f"{u['name']}" for u in uoms]
-                                        # Default Units
+                                        # Toon ALLE UoM's met category als suffix voor herkenning
+                                        uom_labels = [f"{u['name']} ({(u.get('category_id') or [None,'?'])[1]})"
+                                                        if u.get('category_id') else u['name']
+                                                        for u in uoms]
+                                        st.caption(f"📐 {len(uoms)} UoM's beschikbaar · "
+                                                    "klik dropdown, typ om te filteren (leeg = alle)")
+                                        # Default Units / Stuks / Pieces — exacte match prioriteit
                                         default_uom_idx = next(
-                                            (i for i, u in enumerate(uoms) if u["name"].lower() in ("units", "stuks", "stuk", "pieces", "piece")),
+                                            (i for i, u in enumerate(uoms)
+                                              if u["name"].lower() in ("units", "stuks", "stuk", "pieces", "piece", "unit")),
                                             0 if uoms else 0)
                                         uom_sel = st.selectbox("Eenheid (UoM)",
                                                                 ["(geen)"] + uom_labels,
@@ -986,6 +1001,7 @@ with tab_peppol:
                                         uom_id = uoms[uom_labels.index(uom_sel)]["id"] if uom_sel != "(geen)" else None
                                     with fc2:
                                         cat_labels = [c["complete_name"] for c in pcats]
+                                        st.caption(f"📂 {len(pcats)} categorieën · typ om te filteren")
                                         cat_sel = st.selectbox("Productcategorie",
                                                                 ["(geen)"] + cat_labels,
                                                                 key=f"{key}_new_cat")
