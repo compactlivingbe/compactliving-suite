@@ -80,7 +80,7 @@ def create_product_with_supplier(
     odoo: OdooClient, name: str, default_code: str = None,
     cost: float = 0.0, sale_price: float = 0.0,
     uom_id: int = None, categ_id: int = None,
-    is_dienst: bool = False,
+    is_dienst: bool = False, sale_ok: bool = True,
     partner_id: int = None, supplier_code: str = None,
     supplier_name: str = None, supplier_qty: float = 1.0,
     supplier_price: float = None, supplier_uom_id: int = None,
@@ -92,7 +92,7 @@ def create_product_with_supplier(
     vals = {
         "name": (name or "Onbekend product")[:200],
         "purchase_ok": True,
-        "sale_ok": True,
+        "sale_ok": bool(sale_ok),
         "list_price": float(sale_price or 0),
         "standard_price": float(cost or 0),
     }

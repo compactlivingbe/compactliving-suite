@@ -1052,19 +1052,34 @@ with tab_peppol:
                                                                 key=f"{key}_new_cat")
                                         cat_id = pcats[cat_labels.index(cat_sel)]["id"] if cat_sel != "(geen)" else None
 
+                                    # ----- type product: inkoop only / verkoop+inkoop -----
+                                    prod_use = st.radio(
+                                        "Gebruik van dit product",
+                                        ["📥 Alleen inkoop", "📥📤 Inkoop + verkoop"],
+                                        index=1, horizontal=True, key=f"{key}_new_use",
+                                        help="Bepaalt of het product op verkooporders/website mag verschijnen.")
+                                    sale_ok_new = (prod_use == "📥📤 Inkoop + verkoop")
+
                                     fc3, fc4 = st.columns(2)
                                     with fc3:
                                         new_cost = st.number_input("Kostprijs (excl BTW)",
                                                                      min_value=0.0, value=cost_default,
                                                                      step=0.5, key=f"{key}_new_cost")
                                     with fc4:
-                                        margin = st.number_input("Marge ×", min_value=1.0,
-                                                                   value=1.32, step=0.05,
-                                                                   key=f"{key}_new_margin")
-                                    new_sale = st.number_input("Verkoopprijs (auto = kost × marge)",
-                                                                 min_value=0.0,
-                                                                 value=round(new_cost * margin, 2),
-                                                                 step=0.5, key=f"{key}_new_sale")
+                                        if sale_ok_new:
+                                            margin = st.number_input("Marge ×", min_value=1.0,
+                                                                       value=1.32, step=0.05,
+                                                                       key=f"{key}_new_margin")
+                                        else:
+                                            margin = 1.0
+                                            st.caption("_geen marge — alleen inkoop_")
+                                    if sale_ok_new:
+                                        new_sale = st.number_input("Verkoopprijs (auto = kost × marge)",
+                                                                     min_value=0.0,
+                                                                     value=round(new_cost * margin, 2),
+                                                                     step=0.5, key=f"{key}_new_sale")
+                                    else:
+                                        new_sale = 0.0
 
                                     # ----- inkoop / supplier sectie -----
                                     st.markdown("**📥 Inkoop info (auto-ingevuld uit Bill):**")
@@ -1118,6 +1133,7 @@ with tab_peppol:
                                                 name=new_name, default_code=new_code or None,
                                                 cost=new_cost, sale_price=new_sale,
                                                 uom_id=uom_id, categ_id=cat_id,
+                                                sale_ok=sale_ok_new,
                                                 partner_id=bill_partner_id,
                                                 supplier_code=sup_code or None,
                                                 supplier_name=sup_name_full or None,
