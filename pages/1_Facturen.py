@@ -1053,12 +1053,22 @@ with tab_peppol:
                                         cat_id = pcats[cat_labels.index(cat_sel)]["id"] if cat_sel != "(geen)" else None
 
                                     # ----- type product: inkoop only / verkoop+inkoop -----
-                                    prod_use = st.radio(
-                                        "Gebruik van dit product",
-                                        ["📥 Alleen inkoop", "📥📤 Inkoop + verkoop"],
-                                        index=1, horizontal=True, key=f"{key}_new_use",
-                                        help="Bepaalt of het product op verkooporders/website mag verschijnen.")
-                                    sale_ok_new = (prod_use == "📥📤 Inkoop + verkoop")
+                                    tc1, tc2 = st.columns(2)
+                                    with tc1:
+                                        prod_use = st.radio(
+                                            "Gebruik",
+                                            ["📥 Alleen inkoop", "📥📤 Inkoop + verkoop"],
+                                            index=1, horizontal=False, key=f"{key}_new_use",
+                                            help="Bepaalt of het product op verkooporders/website mag verschijnen.")
+                                        sale_ok_new = (prod_use == "📥📤 Inkoop + verkoop")
+                                    with tc2:
+                                        prod_track = st.radio(
+                                            "Voorraad",
+                                            ["📦 Voorraad bijhouden", "🚫 Geen voorraad (verbruik)"],
+                                            index=0, horizontal=False, key=f"{key}_new_track",
+                                            help="Storable = telt mee in voorraadwaardering & receipts. "
+                                                  "Verbruik = geen voorraad, gewoon doorboeken op kost.")
+                                        is_storable_new = (prod_track == "📦 Voorraad bijhouden")
 
                                     fc3, fc4 = st.columns(2)
                                     with fc3:
@@ -1134,6 +1144,7 @@ with tab_peppol:
                                                 cost=new_cost, sale_price=new_sale,
                                                 uom_id=uom_id, categ_id=cat_id,
                                                 sale_ok=sale_ok_new,
+                                                is_storable=is_storable_new,
                                                 partner_id=bill_partner_id,
                                                 supplier_code=sup_code or None,
                                                 supplier_name=sup_name_full or None,

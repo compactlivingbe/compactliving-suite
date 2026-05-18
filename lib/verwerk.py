@@ -80,7 +80,7 @@ def create_product_with_supplier(
     odoo: OdooClient, name: str, default_code: str = None,
     cost: float = 0.0, sale_price: float = 0.0,
     uom_id: int = None, categ_id: int = None,
-    is_dienst: bool = False, sale_ok: bool = True,
+    is_dienst: bool = False, sale_ok: bool = True, is_storable: bool = True,
     partner_id: int = None, supplier_code: str = None,
     supplier_name: str = None, supplier_qty: float = 1.0,
     supplier_price: float = None, supplier_uom_id: int = None,
@@ -100,7 +100,7 @@ def create_product_with_supplier(
         vals["type"] = "service"
     else:
         vals["type"] = "consu"
-        vals["is_storable"] = True
+        vals["is_storable"] = bool(is_storable)
     if default_code:
         vals["default_code"] = default_code
     if uom_id:
