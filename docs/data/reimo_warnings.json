@@ -1,1 +1,178 @@
-[]
+[
+  {
+    "tmpl_id": "1216",
+    "template": "Carbest RW Comfort - klapraam",
+    "categ": "",
+    "action": "block",
+    "detail": "[318101] DISCONTINUED | [318100] DISCONTINUED | [318102] DISCONTINUED | [318105] DISCONTINUED | [318104] DISCONTINUED",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1216"
+  },
+  {
+    "tmpl_id": "878",
+    "template": "Powerstation Carbest LiFePO4 PPS2500",
+    "categ": "",
+    "action": "block",
+    "detail": "[814137] DISCONTINUED",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/878"
+  },
+  {
+    "tmpl_id": "364",
+    "template": "Powerstation EcoFlow Delta 2 Max",
+    "categ": "",
+    "action": "block",
+    "detail": "[813305] DISCONTINUED",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/364"
+  },
+  {
+    "tmpl_id": "5297",
+    "template": "Transit V363 bj 2014 \u2013 P2 Rechts \u2013 5981 \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
+    "categ": "",
+    "action": "block",
+    "detail": "[31734] 04.09.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5297"
+  },
+  {
+    "tmpl_id": "612",
+    "template": "CEE-ingangscontactdoos met magnetische sluiting | wit",
+    "categ": "",
+    "action": "warning",
+    "detail": "[820374] 19.06.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/612"
+  },
+  {
+    "tmpl_id": "5199",
+    "template": "Caddy Maxi 2008-2020 \u2013 P1 Rechts \u2013 LWB \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
+    "categ": "",
+    "action": "warning",
+    "detail": "[316021] 03.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5199"
+  },
+  {
+    "tmpl_id": "1220",
+    "template": "Carbest RW Fusion Curved - klapraam",
+    "categ": "",
+    "action": "warning",
+    "detail": "[319004] 05.06.26 | [319005] 05.06.26 | [319006] 10.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1220"
+  },
+  {
+    "tmpl_id": "1214",
+    "template": "Carbest RW STYLE SLIDE - schuifraam",
+    "categ": "",
+    "action": "warning",
+    "detail": "[318025] 26.06.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1214"
+  },
+  {
+    "tmpl_id": "2180",
+    "template": "Carbest RW Van Rollo/Hor",
+    "categ": "",
+    "action": "warning",
+    "detail": "[319162] 05.06.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/2180"
+  },
+  {
+    "tmpl_id": "325",
+    "template": "Crafter bj 2017 \u2013 P2 Rechts \u2013 5986/6836/7391 \u2013 Schuifraam \u2013 Privacy \u2013 Carbest",
+    "categ": "",
+    "action": "warning",
+    "detail": "[369,--] UNKNOWN",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/325"
+  },
+  {
+    "tmpl_id": "767",
+    "template": "Draaiconsole voor R. Master bj 2011",
+    "categ": "",
+    "action": "warning",
+    "detail": "[59457] 19.06.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/767"
+  },
+  {
+    "tmpl_id": "567",
+    "template": "Draaitafelvoet 756mm, 3-delig, aluminium, antraciet",
+    "categ": "",
+    "action": "warning",
+    "detail": "[57184] 26.05.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/567"
+  },
+  {
+    "tmpl_id": "786",
+    "template": "Fiamma Luifel F43van 2,7m Royal Grey, Deep Black",
+    "categ": "",
+    "action": "warning",
+    "detail": "[440545] 29.05.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/786"
+  },
+  {
+    "tmpl_id": "374",
+    "template": "Hoekverbinder 12mm buis - 12mm slang | Reich",
+    "categ": "",
+    "action": "warning",
+    "detail": "[650599] 05.06.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/374"
+  },
+  {
+    "tmpl_id": "89",
+    "template": "Maxxfan MaxxShade binnenkader",
+    "categ": "",
+    "action": "warning",
+    "detail": "[398194] 19.06.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/89"
+  },
+  {
+    "tmpl_id": "1133",
+    "template": "Renogy Solarpanel 120W",
+    "categ": "",
+    "action": "warning",
+    "detail": "[840240] 26.06.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1133"
+  },
+  {
+    "tmpl_id": "709",
+    "template": "Rubberen doorvoertule voor gasleiding",
+    "categ": "",
+    "action": "warning",
+    "detail": "[820794] 26.05.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/709"
+  },
+  {
+    "tmpl_id": "425",
+    "template": "Schoon- en vuilwatertankmeter LED display",
+    "categ": "",
+    "action": "warning",
+    "detail": "[85327] BACKORDER | [85328] BACKORDER",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/425"
+  },
+  {
+    "tmpl_id": "430",
+    "template": "Truma Combi 6E met iNet X Panel",
+    "categ": "",
+    "action": "warning",
+    "detail": "[721925] BACKORDER",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/430"
+  },
+  {
+    "tmpl_id": "372",
+    "template": "Uni-Quick 12mm: Rechte connector 12mm buis - 12mm slang",
+    "categ": "",
+    "action": "warning",
+    "detail": "[650569] 03.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/372"
+  },
+  {
+    "tmpl_id": "5247",
+    "template": "Vito bj 2015 \u2013 P2 Rechts \u2013 kR/mR/lR \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
+    "categ": "",
+    "action": "warning",
+    "detail": "[315962] 03.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5247"
+  },
+  {
+    "tmpl_id": "716",
+    "template": "Webasto Cool Top Trail 20G",
+    "categ": "",
+    "action": "warning",
+    "detail": "[495065] 25.05.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/716"
+  }
+]

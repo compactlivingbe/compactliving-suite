@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-05-14T18:35:37.309096Z",
+  "timestamp": "2026-05-25T09:20:02.904266Z",
   "counts": {
-    "ok": 0,
-    "warn": 0,
-    "block": 0
+    "ok": 587,
+    "warn": 21,
+    "block": 12
   },
   "success": true
 }
