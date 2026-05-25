@@ -390,8 +390,9 @@ if "_vbd_result" in st.session_state:
                                     help="Verkoopprijs = kost (excl BTW) × marge. Excl BTW.")
                 use_vbd_sale = st.checkbox(
                     "Gebruik VBD incl-BTW prijs als verkoopprijs (i.p.v. kost × marge)",
-                    value=False, key="vbd_use_incl",
-                    help="Aanvinken als jullie dezelfde verkoopprijs willen aanhouden als VBD.")
+                    value=True, key="vbd_use_incl",
+                    help="Default aan: VBD incl-BTW prijs wordt jouw verkoopprijs. "
+                          "Uit = kost × marge.")
                 include_image = st.checkbox(
                     "📷 Productfoto van VBD mee importeren",
                     value=True, key="vbd_include_img",
@@ -506,7 +507,8 @@ if "_vbd_result" in st.session_state:
         if sale_df.empty:
             st.success("Geen verkoopprijs verschillen 🎉")
         else:
-            st.caption("Pas marge aan of gebruik VBD incl-BTW als referentie.")
+            st.caption("Default: VBD incl-BTW prijs wordt jouw verkoopprijs. "
+                        "Per rij wijzigbaar naar 'Voorgesteld' (kost × marge) of 'Skip'.")
             global_margin = st.slider("Globale marge (× kostprijs)", 1.0, 3.0, DEFAULT_MARGIN, 0.05,
                                        key="vbd_sale_margin")
             df_show = sale_df.copy()
@@ -517,7 +519,7 @@ if "_vbd_result" in st.session_state:
             df_show["kostprijs"] = df_show["template_id"].astype(int).map(cost_by_tmpl)
             df_show["voorgesteld"] = (df_show["kostprijs"] * global_margin).round(2)
             df_show["Δ huidige"] = df_show["vbd_incl_btw"] - df_show["current_list_price"]
-            df_show["Toepassen"] = "Voorgesteld"
+            df_show["Toepassen"] = "VBD incl"
             df_show.insert(0, "Selecteer", True)
             edited = st.data_editor(
                 df_show, hide_index=True, use_container_width=True,
@@ -529,7 +531,7 @@ if "_vbd_result" in st.session_state:
                     "voorgesteld": st.column_config.NumberColumn("Kost×marge", format="€ %.2f"),
                     "Δ huidige": st.column_config.NumberColumn("Δ", format="€ %.2f"),
                     "Toepassen": st.column_config.SelectboxColumn(
-                        options=["Voorgesteld", "VBD incl", "Skip"]),
+                        options=["VBD incl", "Voorgesteld", "Skip"]),
                     "template_id": None,
                 },
                 key="vbd_sale_editor",
