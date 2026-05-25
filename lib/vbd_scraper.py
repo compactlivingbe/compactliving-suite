@@ -361,12 +361,13 @@ def compare_with_odoo(odoo, partner_id, vbd_products, log=print):
                 "supplierinfo_id": si["id"],
                 "template_id": tid,
             })
-        # Verkoopprijs verschil
-        if p["price_incl"] is not None and abs(cur_list - p["price_incl"]) > 0.01:
+        # Verkoopprijs verschil (Odoo list_price = excl BTW, vergelijk met VBD excl)
+        if p["price_excl"] is not None and abs(cur_list - p["price_excl"]) > 0.01:
             sale_diffs.append({
                 "sku": sku, "name": p["name"],
                 "current_list_price": cur_list,
                 "vbd_incl_btw": p["price_incl"],
+                "vbd_excl_btw": p["price_excl"],
                 "template_id": tid,
             })
     return {

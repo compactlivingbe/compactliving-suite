@@ -20,6 +20,8 @@ st.caption("Scrape vbdservices.nl (openbare prijzen incl BTW) → vergelijk met 
 
 VBD_PARTNER_ID = 56
 DEFAULT_MARGIN = 1.32
+BTW_RATE = 0.21          # NL/BE = 21%
+INCL_TO_EXCL = 1 + BTW_RATE   # incl / 1.21 = excl
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKIP_LIST_PATH = REPO_ROOT / "skip_list_vbd.csv"
@@ -389,10 +391,10 @@ if "_vbd_result" in st.session_state:
                                     key="vbd_miss_margin",
                                     help="Verkoopprijs = kost (excl BTW) × marge. Excl BTW.")
                 use_vbd_sale = st.checkbox(
-                    "Gebruik VBD incl-BTW prijs als verkoopprijs (i.p.v. kost × marge)",
+                    "Gebruik VBD incl-BTW prijs als verkoopprijs",
                     value=True, key="vbd_use_incl",
-                    help="Default aan: VBD incl-BTW prijs wordt jouw verkoopprijs. "
-                          "Uit = kost × marge.")
+                    help="Default aan: Odoo list_price = VBD incl-BTW / 1.21 = excl. "
+                          "Odoo voegt 21% BTW toe bij display = exact VBD's prijs.")
                 include_image = st.checkbox(
                     "📷 Productfoto van VBD mee importeren",
                     value=True, key="vbd_include_img",
@@ -409,7 +411,8 @@ if "_vbd_result" in st.session_state:
                             try:
                                 cost = float(r["price_excl"])
                                 if use_vbd_sale and r.get("price_incl"):
-                                    sale = float(r["price_incl"])
+                                    # Odoo list_price is excl BTW; VBD prijs is incl BTW
+                                    sale = round(float(r["price_incl"]) / INCL_TO_EXCL, 2)
                                 else:
                                     sale = round(cost * margin, 2)
                                 # Volledige beschrijving ophalen indien gewenst
@@ -518,15 +521,20 @@ if "_vbd_result" in st.session_state:
             cost_by_tmpl = {t["id"]: t["standard_price"] for t in tmpls}
             df_show["kostprijs"] = df_show["template_id"].astype(int).map(cost_by_tmpl)
             df_show["voorgesteld"] = (df_show["kostprijs"] * global_margin).round(2)
-            df_show["Δ huidige"] = df_show["vbd_incl_btw"] - df_show["current_list_price"]
+            # Odoo list_price = excl BTW; VBD is incl BTW → convert
+            df_show["vbd_excl_btw"] = (df_show["vbd_incl_btw"] / INCL_TO_EXCL).round(2)
+            df_show["Δ huidige"] = df_show["vbd_excl_btw"] - df_show["current_list_price"]
             df_show["Toepassen"] = "VBD incl"
             df_show.insert(0, "Selecteer", True)
+            st.caption(f"💡 Huidig = Odoo `list_price` (excl BTW). VBD-prijs wordt geconverteerd "
+                        f"(incl ÷ {INCL_TO_EXCL}) zodat Odoo exact dezelfde incl-prijs toont.")
             edited = st.data_editor(
                 df_show, hide_index=True, use_container_width=True,
                 disabled=[c for c in df_show.columns if c not in ("Selecteer", "Toepassen")],
                 column_config={
-                    "current_list_price": st.column_config.NumberColumn("Huidig", format="€ %.2f"),
+                    "current_list_price": st.column_config.NumberColumn("Huidig (excl)", format="€ %.2f"),
                     "vbd_incl_btw": st.column_config.NumberColumn("VBD incl", format="€ %.2f"),
+                    "vbd_excl_btw": st.column_config.NumberColumn("VBD excl (wordt opgeslagen)", format="€ %.2f"),
                     "kostprijs": st.column_config.NumberColumn("Kost", format="€ %.2f"),
                     "voorgesteld": st.column_config.NumberColumn("Kost×marge", format="€ %.2f"),
                     "Δ huidige": st.column_config.NumberColumn("Δ", format="€ %.2f"),
@@ -542,7 +550,9 @@ if "_vbd_result" in st.session_state:
                 ok = err = 0
                 for _, r in sel.iterrows():
                     if r["Toepassen"] == "Skip": continue
-                    new_price = float(r["voorgesteld"]) if r["Toepassen"] == "Voorgesteld" else float(r["vbd_incl_btw"])
+                    # VBD incl → opgeslagen als excl. Voorgesteld is al een excl-bedrag (kost × marge).
+                    new_price = (float(r["voorgesteld"]) if r["Toepassen"] == "Voorgesteld"
+                                  else float(r["vbd_excl_btw"]))
                     try:
                         odoo.write("product.template", [int(r["template_id"])],
                                     {"list_price": new_price})
