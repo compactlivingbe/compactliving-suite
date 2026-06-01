@@ -1,1 +1,9 @@
-{"timestamp":null,"missing":0,"cost_diffs":0,"sale_diffs":0,"codes_total":0}
+{
+  "timestamp": "2026-06-01T10:38:42.052772Z",
+  "missing": 0,
+  "cost_diffs": 0,
+  "sale_diffs": 0,
+  "no_price": 0,
+  "codes_total": 0,
+  "success": true
+}
