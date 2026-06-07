@@ -36,41 +36,18 @@ for key in ["ANTHROPIC_API_KEY", "ODOO_URL", "ODOO_DB", "ODOO_LOGIN", "ODOO_API_
         pass
 
 
-# ============ AUTH ============
-def check_password():
-    expected = os.environ.get("APP_PASSWORD") or st.secrets.get("APP_PASSWORD", "") if hasattr(st, "secrets") else ""
-    if not expected:
-        return True   # geen password ingesteld = geen gate (lokaal dev)
-
-    def password_entered():
-        if st.session_state.get("pw_input") == expected:
-            st.session_state["pw_ok"] = True
-            del st.session_state["pw_input"]
-        else:
-            st.session_state["pw_ok"] = False
-
-    if st.session_state.get("pw_ok"):
-        return True
-
-    st.markdown("<div style='max-width:420px; margin:80px auto; text-align:center;'>",
-                unsafe_allow_html=True)
-    st.markdown("# ⚡ Compact Living Suite")
-    st.caption("Beveiligde toegang")
-    st.text_input("🔑 Wachtwoord", type="password",
-                  on_change=password_entered, key="pw_input")
-    if "pw_ok" in st.session_state and not st.session_state["pw_ok"]:
-        st.error("❌ Verkeerd wachtwoord")
-    st.markdown("</div>", unsafe_allow_html=True)
-    return False
-
-
-if not check_password():
-    st.stop()
+# ============ AUTH (Odoo-account) ============
+from auth import require_auth, current_user, logout
+require_auth()
 
 
 # ============ LANDING ============
 st.title("⚡ Compact Living Suite")
-st.caption("Centrale dashboard voor leveranciers-automatiseringen")
+_u = current_user()
+if _u:
+    st.caption(f"Centrale dashboard voor leveranciers-automatiseringen · ingelogd als **{_u['name']}**")
+else:
+    st.caption("Centrale dashboard voor leveranciers-automatiseringen")
 
 odoo_url = os.environ.get("ODOO_URL", "https://compactliving.odoo.com")
 
@@ -140,5 +117,5 @@ with cl3:
     st.markdown("[🐙 GitHub repo](https://github.com)")
 with cl4:
     if st.button("🚪 Uitloggen"):
-        st.session_state["pw_ok"] = False
+        logout()
         st.rerun()
