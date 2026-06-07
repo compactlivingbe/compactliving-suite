@@ -170,10 +170,10 @@ if prod_ids:
                     ["free_qty", "qty_available", "incoming_qty", "type"])
     for p in prs:
         stock[p["id"]] = p
-        if p.get("type") == "service":
+        if p.get("type") in ("service", "combo"):
             service_ids.add(p["id"])
 
-# Diensten uit de orderlijnen filteren: enkel fysieke producten tonen
+# Diensten + combi-producten uit de orderlijnen filteren: enkel fysieke producten tonen
 for oid in list(lines_by_so.keys()):
     lines_by_so[oid] = [l for l in lines_by_so[oid] if l["product_id"][0] not in service_ids]
 
