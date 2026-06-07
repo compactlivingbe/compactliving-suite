@@ -6,7 +6,10 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from reimo_scraper import Profiweb, Odoo, decide, aggregate, DEFAULT_RULES
 
-st.set_page_config(page_title="Reimo Sync", page_icon="📦", layout="wide")
+try:
+    st.set_page_config(page_title="Reimo Sync", page_icon="📦", layout="wide")
+except Exception:
+    pass
 
 from auth import require_auth
 require_auth()

@@ -11,7 +11,10 @@ try:
 except ImportError:
     ReimoOrderer = None
 
-st.set_page_config(page_title="Reimo Bestellen", page_icon="🛒", layout="wide")
+try:
+    st.set_page_config(page_title="Reimo Bestellen", page_icon="🛒", layout="wide")
+except Exception:
+    pass
 
 from auth import require_auth
 require_auth()

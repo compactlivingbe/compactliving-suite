@@ -19,12 +19,15 @@ import streamlit as st
 import pandas as pd
 
 # ============ STREAMLIT CONFIG ============
-st.set_page_config(
-    page_title="Factuur Automatisering — Compact Living",
-    page_icon="📄",
-    layout="wide",
-    initial_sidebar_state="auto"
-)
+try:
+    st.set_page_config(
+        page_title="Factuur Automatisering — Compact Living",
+        page_icon="📄",
+        layout="wide",
+        initial_sidebar_state="auto"
+    )
+except Exception:
+    pass
 from auth import require_auth
 require_auth()
 

@@ -10,7 +10,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from odoo_client import OdooClient
 from vbd_scraper import fetch_all, fetch_full_description, compare_with_odoo, DEFAULT_CATEGORIES, BASE
 
-st.set_page_config(page_title="VBD Standkachels", page_icon="🔥", layout="wide")
+try:
+    st.set_page_config(page_title="VBD Standkachels", page_icon="🔥", layout="wide")
+except Exception:
+    pass
 
 from auth import require_auth
 require_auth()

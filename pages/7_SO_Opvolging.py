@@ -19,7 +19,10 @@ try:
 except ImportError:
     Profiweb = None
 
-st.set_page_config(page_title="SO Opvolging", page_icon="📊", layout="wide")
+try:
+    st.set_page_config(page_title="SO Opvolging", page_icon="📊", layout="wide")
+except Exception:
+    pass
 
 from auth import require_auth
 require_auth()
