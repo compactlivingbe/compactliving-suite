@@ -186,14 +186,23 @@ if all_po_line_ids:
     for pl in pls_all:
         if pl.get("order_id"):
             po_lines_cache.setdefault(pl["order_id"][0], []).append(pl)
-prod_to_pos = {}      # so_id -> { product_id -> (po_id, po_name) }
+prod_to_pos = {}      # so_id -> { product_id -> (po_id, po_name, po_state) }
 for so in sos:
     m = {}
     for po in so_pos[so["id"]]:
         for pl in po_lines_cache.get(po["id"], []):
             if pl.get("product_id"):
-                m.setdefault(pl["product_id"][0], (po["id"], po["name"]))
+                m.setdefault(pl["product_id"][0], (po["id"], po["name"], po.get("state")))
     prod_to_pos[so["id"]] = m
+
+
+PO_STATE_BADGE = {
+    "draft": "📝 concept (RFQ)",
+    "sent": "📨 RFQ verstuurd",
+    "purchase": "✅ besteld",
+    "done": "✅ besteld (vergrendeld)",
+    "cancel": "❌ geannuleerd",
+}
 
 
 # ============================================================================
@@ -312,18 +321,19 @@ for so in sos:
             onhand = float(stock.get(pid, {}).get("qty_available") or 0)
             free = float(stock.get(pid, {}).get("free_qty") or 0)
             qty = float(l.get("product_uom_qty") or 0)
+
+            po = pmap.get(pid)
+            po_link = f"{ODOO_URL}/odoo/purchase/{po[0]}" if po else ""
+            po_status = PO_STATE_BADGE.get(po[2], po[2]) if po else "— geen PO"
+
             if needed <= 1e-6:
                 status = "✅ geleverd"
-                po_link = ""
                 lev = ""
             elif onhand >= needed - 1e-6:
                 status = "✅ op voorraad"
-                po_link = ""
                 lev = ""
             else:
                 status = f"❌ tekort ({onhand:.0f}/{needed:.0f})"
-                po = pmap.get(pid)
-                po_link = f"{ODOO_URL}/odoo/purchase/{po[0]}" if po else ""
                 code = code_map.get(pid)
                 lev = fmt_lev(reimo_lev.get(code)) if code else "geen Reimo-code"
             detail_rows.append({
@@ -333,6 +343,7 @@ for so in sos:
                 "Vrij": free,
                 "Status": status,
                 "PO": po_link,
+                "PO status": po_status,
                 "Reimo levertijd": lev,
             })
         st.dataframe(
