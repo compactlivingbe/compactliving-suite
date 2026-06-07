@@ -390,7 +390,7 @@ with tab_ai:
     if "_cats_with_count" not in st.session_state:
         with st.spinner("Categorieën ophalen..."):
             cats = odoo.search_read("product.category", [],
-                                     ["id", "complete_name"], 500, "complete_name")
+                                     ["id", "complete_name"], 500, "name")
             counts = {}
             for c in cats:
                 n = odoo.call("product.template", "search_count",
