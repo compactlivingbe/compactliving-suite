@@ -121,6 +121,13 @@ with c2:
         st.caption("Openbare prijzen incl BTW; kost = excl BTW (NL 21%).")
         st.page_link("pages/6_VBD_Standkachels.py", label="Open →", icon="🔥")
 
+    with st.container(border=True):
+        st.markdown("#### 📊 SO Opvolging")
+        st.write("Dashboard sales orders: beschikbaar bij leverancier (Reimo), "
+                 "ontvangen bij ons, en verwachte leverdatum per order.")
+        st.caption("Live Reimo Profiweb check + ontvangststatus uit gekoppelde PO's.")
+        st.page_link("pages/7_SO_Opvolging.py", label="Open →", icon="📊")
+
 st.divider()
 
 # Quick links
