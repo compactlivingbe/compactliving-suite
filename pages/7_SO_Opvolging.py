@@ -162,13 +162,20 @@ for l in sol:
     lines_by_so.setdefault(oid, []).append(l)
     prod_ids.add(l["product_id"][0])
 
-# ---- Voorraad per product ----
+# ---- Voorraad + type per product ----
 stock = {}
+service_ids = set()
 if prod_ids:
     prs = odoo.read("product.product", list(prod_ids),
-                    ["free_qty", "qty_available", "incoming_qty"])
+                    ["free_qty", "qty_available", "incoming_qty", "type"])
     for p in prs:
         stock[p["id"]] = p
+        if p.get("type") == "service":
+            service_ids.add(p["id"])
+
+# Diensten uit de orderlijnen filteren: enkel fysieke producten tonen
+for oid in list(lines_by_so.keys()):
+    lines_by_so[oid] = [l for l in lines_by_so[oid] if l["product_id"][0] not in service_ids]
 
 # ---- PO-koppeling: product -> PO (id + naam) per SO ----
 so_pos = {so["id"]: match_pos_to_so(so, all_pos) for so in sos}
