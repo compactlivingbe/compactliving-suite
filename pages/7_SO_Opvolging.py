@@ -1,9 +1,11 @@
-"""SO Opvolging — dashboard sales orders met leverancier-beschikbaarheid + ontvangststatus.
+"""SO Opvolging — dashboard open sales orders met eigen-voorraad + Reimo-levertijd.
 
-Per sales order:
-  1. Is alles beschikbaar bij de leverancier (Reimo)?  -> live Profiweb lookup
-  2. Is alles toegekomen bij ons?                       -> qty_received op gekoppelde PO('s)
-  3. Wat is de verwachte leverdatum bij Reimo?          -> Profiweb expected_date
+Overzicht:
+  - Tabel van open SO's; direct zichtbaar of alle producten op voorraad zijn.
+Detail (SO openklikken):
+  - Per productlijn: op voorraad bij ons (ja/nee).
+  - Indien niet op voorraad: de gekoppelde inkooporder (klikbare link)
+    + de verwachte levertijd opgevraagd bij Reimo.
 """
 import os, sys, time
 from pathlib import Path
@@ -13,7 +15,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from odoo_client import OdooClient
 try:
-    from reimo_scraper import Profiweb, decide, DEFAULT_RULES
+    from reimo_scraper import Profiweb
 except ImportError:
     Profiweb = None
 
@@ -23,9 +25,10 @@ from auth import require_auth
 require_auth()
 
 REIMO_PARTNER_ID = 66
+ODOO_URL = os.environ.get("ODOO_URL", "https://compactliving.odoo.com").rstrip("/")
 
 st.title("📊 Sales Order opvolging")
-st.caption("Per order: beschikbaar bij leverancier (Reimo) · ontvangen bij ons · verwachte leverdatum")
+st.caption("Open orders · op voorraad bij ons · gekoppelde PO · verwachte levertijd bij Reimo")
 
 
 def get_odoo():
@@ -36,27 +39,24 @@ def get_odoo():
 
 
 # ============================================================================
-# Helpers
+# Data laden
 # ============================================================================
 def load_sale_orders(odoo, limit, only_open):
     domain = [("state", "in", ["sale", "done"])]
+    base = ["id", "name", "partner_id", "date_order", "amount_total", "state"]
     if only_open:
-        # delivery_status bestaat in Odoo 17+: 'full' = volledig geleverd aan klant
         domain.append(("delivery_status", "!=", "full"))
-    fields = ["id", "name", "partner_id", "date_order", "amount_total", "state"]
-    # procurement_group_id + delivery_status defensief toevoegen
-    try:
-        return odoo.search_read("sale.order", domain, fields + ["procurement_group_id", "delivery_status"],
-                                limit, "date_order desc")
-    except Exception:
-        return odoo.search_read("sale.order", domain, fields, limit, "date_order desc")
+    for fields in (base + ["delivery_status"], base):
+        try:
+            return odoo.search_read("sale.order", domain, fields, limit, "date_order desc")
+        except Exception:
+            continue
+    return []
 
 
-def load_all_pos(odoo, since_days=180):
-    """Alle recente PO's met hun origin/group voor SO-matching."""
+def load_all_pos(odoo):
     base = ["id", "name", "origin", "partner_id", "state", "amount_total", "order_line"]
     domain = [("state", "in", ["draft", "sent", "purchase", "done"])]
-    # Probeer met group_id; val terug zonder als veld/order niet bestaat
     for fields in (base + ["group_id"], base):
         for order in ("date_order desc", None):
             try:
@@ -67,7 +67,6 @@ def load_all_pos(odoo, since_days=180):
 
 
 def match_pos_to_so(so, all_pos):
-    """Koppel PO's aan een SO via origin (SO-naam) of gedeelde procurement group."""
     so_name = so["name"]
     gid = so.get("procurement_group_id")
     gid = gid[0] if isinstance(gid, (list, tuple)) and gid else None
@@ -83,120 +82,8 @@ def match_pos_to_so(so, all_pos):
     return matched
 
 
-def receipt_status(odoo, po_line_ids):
-    """Aggregeer qty_received vs product_qty over PO-lijnen -> (status, recv, qty)."""
-    if not po_line_ids:
-        return "geen PO", 0.0, 0.0
-    lines = odoo.read("purchase.order.line", po_line_ids,
-                      ["product_qty", "qty_received"])
-    tot_qty = sum(float(l.get("product_qty") or 0) for l in lines)
-    tot_recv = sum(float(l.get("qty_received") or 0) for l in lines)
-    if tot_qty <= 0:
-        return "—", tot_recv, tot_qty
-    if tot_recv >= tot_qty - 1e-6:
-        return "volledig", tot_recv, tot_qty
-    if tot_recv > 0:
-        return "deels", tot_recv, tot_qty
-    return "niets", tot_recv, tot_qty
-
-
-RECEIPT_BADGE = {
-    "volledig": "✅ Volledig ontvangen",
-    "deels": "🟡 Deels ontvangen",
-    "niets": "⏳ Nog niets ontvangen",
-    "geen PO": "— geen PO",
-    "—": "—",
-}
-
-
-# ============================================================================
-# Data laden
-# ============================================================================
-try:
-    odoo = get_odoo()
-except Exception as e:
-    st.error(f"Odoo connectie faalt: {e}")
-    st.stop()
-
-ctrl1, ctrl2, ctrl3 = st.columns([1, 1, 2])
-with ctrl1:
-    limit = st.number_input("Aantal orders", min_value=10, max_value=300, value=50, step=10)
-with ctrl2:
-    only_open = st.checkbox("Enkel niet-volledig geleverd", value=True)
-with ctrl3:
-    search = st.text_input("Zoek (SO-nr of klant)", value="")
-
-with st.spinner("Sales orders laden..."):
-    try:
-        sos = load_sale_orders(odoo, int(limit), only_open)
-    except Exception as e:
-        st.error(f"Kon sales orders niet laden: {e}")
-        st.stop()
-    all_pos = load_all_pos(odoo)
-
-if search:
-    s = search.lower()
-    sos = [so for so in sos
-           if s in (so["name"] or "").lower()
-           or s in ((so["partner_id"][1] if so.get("partner_id") else "")).lower()]
-
-if not sos:
-    st.info("Geen sales orders gevonden voor deze filter.")
-    st.stop()
-
-# PO's per SO koppelen + ontvangststatus (goedkoop, geen scraping)
-po_by_id = {p["id"]: p for p in all_pos}
-so_pos = {}          # so_id -> [po,...]
-so_receipt = {}      # so_id -> (status, recv, qty)
-for so in sos:
-    matched = match_pos_to_so(so, all_pos)
-    so_pos[so["id"]] = matched
-    line_ids = [lid for po in matched for lid in (po.get("order_line") or [])]
-    so_receipt[so["id"]] = receipt_status(odoo, line_ids) if line_ids else ("geen PO", 0, 0)
-
-# ============================================================================
-# Overzichtstabel
-# ============================================================================
-st.markdown(f"### {len(sos)} sales order(s)")
-
-rows = []
-for so in sos:
-    matched = so_pos[so["id"]]
-    reimo_pos = [p for p in matched if p.get("partner_id") and p["partner_id"][0] == REIMO_PARTNER_ID]
-    rstat, recv, qty = so_receipt[so["id"]]
-    av = st.session_state.get("so_avail", {}).get(so["id"])
-    rows.append({
-        "Selecteer": False,
-        "SO": so["name"],
-        "Klant": so["partner_id"][1] if so.get("partner_id") else "—",
-        "Datum": (so.get("date_order") or "")[:10],
-        "Bedrag": f"€ {so['amount_total']:,.2f}",
-        "Ontvangst": RECEIPT_BADGE.get(rstat, rstat) + (f" ({recv:.0f}/{qty:.0f})" if qty else ""),
-        "Reimo PO": ", ".join(p["name"] for p in reimo_pos) or "—",
-        "Reimo beschikbaar": av or "— (klik check)",
-        "_id": so["id"],
-    })
-
-df = pd.DataFrame(rows)
-edited = st.data_editor(
-    df, hide_index=True, use_container_width=True,
-    column_config={"_id": None},
-    disabled=[c for c in df.columns if c not in ("Selecteer",)],
-    key="so_table",
-)
-selected_ids = edited[edited["Selecteer"]]["_id"].tolist()
-
-st.caption("Vink orders aan en klik **Check Reimo beschikbaarheid** voor een live controle "
-           "(beschikbaarheid + verwachte leverdatum per lijn).")
-
-check_btn = st.button("🔍 Check Reimo beschikbaarheid (geselecteerd)",
-                      type="primary", disabled=not selected_ids)
-
-
-# ============================================================================
-# Reimo code-resolutie (variant/template -> Reimo artikelcode)
-# ============================================================================
 def build_reimo_code_map(odoo, product_ids):
+    """variant/template -> Reimo artikelcode."""
     if not product_ids:
         return {}
     prods = odoo.search_read("product.product", [("id", "in", product_ids)],
@@ -229,125 +116,219 @@ def build_reimo_code_map(odoo, product_ids):
 
 
 # ============================================================================
-# Live check uitvoeren
+# Connect + filters
 # ============================================================================
-if check_btn and selected_ids:
-    if Profiweb is None:
-        st.error("Reimo scraper niet beschikbaar.")
-        st.stop()
-    pw_user = os.environ.get("PROFIWEB_USER", "")
-    pw_pass = os.environ.get("PROFIWEB_PASS", "")
-    if not (pw_user and pw_pass):
-        st.error("PROFIWEB_USER / PROFIWEB_PASS ontbreken in secrets.")
-        st.stop()
+try:
+    odoo = get_odoo()
+except Exception as e:
+    st.error(f"Odoo connectie faalt: {e}")
+    st.stop()
 
-    # Verzamel Reimo PO-lijnen voor de geselecteerde SO's
-    detail = {}   # so_id -> list of line dicts
-    all_var_ids = set()
-    for sid in selected_ids:
-        reimo_pos = [p for p in so_pos[sid]
-                     if p.get("partner_id") and p["partner_id"][0] == REIMO_PARTNER_ID]
-        line_ids = [lid for po in reimo_pos for lid in (po.get("order_line") or [])]
-        lines = odoo.read("purchase.order.line", line_ids,
-                          ["product_id", "product_qty", "qty_received", "name"]) if line_ids else []
+c1, c2, c3 = st.columns([1, 1, 2])
+with c1:
+    limit = st.number_input("Aantal orders", min_value=10, max_value=300, value=50, step=10)
+with c2:
+    only_open = st.checkbox("Enkel niet-volledig geleverd", value=True)
+with c3:
+    search = st.text_input("Zoek (SO-nr of klant)", value="")
+
+with st.spinner("Sales orders laden..."):
+    sos = load_sale_orders(odoo, int(limit), only_open)
+    all_pos = load_all_pos(odoo)
+
+if search:
+    s = search.lower()
+    sos = [so for so in sos if s in (so["name"] or "").lower()
+           or s in ((so["partner_id"][1] if so.get("partner_id") else "")).lower()]
+
+if not sos:
+    st.info("Geen open sales orders gevonden voor deze filter.")
+    st.stop()
+
+so_ids = [so["id"] for so in sos]
+
+# ---- SO-lijnen in batch ----
+sol = odoo.search_read(
+    "sale.order.line",
+    [("order_id", "in", so_ids), ("display_type", "=", False)],
+    ["id", "order_id", "product_id", "product_uom_qty", "qty_delivered"], 2000,
+)
+lines_by_so = {}
+prod_ids = set()
+for l in sol:
+    if not l.get("product_id"):
+        continue
+    oid = l["order_id"][0]
+    lines_by_so.setdefault(oid, []).append(l)
+    prod_ids.add(l["product_id"][0])
+
+# ---- Voorraad per product ----
+stock = {}
+if prod_ids:
+    prs = odoo.read("product.product", list(prod_ids),
+                    ["free_qty", "qty_available", "incoming_qty"])
+    for p in prs:
+        stock[p["id"]] = p
+
+# ---- PO-koppeling: product -> PO (id + naam) per SO ----
+so_pos = {so["id"]: match_pos_to_so(so, all_pos) for so in sos}
+all_po_line_ids = list({lid for pos in so_pos.values() for po in pos for lid in (po.get("order_line") or [])})
+po_lines_cache = {}   # po_id -> [po_line,...]
+if all_po_line_ids:
+    pls_all = odoo.read("purchase.order.line", all_po_line_ids, ["product_id", "order_id"])
+    for pl in pls_all:
+        if pl.get("order_id"):
+            po_lines_cache.setdefault(pl["order_id"][0], []).append(pl)
+prod_to_pos = {}      # so_id -> { product_id -> (po_id, po_name) }
+for so in sos:
+    m = {}
+    for po in so_pos[so["id"]]:
+        for pl in po_lines_cache.get(po["id"], []):
+            if pl.get("product_id"):
+                m.setdefault(pl["product_id"][0], (po["id"], po["name"]))
+    prod_to_pos[so["id"]] = m
+
+
+# ============================================================================
+# Per-SO voorraadstatus berekenen
+# ============================================================================
+def so_stock_summary(so):
+    """-> (badge, n_missing, n_total)."""
+    lines = lines_by_so.get(so["id"], [])
+    n_total = 0
+    n_missing = 0
+    for l in lines:
+        pid = l["product_id"][0]
+        needed = float(l.get("product_uom_qty") or 0) - float(l.get("qty_delivered") or 0)
+        if needed <= 1e-6:
+            continue   # al geleverd
+        n_total += 1
+        onhand = float(stock.get(pid, {}).get("qty_available") or 0)
+        if onhand < needed - 1e-6:
+            n_missing += 1
+    if n_total == 0:
+        return "✅ Alles geleverd", 0, 0
+    if n_missing == 0:
+        return "✅ Alles op voorraad", 0, n_total
+    return f"⚠️ {n_missing}/{n_total} niet op voorraad", n_missing, n_total
+
+
+# ============================================================================
+# Overzichtstabel
+# ============================================================================
+st.markdown(f"### {len(sos)} open sales order(s)")
+
+rows = []
+for so in sos:
+    badge, n_missing, n_total = so_stock_summary(so)
+    rows.append({
+        "SO": so["name"],
+        "Klant": so["partner_id"][1] if so.get("partner_id") else "—",
+        "Datum": (so.get("date_order") or "")[:10],
+        "Bedrag": f"€ {so['amount_total']:,.2f}",
+        "Voorraad": badge,
+        "Open in Odoo": f"{ODOO_URL}/odoo/sales/{so['id']}",
+    })
+st.dataframe(
+    pd.DataFrame(rows), hide_index=True, use_container_width=True,
+    column_config={"Open in Odoo": st.column_config.LinkColumn("Odoo", display_text="open ↗")},
+)
+
+st.divider()
+st.markdown("### 🔎 Detail per order")
+st.caption("Klik een order open. Producten die niet op voorraad zijn tonen de gekoppelde PO; "
+           "klik **Check Reimo levertijd** voor de verwachte beschikbaarheid.")
+
+reimo_lev = st.session_state.setdefault("reimo_lev", {})   # code -> info
+
+
+def fmt_lev(info):
+    if not info:
+        return "—"
+    if info.get("discontinued"):
+        return "🚫 niet meer leverbaar"
+    exp = info.get("expected_date")
+    if exp:
+        return f"🟡 verwacht {exp}"
+    if info.get("raw_status") == "AVAILABLE":
+        return "✅ op voorraad bij Reimo"
+    if info.get("error"):
+        return f"⚠️ {info['error'][:30]}"
+    return info.get("verfuegbarkeit") or info.get("raw_status") or "❔ onbekend"
+
+
+for so in sos:
+    badge, n_missing, n_total = so_stock_summary(so)
+    klant = so["partner_id"][1] if so.get("partner_id") else ""
+    with st.expander(f"{so['name']} — {klant} · {badge}", expanded=False):
+        lines = lines_by_so.get(so["id"], [])
+        pmap = prod_to_pos.get(so["id"], {})
+
+        # Reimo codes voor niet-op-voorraad lijnen
+        missing_pids = []
         for l in lines:
-            if l.get("product_id"):
-                all_var_ids.add(l["product_id"][0])
-        detail[sid] = lines
+            pid = l["product_id"][0]
+            needed = float(l.get("product_uom_qty") or 0) - float(l.get("qty_delivered") or 0)
+            onhand = float(stock.get(pid, {}).get("qty_available") or 0)
+            if needed > 1e-6 and onhand < needed - 1e-6:
+                missing_pids.append(pid)
+        code_map = build_reimo_code_map(odoo, missing_pids) if missing_pids else {}
 
-    code_map = build_reimo_code_map(odoo, list(all_var_ids))
-
-    log_box = st.empty()
-    log_lines = []
-    def stlog(m):
-        log_lines.append(str(m))
-        log_box.code("\n".join(log_lines[-15:]), language=None)
-
-    avail_cache = {}   # code -> info
-    try:
-        with st.spinner("Profiweb login..."):
-            pw = Profiweb(pw_user, pw_pass, log=stlog)
-            pw.login()
-
-        avail_state = st.session_state.setdefault("so_avail", {})
-        prog = st.progress(0, text="Beschikbaarheid ophalen...")
-        codes_needed = []
-        for sid in selected_ids:
-            for l in detail[sid]:
-                vid = l["product_id"][0] if l.get("product_id") else None
-                code = code_map.get(vid)
-                if code and code not in avail_cache:
-                    codes_needed.append(code)
-        codes_needed = list(dict.fromkeys(codes_needed))
-
-        for i, code in enumerate(codes_needed, 1):
-            try:
-                avail_cache[code] = pw.lookup(code)
-            except Exception as e:
-                avail_cache[code] = {"found": False, "error": str(e), "raw_status": "ERROR",
-                                     "expected_date": "", "verfuegbarkeit": "", "discontinued": False}
-            prog.progress(int(i / max(len(codes_needed), 1) * 100),
-                          text=f"{i}/{len(codes_needed)} codes")
-            time.sleep(0.5)
-        prog.empty()
-
-        # Per SO aggregeren + tonen
-        for sid in selected_ids:
-            so = next(x for x in sos if x["id"] == sid)
-            lines = detail[sid]
-            line_rows = []
-            n_avail = n_back = n_disc = n_unknown = 0
-            latest_date = ""
-            for l in lines:
-                vid = l["product_id"][0] if l.get("product_id") else None
-                code = code_map.get(vid, "?")
-                info = avail_cache.get(code, {})
-                status = info.get("raw_status", "UNKNOWN")
-                exp = info.get("expected_date", "")
-                if info.get("discontinued"):
-                    n_disc += 1; badge = "🚫 Niet leverbaar"
-                elif status == "AVAILABLE":
-                    n_avail += 1; badge = "✅ Op voorraad"
-                elif status == "BACKORDER" or exp:
-                    n_back += 1; badge = "🟡 Backorder"
-                else:
-                    n_unknown += 1; badge = "❔ Onbekend"
-                if exp and exp > latest_date:
-                    latest_date = exp
-                recv = float(l.get("qty_received") or 0)
-                qty = float(l.get("product_qty") or 0)
-                line_rows.append({
-                    "Reimo code": code,
-                    "Product": (l["product_id"][1] if l.get("product_id") else l.get("name", ""))[:50],
-                    "Besteld": qty,
-                    "Ontvangen": recv,
-                    "Beschikbaar": badge,
-                    "Verwacht": exp or "—",
-                    "Detail": (info.get("verfuegbarkeit") or info.get("error") or "")[:45],
-                })
-
-            # Samenvatting voor overzichtstabel
-            if n_disc:
-                summ = f"🚫 {n_disc} niet leverbaar"
-            elif n_back:
-                summ = f"🟡 {n_back} backorder" + (f" → {latest_date}" if latest_date else "")
-            elif n_unknown and not n_avail:
-                summ = "❔ onbekend"
+        if st.button("🔍 Check Reimo levertijd", key=f"chk_{so['id']}",
+                     disabled=not missing_pids):
+            if Profiweb is None:
+                st.error("Reimo scraper niet beschikbaar.")
+            elif not (os.environ.get("PROFIWEB_USER") and os.environ.get("PROFIWEB_PASS")):
+                st.error("PROFIWEB_USER / PROFIWEB_PASS ontbreken in secrets.")
             else:
-                summ = "✅ alles beschikbaar"
-            avail_state[sid] = summ
+                try:
+                    with st.spinner("Reimo opvragen..."):
+                        pw = Profiweb(os.environ["PROFIWEB_USER"],
+                                      os.environ["PROFIWEB_PASS"], log=lambda *_: None)
+                        pw.login()
+                        codes = list(dict.fromkeys(c for c in code_map.values() if c))
+                        for code in codes:
+                            try:
+                                reimo_lev[code] = pw.lookup(code)
+                            except Exception as e:
+                                reimo_lev[code] = {"error": str(e)}
+                            time.sleep(0.5)
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Reimo check faalde: {e}")
 
-            with st.expander(f"📋 {so['name']} — {so['partner_id'][1] if so.get('partner_id') else ''} · {summ}",
-                             expanded=True):
-                if not line_rows:
-                    st.info("Geen Reimo PO-lijnen gevonden voor deze order.")
-                else:
-                    st.dataframe(pd.DataFrame(line_rows), hide_index=True,
-                                 use_container_width=True)
-                    if latest_date:
-                        st.caption(f"⏱ Laatste verwachte leverdatum bij Reimo: **{latest_date}**")
-        st.success("✓ Beschikbaarheid bijgewerkt. De samenvatting staat nu ook in de tabel hierboven.")
-    except Exception as e:
-        st.error(f"Check faalde: {e}")
-        import traceback
-        st.code(traceback.format_exc())
+        # Lijntabel
+        detail_rows = []
+        for l in lines:
+            pid = l["product_id"][0]
+            needed = float(l.get("product_uom_qty") or 0) - float(l.get("qty_delivered") or 0)
+            onhand = float(stock.get(pid, {}).get("qty_available") or 0)
+            free = float(stock.get(pid, {}).get("free_qty") or 0)
+            qty = float(l.get("product_uom_qty") or 0)
+            if needed <= 1e-6:
+                status = "✅ geleverd"
+                po_link = ""
+                lev = ""
+            elif onhand >= needed - 1e-6:
+                status = "✅ op voorraad"
+                po_link = ""
+                lev = ""
+            else:
+                status = f"❌ tekort ({onhand:.0f}/{needed:.0f})"
+                po = pmap.get(pid)
+                po_link = f"{ODOO_URL}/odoo/purchase/{po[0]}" if po else ""
+                code = code_map.get(pid)
+                lev = fmt_lev(reimo_lev.get(code)) if code else "geen Reimo-code"
+            detail_rows.append({
+                "Product": (l["product_id"][1] if l.get("product_id") else "")[:55],
+                "Besteld": qty,
+                "Op voorraad": onhand,
+                "Vrij": free,
+                "Status": status,
+                "PO": po_link,
+                "Reimo levertijd": lev,
+            })
+        st.dataframe(
+            pd.DataFrame(detail_rows), hide_index=True, use_container_width=True,
+            column_config={"PO": st.column_config.LinkColumn("PO", display_text="open ↗")},
+        )
