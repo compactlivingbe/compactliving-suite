@@ -54,17 +54,16 @@ def load_sale_orders(odoo, limit, only_open):
 
 def load_all_pos(odoo, since_days=180):
     """Alle recente PO's met hun origin/group voor SO-matching."""
-    fields = ["id", "name", "origin", "partner_id", "state", "amount_total", "order_line"]
-    try:
-        fields.append("group_id")
-    except Exception:
-        pass
-    pos = odoo.search_read(
-        "purchase.order",
-        [("state", "in", ["draft", "sent", "purchase", "done"])],
-        fields, 500, "date_order desc",
-    )
-    return pos
+    base = ["id", "name", "origin", "partner_id", "state", "amount_total", "order_line"]
+    domain = [("state", "in", ["draft", "sent", "purchase", "done"])]
+    # Probeer met group_id; val terug zonder als veld/order niet bestaat
+    for fields in (base + ["group_id"], base):
+        for order in ("date_order desc", None):
+            try:
+                return odoo.search_read("purchase.order", domain, fields, 500, order)
+            except Exception:
+                continue
+    return []
 
 
 def match_pos_to_so(so, all_pos):
