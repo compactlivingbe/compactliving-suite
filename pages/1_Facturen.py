@@ -1006,7 +1006,7 @@ with tab_peppol:
                                         try:
                                             st.session_state["_pcats"] = odoo.search_read(
                                                 "product.category", [], ["id", "complete_name"],
-                                                200, "complete_name")
+                                                200, "name")
                                         except Exception as e:
                                             st.session_state["_pcats"] = []
                                             st.warning(f"Categorieën laden faalde: {e}")

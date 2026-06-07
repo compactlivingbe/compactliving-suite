@@ -44,7 +44,7 @@ def load_categories(url, db, login, password):
     o = Odoo(url, db, login, password, log=lambda *_: None)
     o.authenticate()
     cats = o.call("product.category", "search_read",
-                  [[], ["id", "complete_name"]], {"order": "complete_name"})
+                  [[], ["id", "complete_name"]], {"order": "name"})
     return [(c["id"], c["complete_name"]) for c in cats]
 
 
