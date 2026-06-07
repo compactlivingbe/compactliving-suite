@@ -54,32 +54,44 @@ def load_sale_orders(odoo, limit, only_open):
     return []
 
 
-def load_all_pos(odoo):
-    base = ["id", "name", "origin", "partner_id", "state", "amount_total", "order_line"]
-    domain = [("state", "in", ["draft", "sent", "purchase", "done"])]
-    for fields in (base + ["group_id"], base):
-        for order in ("date_order desc", None):
-            try:
-                return odoo.search_read("purchase.order", domain, fields, 500, order)
-            except Exception:
-                continue
-    return []
+STATE_PRIO = {"purchase": 3, "done": 3, "sent": 2, "draft": 1, "cancel": 0}
+
+PO_STATE_BADGE = {
+    "draft": "📝 concept (RFQ)",
+    "sent": "📨 RFQ verstuurd",
+    "purchase": "✅ besteld",
+    "done": "✅ besteld (vergrendeld)",
+    "cancel": "❌ geannuleerd",
+}
 
 
-def match_pos_to_so(so, all_pos):
-    so_name = so["name"]
-    gid = so.get("procurement_group_id")
-    gid = gid[0] if isinstance(gid, (list, tuple)) and gid else None
-    matched = []
-    for po in all_pos:
-        origin = po.get("origin") or ""
-        po_gid = po.get("group_id")
-        po_gid = po_gid[0] if isinstance(po_gid, (list, tuple)) and po_gid else None
-        if so_name and so_name in origin:
-            matched.append(po)
-        elif gid and po_gid and gid == po_gid:
-            matched.append(po)
-    return matched
+def build_product_po_map(odoo, product_ids):
+    """product_id -> (po_id, po_name, po_state) — beste open PO per product.
+
+    Onze PO's worden handmatig aangemaakt (geen SO-link via origin/group), dus
+    matchen we op product: staat het product op een openstaande inkooporder?
+    Bij meerdere PO's wint een bevestigde PO van een concept/RFQ.
+    """
+    if not product_ids:
+        return {}
+    pol = odoo.search_read(
+        "purchase.order.line",
+        [("product_id", "in", list(product_ids)),
+         ("state", "in", ["draft", "sent", "purchase", "done"])],
+        ["product_id", "order_id", "state"], 3000,
+    )
+    best = {}
+    for l in pol:
+        if not l.get("product_id") or not l.get("order_id"):
+            continue
+        pid = l["product_id"][0]
+        po_id, po_name = l["order_id"][0], l["order_id"][1]
+        stt = l.get("state")
+        cand = (STATE_PRIO.get(stt, 0), po_id)
+        cur = best.get(pid)
+        if cur is None or cand > (STATE_PRIO.get(cur[2], 0), cur[0]):
+            best[pid] = (po_id, po_name, stt)
+    return best
 
 
 def build_reimo_code_map(odoo, product_ids):
@@ -134,7 +146,6 @@ with c3:
 
 with st.spinner("Sales orders laden..."):
     sos = load_sale_orders(odoo, int(limit), only_open)
-    all_pos = load_all_pos(odoo)
 
 if search:
     s = search.lower()
@@ -177,32 +188,8 @@ if prod_ids:
 for oid in list(lines_by_so.keys()):
     lines_by_so[oid] = [l for l in lines_by_so[oid] if l["product_id"][0] not in service_ids]
 
-# ---- PO-koppeling: product -> PO (id + naam) per SO ----
-so_pos = {so["id"]: match_pos_to_so(so, all_pos) for so in sos}
-all_po_line_ids = list({lid for pos in so_pos.values() for po in pos for lid in (po.get("order_line") or [])})
-po_lines_cache = {}   # po_id -> [po_line,...]
-if all_po_line_ids:
-    pls_all = odoo.read("purchase.order.line", all_po_line_ids, ["product_id", "order_id"])
-    for pl in pls_all:
-        if pl.get("order_id"):
-            po_lines_cache.setdefault(pl["order_id"][0], []).append(pl)
-prod_to_pos = {}      # so_id -> { product_id -> (po_id, po_name, po_state) }
-for so in sos:
-    m = {}
-    for po in so_pos[so["id"]]:
-        for pl in po_lines_cache.get(po["id"], []):
-            if pl.get("product_id"):
-                m.setdefault(pl["product_id"][0], (po["id"], po["name"], po.get("state")))
-    prod_to_pos[so["id"]] = m
-
-
-PO_STATE_BADGE = {
-    "draft": "📝 concept (RFQ)",
-    "sent": "📨 RFQ verstuurd",
-    "purchase": "✅ besteld",
-    "done": "✅ besteld (vergrendeld)",
-    "cancel": "❌ geannuleerd",
-}
+# ---- PO-koppeling op productniveau (handmatige PO's, geen SO-link) ----
+prod_po = build_product_po_map(odoo, prod_ids)   # product_id -> (po_id, po_name, po_state)
 
 
 # ============================================================================
@@ -278,7 +265,6 @@ for so in sos:
     klant = so["partner_id"][1] if so.get("partner_id") else ""
     with st.expander(f"{so['name']} — {klant} · {badge}", expanded=False):
         lines = lines_by_so.get(so["id"], [])
-        pmap = prod_to_pos.get(so["id"], {})
 
         # Reimo codes voor niet-op-voorraad lijnen
         missing_pids = []
@@ -322,7 +308,7 @@ for so in sos:
             free = float(stock.get(pid, {}).get("free_qty") or 0)
             qty = float(l.get("product_uom_qty") or 0)
 
-            po = pmap.get(pid)
+            po = prod_po.get(pid)
             po_link = f"{ODOO_URL}/odoo/purchase/{po[0]}" if po else ""
             po_status = PO_STATE_BADGE.get(po[2], po[2]) if po else "— geen PO"
 
