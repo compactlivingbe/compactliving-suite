@@ -8,6 +8,14 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1216"
   },
   {
+    "tmpl_id": "2178",
+    "template": "Carbest RW MOTION Rollo/Hor",
+    "categ": "",
+    "action": "block",
+    "detail": "[316591] 13.11.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/2178"
+  },
+  {
     "tmpl_id": "878",
     "template": "Powerstation Carbest LiFePO4 PPS2500",
     "categ": "",
@@ -28,7 +36,7 @@
     "template": "Transit V363 bj 2014 \u2013 P2 Rechts \u2013 5981 \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
     "categ": "",
     "action": "block",
-    "detail": "[31734] 04.09.26",
+    "detail": "[31734] 18.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5297"
   },
   {
@@ -36,7 +44,7 @@
     "template": "CEE-ingangscontactdoos met magnetische sluiting | wit",
     "categ": "",
     "action": "warning",
-    "detail": "[820374] 19.06.26",
+    "detail": "[820374] 03.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/612"
   },
   {
@@ -52,7 +60,7 @@
     "template": "Carbest RW Fusion Curved - klapraam",
     "categ": "",
     "action": "warning",
-    "detail": "[319004] 05.06.26 | [319005] 05.06.26 | [319006] 10.07.26",
+    "detail": "[319003] 09.06.26 | [319004] 09.06.26 | [319005] 09.06.26 | [319006] 10.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1220"
   },
   {
@@ -68,7 +76,7 @@
     "template": "Carbest RW Van Rollo/Hor",
     "categ": "",
     "action": "warning",
-    "detail": "[319162] 05.06.26",
+    "detail": "[319113] 10.07.26 | [319123] 10.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/2180"
   },
   {
@@ -88,35 +96,35 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/767"
   },
   {
-    "tmpl_id": "567",
-    "template": "Draaitafelvoet 756mm, 3-delig, aluminium, antraciet",
+    "tmpl_id": "557",
+    "template": "Fiamma expansievat A20",
     "categ": "",
     "action": "warning",
-    "detail": "[57184] 26.05.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/567"
+    "detail": "[440688] 10.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/557"
   },
   {
-    "tmpl_id": "786",
-    "template": "Fiamma Luifel F43van 2,7m Royal Grey, Deep Black",
+    "tmpl_id": "815",
+    "template": "Lage zetel console voor Ducato 250/Boxer/Jumper",
     "categ": "",
     "action": "warning",
-    "detail": "[440545] 29.05.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/786"
+    "detail": "[59548] 26.06.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/815"
   },
   {
-    "tmpl_id": "374",
-    "template": "Hoekverbinder 12mm buis - 12mm slang | Reich",
+    "tmpl_id": "131",
+    "template": "Maxxair Maxxfan Deluxe ventilator",
     "categ": "",
     "action": "warning",
-    "detail": "[650599] 05.06.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/374"
+    "detail": "[398192] 17.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/131"
   },
   {
     "tmpl_id": "89",
     "template": "Maxxfan MaxxShade binnenkader",
     "categ": "",
     "action": "warning",
-    "detail": "[398194] 19.06.26",
+    "detail": "[398194] 03.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/89"
   },
   {
@@ -124,16 +132,8 @@
     "template": "Renogy Solarpanel 120W",
     "categ": "",
     "action": "warning",
-    "detail": "[840240] 26.06.26",
+    "detail": "[840240] 10.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1133"
-  },
-  {
-    "tmpl_id": "709",
-    "template": "Rubberen doorvoertule voor gasleiding",
-    "categ": "",
-    "action": "warning",
-    "detail": "[820794] 26.05.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/709"
   },
   {
     "tmpl_id": "425",
@@ -142,6 +142,22 @@
     "action": "warning",
     "detail": "[85327] BACKORDER | [85328] BACKORDER",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/425"
+  },
+  {
+    "tmpl_id": "715",
+    "template": "Telair Clima e-Van 5400H airconditioning met warmtepomp",
+    "categ": "",
+    "action": "warning",
+    "detail": "[495014] 12.06.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/715"
+  },
+  {
+    "tmpl_id": "508",
+    "template": "Transit V363 bj 2014 \u2013 P2 Rechts \u2013 5531/5981/6704 \u2013 Schuifraam \u2013 Privacy \u2013 Carbest",
+    "categ": "",
+    "action": "warning",
+    "detail": "[31730] 03.07.26 | [31730] 03.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/508"
   },
   {
     "tmpl_id": "430",
@@ -172,7 +188,7 @@
     "template": "Webasto Cool Top Trail 20G",
     "categ": "",
     "action": "warning",
-    "detail": "[495065] 25.05.26",
+    "detail": "[495065] 12.06.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/716"
   }
 ]
