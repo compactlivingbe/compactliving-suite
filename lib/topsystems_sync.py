@@ -30,7 +30,7 @@ SALE_VAT_DIVISOR = 1.0
 VICTRON_PREFIXES = {
     "ADA","ARG","ASS","BAM","BAT","BBA","BCD","BMS","BPC","BPP","BPR","CCH","CEP",
     "CIN","CIP","CMP","COS","CTR","GSM","INTD","LYN","ORI","PCH","PIN","PMP","PPP",
-    "QUA","RCD","REL","SCC","SDFI","SHP","SHU","SIN","SKY","SPM","SPP","VBS",
+    "QUA","RCD","REL","SCC","SDFI","SHP","SHU","SIN","SKY","SPM","SPP","VBB","VBS",
 }
 
 def is_victron_code(code):
@@ -58,7 +58,7 @@ def is_victron_product(code, description):
     # Prefix-based: accept if it's one of the strict Victron-only prefixes
     # (ASS = Accessories is gemengd, BAT/BPC/PIN/QUA/SCC/etc. zijn 99% Victron)
     strict = {"BAT","BPC","BPP","BPR","CIP","INTD","LYN","ORI","PCH","PIN","PMP",
-              "QUA","REL","SCC","SDFI","SHP","SHU","SIN","SKY","SPM","SPP","VBS",
+              "QUA","REL","SCC","SDFI","SHP","SHU","SIN","SKY","SPM","SPP","VBB","VBS",
               "BMS","BAM","BBA","BCD","CCH","CEP","CIN","CMP","COS","CTR","GSM","RCD",
               "ARG","ADA"}
     import re
