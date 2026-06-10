@@ -120,26 +120,21 @@ st.caption(f"Master-catalogus: **{len(master)}** Victron-producten "
            f"({n_new_master} nieuw 🆕) · ingelezen {saved.get('parsed_at', '?')} "
            f"uit `{saved.get('source_file', '?')}`")
 
-# ============ UITSLUITINGEN ============
-with st.expander("🚫 Uitsluitingen (producten / categorieën negeren)", expanded=False):
-    st.caption("Uitgesloten producten/categorieën tellen niet mee bij import en dekking. "
-               "Ze blijven wel zichtbaar (apart gemarkeerd) en kun je via het filter tonen/verbergen.")
+# ============ UITSLUITINGEN (categorieën) ============
+with st.expander("🚫 Categorieën uitsluiten", expanded=False):
+    st.caption("Sluit hele categorieën in één keer uit. Losse producten sluit je uit "
+               "via de tabel op **Overzicht & dekking** (kolom *Uitgesloten*) en bekijk "
+               "je op het tabblad **🚫 Uitgesloten**.")
     excl = load_exclusions()
-    xc1, xc2 = st.columns(2)
-    with xc1:
-        excl_cats = st.text_area("Uitgesloten categorieën (één per regel)",
-                                 value="\n".join(excl.get("categories", [])), height=140,
-                                 key="vpl_excl_cats")
-    with xc2:
-        excl_prods = st.text_area("Uitgesloten product-codes (één per regel)",
-                                  value="\n".join(excl.get("products", [])), height=140,
-                                  key="vpl_excl_prods")
-    if st.button("💾 Uitsluitingen opslaan", key="vpl_save_excl"):
+    excl_cats = st.text_area("Uitgesloten categorieën (één per regel)",
+                             value="\n".join(excl.get("categories", [])), height=140,
+                             key="vpl_excl_cats")
+    if st.button("💾 Categorie-uitsluitingen opslaan", key="vpl_save_excl"):
         new_excl = {
             "categories": [x.strip() for x in excl_cats.splitlines() if x.strip()],
-            "products": [x.strip() for x in excl_prods.splitlines() if x.strip()],
+            "products": excl.get("products", []),   # product-uitsluitingen uit de tabel behouden
         }
-        pushed, info = save_exclusions(new_excl, "Victron uitsluitingen bijgewerkt")
+        pushed, info = save_exclusions(new_excl, "Victron categorie-uitsluitingen bijgewerkt")
         st.success(f"✓ Opgeslagen{' + GitHub ' + info if pushed else ' (lokaal)'}")
         st.rerun()
 
@@ -191,8 +186,10 @@ m[4].metric("Bij All-Spark", int(df_act["all_spark"].sum()))
 m[5].metric("Nergens te koop", int((~df_act["top_systems"] & ~df_act["all_spark"]).sum()))
 
 st.divider()
-tab_overzicht, tab_missing, tab_detail = st.tabs(
-    ["📋 Overzicht & dekking", "➕ Ontbreekt in Odoo", "✏️ Product verrijken"])
+n_excluded = int(df["uitgesloten"].sum())
+tab_overzicht, tab_excluded, tab_missing, tab_detail = st.tabs(
+    [f"📋 Overzicht & dekking", f"🚫 Uitgesloten ({n_excluded})",
+     "➕ Ontbreekt in Odoo", "✏️ Product verrijken"])
 
 # ---- Overzicht ----
 with tab_overzicht:
@@ -297,6 +294,57 @@ with tab_overzicht:
 
     st.download_button("⬇️ Exporteer (CSV)", edited_ov.to_csv(index=False).encode("utf-8"),
                        "victron_dekking.csv", "text/csv")
+
+# ---- Uitgesloten ----
+with tab_excluded:
+    exc = df[df["uitgesloten"]].copy()
+    if exc.empty:
+        st.success("Geen producten uitgesloten. Sluit producten uit via de kolom "
+                   "*Uitgesloten* op het tabblad **Overzicht & dekking**.")
+    else:
+        exc["via_categorie"] = exc["categorie"].isin(excl_cat_set)
+        st.caption(f"{len(exc)} uitgesloten producten. Vink **Uitgesloten** uit en klik "
+                   "**Wijzigingen opslaan** om ze weer op te nemen. Producten met "
+                   "*Via categorie* ✓ zijn uitgesloten via hun categorie — die neem je weer "
+                   "op via de sectie **Categorieën uitsluiten** bovenaan.")
+        edited_exc = st.data_editor(
+            exc[["code", "nieuw", "naam", "categorie", "via_categorie", "advies_excl",
+                 "in_odoo", "top_systems", "all_spark", "uitgesloten"]],
+            hide_index=True, use_container_width=True,
+            disabled=["code", "nieuw", "naam", "categorie", "via_categorie",
+                      "advies_excl", "in_odoo", "top_systems", "all_spark"],
+            column_config={
+                "nieuw": st.column_config.CheckboxColumn("🆕"),
+                "via_categorie": st.column_config.CheckboxColumn("Via categorie"),
+                "advies_excl": st.column_config.NumberColumn("Advies (excl)", format="€ %.2f"),
+                "in_odoo": st.column_config.CheckboxColumn("Odoo"),
+                "top_systems": st.column_config.CheckboxColumn("Top Systems"),
+                "all_spark": st.column_config.CheckboxColumn("All-Spark"),
+                "uitgesloten": st.column_config.CheckboxColumn(
+                    "Uitgesloten", help="Uitvinken = weer opnemen"),
+            },
+            key="exc_editor")
+        reinclude = edited_exc[~edited_exc["uitgesloten"]]
+        if st.button(f"💾 Wijzigingen opslaan{f' ({len(reinclude)})' if len(reinclude) else ''}",
+                     type="primary", disabled=reinclude.empty, key="exc_save"):
+            new_prod_excl = set(excl_prod_set)
+            cat_blocked = []
+            for _, r in reinclude.iterrows():
+                new_prod_excl.discard(str(r["code"]))
+                if r["via_categorie"]:
+                    cat_blocked.append(str(r["code"]))
+            new_excl = {"categories": sorted(excl_cat_set), "products": sorted(new_prod_excl)}
+            pushed, info = save_exclusions(new_excl, "Victron uitsluitingen via tabel bijgewerkt")
+            st.success(f"✓ Bijgewerkt · {len(new_prod_excl)} product(en) nog uitgesloten"
+                       f"{' + GitHub ' + info if pushed else ' (lokaal)'}")
+            if cat_blocked:
+                st.warning("Deze blijven uitgesloten via hun categorie (pas aan via "
+                           f"**Categorieën uitsluiten**): {', '.join(cat_blocked[:10])}"
+                           f"{'…' if len(cat_blocked) > 10 else ''}")
+            st.rerun()
+        st.download_button("⬇️ Exporteer uitgesloten (CSV)",
+                           exc.to_csv(index=False).encode("utf-8"),
+                           "victron_uitgesloten.csv", "text/csv")
 
 # ---- Ontbreekt in Odoo ----
 with tab_missing:
