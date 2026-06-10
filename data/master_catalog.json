@@ -1,5 +1,5 @@
 {
-  "parsed_at": "2026-06-10T19:26:07",
+  "parsed_at": "2026-06-10T19:52:01",
   "source_file": "Pricelist_Victron_EUR_C_2026-Q2_web.pdf",
   "products": {
     "PIN121251200": {
@@ -4985,14 +4985,25 @@
       "is_new": false,
       "source": "victron_pricelist"
     },
-    "CIP100400070": {
-      "code": "CIP100400070",
-      "name": "",
+    "CIP100400060": {
+      "code": "CIP100400060",
+      "name": "Busbar to connect 5 CIP100200100 (500 A)",
       "brand": "Victron",
       "category": "FUSES",
       "dimensions": "5 x 40 x 180",
       "weight": null,
       "advice_price": 41.0,
+      "is_new": false,
+      "source": "victron_pricelist"
+    },
+    "CIP100400070": {
+      "code": "CIP100400070",
+      "name": "with fuse holders Busbar to connect 6 CIP100200100 (1500 A)",
+      "brand": "Victron",
+      "category": "FUSES",
+      "dimensions": "5 x 40 x 240",
+      "weight": null,
+      "advice_price": 48.0,
       "is_new": false,
       "source": "victron_pricelist"
     },
@@ -5249,6 +5260,17 @@
       "is_new": false,
       "source": "victron_pricelist"
     },
+    "ASS030690000": {
+      "code": "ASS030690000",
+      "name": "VE.Can Power Cable for BPP900600100",
+      "brand": "Victron",
+      "category": "GX PRODUCTS",
+      "dimensions": "",
+      "weight": null,
+      "advice_price": 33.0,
+      "is_new": false,
+      "source": "victron_pricelist"
+    },
     "BPP920140100": {
       "code": "BPP920140100",
       "name": "GX Tank 140",
@@ -5455,39 +5477,6 @@
       "dimensions": "80 x 150 x 50",
       "weight": null,
       "advice_price": 27.0,
-      "is_new": false,
-      "source": "victron_pricelist"
-    },
-    "BPA000100000R": {
-      "code": "BPA000100000R",
-      "name": "",
-      "brand": "Victron",
-      "category": "REMOTE PANELS",
-      "dimensions": "",
-      "weight": null,
-      "advice_price": null,
-      "is_new": false,
-      "source": "victron_pricelist"
-    },
-    "REC000300000R": {
-      "code": "REC000300000R",
-      "name": "",
-      "brand": "Victron",
-      "category": "REMOTE PANELS",
-      "dimensions": "",
-      "weight": null,
-      "advice_price": null,
-      "is_new": false,
-      "source": "victron_pricelist"
-    },
-    "DMC000200000R": {
-      "code": "DMC000200000R",
-      "name": "",
-      "brand": "Victron",
-      "category": "REMOTE PANELS",
-      "dimensions": "",
-      "weight": null,
-      "advice_price": null,
       "is_new": false,
       "source": "victron_pricelist"
     },
