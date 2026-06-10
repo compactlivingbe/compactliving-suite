@@ -55,30 +55,51 @@ def save_exclusions(allspark_excl, msg):
     return ghs.save_json(EXCLUSIONS_FILE, data, msg)
 
 
+# Beschikbare merken/categorieën/codes uit de laatste scrape, om keuzelijsten
+# in de korting- en uitsluit-instellingen mee te vullen.
+_snap_now = ghs.load_json(SNAPSHOT_FILE, default={})
+_snap_prods = _snap_now.get("products", {}) or {}
+ALL_BRANDS = sorted({(p.get("brand") or "").strip()
+                     for p in _snap_prods.values() if (p.get("brand") or "").strip()})
+ALL_CATEGORIES = sorted({(p.get("category") or "").strip()
+                         for p in _snap_prods.values() if (p.get("category") or "").strip()})
+ALL_CODES = sorted(_snap_prods.keys())
+
+
 # ============ INSTELLINGEN ============
 with st.expander("⚙️ Korting-instellingen (inkoop = publiek × (1 − korting))", expanded=False):
-    st.caption("Precedentie: **product > categorie > merk > default**. "
-               "Korting als percentage (30 = 30%).")
+    st.caption("Korting als percentage (30 = 30%). **Voorrang: product > categorie > "
+               "merk > default** — de meest specifieke korting die op een product van "
+               "toepassing is, wint automatisch.")
+    if not _snap_prods:
+        st.info("Nog geen scrape: de keuzelijsten met merken/categorieën worden gevuld "
+                "zodra je een keer hebt gescrapet. Tot dan kun je vrij typen.")
     cfg = load_discounts()
     c0, _ = st.columns([1, 3])
     with c0:
         default_pct = st.number_input("Default korting %", 0.0, 95.0,
                                       value=round(cfg["default"] * 100, 1), step=1.0)
 
-    def _dict_editor(title, d, key):
+    def _dict_editor(title, d, key, options=None):
         st.markdown(f"**{title}**")
         rows = [{"sleutel": k, "korting_%": round(v * 100, 1)} for k, v in d.items()]
         if not rows:
             rows = [{"sleutel": "", "korting_%": 0.0}]
+        if options:
+            # Bestaande sleutels meenemen zodat de selectbox niet faalt.
+            opts = sorted(set(options) | {k for k in d.keys()})
+            key_col = st.column_config.SelectboxColumn("sleutel", options=opts, width="large")
+        else:
+            key_col = st.column_config.TextColumn("sleutel", width="large")
         edited = st.data_editor(pd.DataFrame(rows), hide_index=True, num_rows="dynamic",
                                 use_container_width=True, key=key,
                                 column_config={
-                                    "sleutel": st.column_config.TextColumn(width="large"),
+                                    "sleutel": key_col,
                                     "korting_%": st.column_config.NumberColumn(format="%.1f")})
         out = {}
         for _, r in edited.iterrows():
             k = str(r["sleutel"]).strip()
-            if k:
+            if k and k != "None":
                 try:
                     out[k] = float(r["korting_%"]) / 100.0
                 except (TypeError, ValueError):
@@ -87,11 +108,14 @@ with st.expander("⚙️ Korting-instellingen (inkoop = publiek × (1 − kortin
 
     ec1, ec2, ec3 = st.columns(3)
     with ec1:
-        by_brand = _dict_editor("Per merk", cfg["by_brand"], "disc_brand")
+        by_brand = _dict_editor("Per merk", cfg["by_brand"], "disc_brand",
+                                options=ALL_BRANDS)
     with ec2:
-        by_cat = _dict_editor("Per categorie", cfg["by_category"], "disc_cat")
+        by_cat = _dict_editor("Per categorie", cfg["by_category"], "disc_cat",
+                              options=ALL_CATEGORIES)
     with ec3:
-        by_prod = _dict_editor("Per product (code)", cfg["by_product"], "disc_prod")
+        by_prod = _dict_editor("Per product (code)", cfg["by_product"], "disc_prod",
+                               options=ALL_CODES)
 
     if st.button("💾 Korting-config opslaan", type="primary"):
         new_cfg = {"default": default_pct / 100.0, "by_brand": by_brand,
@@ -102,16 +126,22 @@ with st.expander("⚙️ Korting-instellingen (inkoop = publiek × (1 − kortin
 
 with st.expander("🚫 Uitsluitingen (categorieën / producten niet syncen)", expanded=False):
     excl = load_exclusions()
+    if not _snap_prods:
+        st.info("Nog geen scrape: scrape eerst om de lijst met categorieën te vullen. "
+                "Tot dan kun je codes vrij intypen.")
     cc1, cc2 = st.columns(2)
     with cc1:
-        excl_cats = st.text_area("Uitgesloten categorieën (één per regel)",
-                                 value="\n".join(excl.get("categories", [])), height=140)
+        cat_opts = sorted(set(ALL_CATEGORIES) | set(excl.get("categories", [])))
+        excl_cats = st.multiselect(
+            f"Uitgesloten categorieën ({len(ALL_CATEGORIES)} beschikbaar)",
+            options=cat_opts, default=excl.get("categories", []),
+            help="Kies de categorieën die je niet wilt syncen.")
     with cc2:
         excl_prods = st.text_area("Uitgesloten product-codes (één per regel)",
                                   value="\n".join(excl.get("products", [])), height=140)
     if st.button("💾 Uitsluitingen opslaan"):
         new_excl = {
-            "categories": [x.strip() for x in excl_cats.splitlines() if x.strip()],
+            "categories": [x.strip() for x in excl_cats if x.strip()],
             "products": [x.strip() for x in excl_prods.splitlines() if x.strip()],
         }
         pushed, info = save_exclusions(new_excl, "All-Spark uitsluitingen bijgewerkt")
