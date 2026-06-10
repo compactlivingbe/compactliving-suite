@@ -174,7 +174,9 @@ def crawl_category_map(log: Callable[[str], None] = print,
         slug = href.rstrip("/").split("/shop/category/")[-1]
         if slug and label:
             cats[slug] = label
-    log(f"  {len(cats)} categorieën gevonden")
+    n_cats = len(cats)
+    log(f"  {n_cats} categorieën gevonden — nu per categorie de producten "
+        "in kaart brengen (dit kan even duren)...")
 
     tid_map: dict[str, dict] = {}
     for i, (slug, label) in enumerate(cats.items(), 1):
@@ -184,7 +186,7 @@ def crawl_category_map(log: Callable[[str], None] = print,
         while True:
             u = cat_url if page == 1 else f"{cat_url}/page/{page}"
             try:
-                r = s.get(u, timeout=40)
+                r = s.get(u, timeout=25)
             except Exception:
                 break
             if r.status_code != 200:
@@ -209,8 +211,9 @@ def crawl_category_map(log: Callable[[str], None] = print,
             page += 1
             if pause:
                 time.sleep(pause)
-        if i % 25 == 0:
-            log(f"  ...{i}/{len(cats)} categorieën verwerkt")
+        if i % 5 == 0 or i == n_cats:
+            log(f"  ...{i}/{n_cats} categorieën verwerkt "
+                f"({len(tid_map)} producten gekoppeld)")
     for v in tid_map.values():
         v.pop("_slug_len", None)
     return tid_map
