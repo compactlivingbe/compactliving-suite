@@ -32,6 +32,11 @@ from typing import Callable, Optional
 CODE_RE = re.compile(r"\b([A-Z]{2,4}\d{6,9}[A-Z]?)\b")
 # Volledige-match variant (één los woord = precies een code).
 CODE_FULL_RE = re.compile(r"^[A-Z]{2,4}\d{6,9}[A-Z]?$")
+# Uitgelekte code aan het begin van een naam (PDF-layout die rijen vermengt).
+CODE_LEAD_RE = re.compile(r"^[A-Z]{2,4}\d{6,9}[A-Z]?\s+")
+# Data-kolommen die in de PDF direct ná de code volgen: afmetingen, het
+# √-vinkje of meteen de prijs. Hierop herkennen we wélke code de regel "bezit".
+ANCHOR_RE = re.compile(r"^\s*(?:\d+\s*[x×]\s*\d+\s*[x×]\s*\d+|[√✓]|€)")
 # "Nieuw"-markering in de Victron-prijslijst: een icoon-font glyph (geen tekst).
 # Staat als los symbool náást de productregel, niet op dezelfde tekstregel.
 NEW_GLYPH = chr(0xF0AB)
@@ -77,6 +82,23 @@ def _is_category_header(line: str) -> Optional[str]:
     return None
 
 
+def _pick_code(line: str):
+    """Kies de code die de regel 'bezit' = die direct vóór de datakolommen staat.
+
+    Bij nette regels is dat de enige code. Bij regels waar de PDF twee rijen
+    vermengt (een code lekt vóór de naam van de volgende rij), kiezen we de code
+    die meteen wordt gevolgd door afmetingen/√/prijs, niet de uitgelekte code
+    helemaal vooraan. Valt geen enkele code zo te ankeren, dan de eerste.
+    """
+    matches = list(CODE_RE.finditer(line))
+    if not matches:
+        return None
+    for m in reversed(matches):
+        if ANCHOR_RE.search(line[m.end():]):
+            return m
+    return matches[0]
+
+
 def parse_text(text: str, log: Callable[[str], None] = print) -> dict[str, dict]:
     """Parse de volledige PDF-tekst tot {code: product-dict}."""
     products: dict[str, dict] = {}
@@ -91,12 +113,14 @@ def parse_text(text: str, log: Callable[[str], None] = print) -> dict[str, dict]
             category = cat
             continue
 
-        m = CODE_RE.search(line)
+        m = _pick_code(line)
         if not m:
             continue
         code = m.group(1)
 
         name = line[:m.start()].strip(" -–·")
+        # Strip een eventueel uitgelekte code aan het begin van de naam.
+        name = CODE_LEAD_RE.sub("", name).strip(" -–·")
         rest = line[m.end():]
 
         dim = DIM_RE.search(rest)
@@ -116,6 +140,11 @@ def parse_text(text: str, log: Callable[[str], None] = print) -> dict[str, dict]
                 weight = float(wm.group(1).replace(",", "."))
             except ValueError:
                 weight = None
+
+        # Geen naam én geen prijs én geen afmetingen = geen echte productregel
+        # (bv. een kruisverwijzing "- CODE - Naam" of een uitgelekt bijschrift).
+        if not name and price is None and not dimensions:
+            continue
 
         # Eerste voorkomen wint (PDF kan codes herhalen in bijschriften).
         if code in products:
