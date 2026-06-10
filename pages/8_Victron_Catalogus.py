@@ -35,9 +35,12 @@ st.caption("De officiële Victron-prijslijst als bron van waarheid: welke produc
 MASTER_FILE = "master_catalog.json"
 ALLSPARK_SNAPSHOT = "allspark_snapshot.json"
 EXCLUSIONS_FILE = "supplier_exclusions.json"
+OVERRIDES_FILE = "victron_overrides.json"   # handmatige correcties, overleven her-import
 TS_PARTNER_ID = 690          # Top Systems res.partner
 VICTRON_CATEG_DEFAULT = 154  # Victron-categorie in Odoo (zie topsystems_sync)
 DEFAULT_MARGIN = 1.32
+# Velden die je handmatig kunt overschrijven bovenop de geparste catalogus.
+OVERRIDE_FIELDS = ("name", "image_url", "description", "specs")
 
 
 def get_odoo():
@@ -46,9 +49,43 @@ def get_odoo():
                       api_key=os.environ.get("ODOO_API_KEY", ""))
 
 
+def load_overrides() -> dict:
+    """Per-code handmatige correcties ({code: {veld: waarde}})."""
+    data = ghs.load_json(OVERRIDES_FILE, default={})
+    return data if isinstance(data, dict) else {}
+
+
+def save_override(code: str, fields: dict, msg: str):
+    data = load_overrides()
+    cur = data.get(code, {})
+    cur.update(fields)
+    # Lege waarden weer verwijderen zodat de geparste waarde terugkomt.
+    cur = {k: v for k, v in cur.items() if v not in (None, "", {}, [])}
+    if cur:
+        data[code] = cur
+    else:
+        data.pop(code, None)
+    return ghs.save_json(OVERRIDES_FILE, data, msg)
+
+
+def apply_overrides(master: dict, overrides: dict) -> int:
+    """Leg de handmatige correcties bovenop de geparste catalogus. Geeft #toegepast."""
+    n = 0
+    for code, ov in overrides.items():
+        if code in master and isinstance(ov, dict):
+            for k, v in ov.items():
+                if k in OVERRIDE_FIELDS and v not in (None, "", {}, []):
+                    master[code][k] = v
+            n += 1
+    return n
+
+
 def load_master() -> dict:
     data = ghs.load_json(MASTER_FILE, default={})
-    return data.get("products", {}) if isinstance(data, dict) else {}
+    master = data.get("products", {}) if isinstance(data, dict) else {}
+    if master:
+        apply_overrides(master, load_overrides())
+    return master
 
 
 def load_exclusions() -> dict:
@@ -116,9 +153,11 @@ if not master:
 
 saved = ghs.load_json(MASTER_FILE, default={})
 n_new_master = sum(1 for p in master.values() if p.get("is_new"))
+n_overrides = sum(1 for c in load_overrides() if c in master)
+ovr_txt = f" · ✏️ {n_overrides} handmatige correctie(s)" if n_overrides else ""
 st.caption(f"Master-catalogus: **{len(master)}** Victron-producten "
            f"({n_new_master} nieuw 🆕) · ingelezen {saved.get('parsed_at', '?')} "
-           f"uit `{saved.get('source_file', '?')}`")
+           f"uit `{saved.get('source_file', '?')}`{ovr_txt}")
 
 # ============ UITSLUITINGEN (categorieën) ============
 with st.expander("🚫 Categorieën uitsluiten", expanded=False):
@@ -415,6 +454,10 @@ with tab_detail:
         st.write(("✅ Staat in Odoo" if in_odoo_now else "❌ Nog niet in Odoo"))
 
     with dc2:
+        name_val = st.text_input("Naam (corrigeren mag)", value=p.get("name", ""),
+                                 key="vpl_name",
+                                 help="Bv. een uitgelekt bijschrift uit de PDF weghalen. "
+                                      "Correcties blijven behouden bij een nieuwe import.")
         image_url = st.text_input("Foto-URL", value=p.get("image_url", ""), key="vpl_img")
         description = st.text_area("Omschrijving", value=p.get("description", ""),
                                    height=100, key="vpl_desc")
@@ -434,15 +477,19 @@ with tab_detail:
 
     bc1, bc2 = st.columns(2)
     with bc1:
-        if st.button("💾 Opslaan in master", key="vpl_save_master"):
-            master[code]["image_url"] = image_url.strip()
-            master[code]["description"] = description.strip()
-            master[code]["specs"] = new_specs
-            payload = {"parsed_at": saved.get("parsed_at"),
-                       "source_file": saved.get("source_file"), "products": master}
-            pushed, info = ghs.save_json(MASTER_FILE, payload,
-                                         f"Victron {code} verrijkt")
+        if st.button("💾 Opslaan (blijft bij her-import)", key="vpl_save_master"):
+            fields = {
+                "name": name_val.strip(),
+                "image_url": image_url.strip(),
+                "description": description.strip(),
+                "specs": new_specs,
+            }
+            pushed, info = save_override(code, fields, f"Victron {code} verrijkt/gecorrigeerd")
+            # In-memory direct toepassen zodat de wijziging meteen zichtbaar is.
+            for k, v in fields.items():
+                master[code][k] = v
             st.success(f"✓ Opgeslagen{' + GitHub ' + info if pushed else ' (lokaal)'}")
+            st.rerun()
 
     with bc2:
         if st.button("⬆️ Naar Odoo pushen", type="primary", key="vpl_push"):
@@ -460,7 +507,8 @@ with tab_detail:
                 else:
                     cost = p.get("advice_price")
                     sale = round(cost * DEFAULT_MARGIN, 2) if cost is not None else None
-                    tid = op.create_product(odoo, TS_PARTNER_ID, code, p.get("name", ""),
+                    tid = op.create_product(odoo, TS_PARTNER_ID, code,
+                                            name_val.strip() or p.get("name", ""),
                                             cost, sale, image_b64=img_b64,
                                             categ_id=VICTRON_CATEG_DEFAULT,
                                             description=description.strip())
