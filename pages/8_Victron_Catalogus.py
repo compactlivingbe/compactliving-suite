@@ -242,18 +242,60 @@ with tab_overzicht:
         view = view[view["code"].str.lower().str.contains(q, na=False)
                     | view["naam"].str.lower().str.contains(q, na=False)]
 
-    st.caption(f"{len(view)} producten")
-    st.dataframe(
+    st.caption(f"{len(view)} producten · vink **Uitgesloten** aan/uit en klik "
+               "**Uitsluitingen opslaan** om producten uit te sluiten.")
+    edited_ov = st.data_editor(
         view, hide_index=True, use_container_width=True,
+        disabled=["code", "nieuw", "naam", "categorie", "advies_excl",
+                  "in_odoo", "top_systems", "all_spark"],
         column_config={
+            "code": st.column_config.TextColumn("code", disabled=True),
             "nieuw": st.column_config.CheckboxColumn("🆕"),
             "advies_excl": st.column_config.NumberColumn("Advies (excl)", format="€ %.2f"),
             "in_odoo": st.column_config.CheckboxColumn("Odoo"),
             "top_systems": st.column_config.CheckboxColumn("Top Systems"),
             "all_spark": st.column_config.CheckboxColumn("All-Spark"),
-            "uitgesloten": st.column_config.CheckboxColumn("Uitgesloten"),
-        })
-    st.download_button("⬇️ Exporteer (CSV)", view.to_csv(index=False).encode("utf-8"),
+            "uitgesloten": st.column_config.CheckboxColumn(
+                "Uitgesloten", help="Aanvinken = uitsluiten van import en dekking"),
+        },
+        key="ov_editor")
+
+    # Bepaal wijzigingen t.o.v. de huidige (zichtbare) status.
+    changed = edited_ov[edited_ov["uitgesloten"] != view["uitgesloten"].values]
+    bc1, bc2 = st.columns([1, 3])
+    with bc1:
+        save_excl = st.button(
+            f"💾 Uitsluitingen opslaan{f' ({len(changed)})' if len(changed) else ''}",
+            type="primary", disabled=changed.empty, key="ov_save_excl")
+    with bc2:
+        if not changed.empty:
+            st.caption(f"{len(changed)} wijziging(en) nog niet opgeslagen.")
+    if save_excl and not changed.empty:
+        new_prod_excl = set(excl_prod_set)
+        cat_blocked = []
+        for _, r in edited_ov.iterrows():
+            ccode = str(r["code"])
+            cat_excl = (r["categorie"] or "") in excl_cat_set
+            if r["uitgesloten"] and not cat_excl:
+                new_prod_excl.add(ccode)
+            elif not r["uitgesloten"]:
+                new_prod_excl.discard(ccode)
+                if cat_excl:
+                    cat_blocked.append(ccode)
+        new_excl = {
+            "categories": sorted(excl_cat_set),
+            "products": sorted(new_prod_excl),
+        }
+        pushed, info = save_exclusions(new_excl, "Victron uitsluitingen via tabel bijgewerkt")
+        st.success(f"✓ {len(new_prod_excl)} product(en) uitgesloten"
+                   f"{' + GitHub ' + info if pushed else ' (lokaal)'}")
+        if cat_blocked:
+            st.warning("Deze blijven uitgesloten via hun categorie (pas de categorie-"
+                       f"uitsluiting aan in de sectie hierboven): {', '.join(cat_blocked[:10])}"
+                       f"{'…' if len(cat_blocked) > 10 else ''}")
+        st.rerun()
+
+    st.download_button("⬇️ Exporteer (CSV)", edited_ov.to_csv(index=False).encode("utf-8"),
                        "victron_dekking.csv", "text/csv")
 
 # ---- Ontbreekt in Odoo ----
