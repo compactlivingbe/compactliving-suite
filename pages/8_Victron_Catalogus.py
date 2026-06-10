@@ -34,6 +34,7 @@ st.caption("De officiële Victron-prijslijst als bron van waarheid: welke produc
 
 MASTER_FILE = "master_catalog.json"
 ALLSPARK_SNAPSHOT = "allspark_snapshot.json"
+EXCLUSIONS_FILE = "supplier_exclusions.json"
 TS_PARTNER_ID = 690          # Top Systems res.partner
 VICTRON_CATEG_DEFAULT = 154  # Victron-categorie in Odoo (zie topsystems_sync)
 DEFAULT_MARGIN = 1.32
@@ -48,6 +49,17 @@ def get_odoo():
 def load_master() -> dict:
     data = ghs.load_json(MASTER_FILE, default={})
     return data.get("products", {}) if isinstance(data, dict) else {}
+
+
+def load_exclusions() -> dict:
+    data = ghs.load_json(EXCLUSIONS_FILE, default={})
+    return data.get("victron", {"products": [], "categories": []})
+
+
+def save_exclusions(victron_excl, msg):
+    data = ghs.load_json(EXCLUSIONS_FILE, default={})
+    data["victron"] = victron_excl
+    return ghs.save_json(EXCLUSIONS_FILE, data, msg)
 
 
 def odoo_present_codes(odoo, codes: list[str]) -> set[str]:
@@ -103,8 +115,42 @@ if not master:
     st.stop()
 
 saved = ghs.load_json(MASTER_FILE, default={})
-st.caption(f"Master-catalogus: **{len(master)}** Victron-producten · "
-           f"ingelezen {saved.get('parsed_at', '?')} uit `{saved.get('source_file', '?')}`")
+n_new_master = sum(1 for p in master.values() if p.get("is_new"))
+st.caption(f"Master-catalogus: **{len(master)}** Victron-producten "
+           f"({n_new_master} nieuw 🆕) · ingelezen {saved.get('parsed_at', '?')} "
+           f"uit `{saved.get('source_file', '?')}`")
+
+# ============ UITSLUITINGEN ============
+with st.expander("🚫 Uitsluitingen (producten / categorieën negeren)", expanded=False):
+    st.caption("Uitgesloten producten/categorieën tellen niet mee bij import en dekking. "
+               "Ze blijven wel zichtbaar (apart gemarkeerd) en kun je via het filter tonen/verbergen.")
+    excl = load_exclusions()
+    xc1, xc2 = st.columns(2)
+    with xc1:
+        excl_cats = st.text_area("Uitgesloten categorieën (één per regel)",
+                                 value="\n".join(excl.get("categories", [])), height=140,
+                                 key="vpl_excl_cats")
+    with xc2:
+        excl_prods = st.text_area("Uitgesloten product-codes (één per regel)",
+                                  value="\n".join(excl.get("products", [])), height=140,
+                                  key="vpl_excl_prods")
+    if st.button("💾 Uitsluitingen opslaan", key="vpl_save_excl"):
+        new_excl = {
+            "categories": [x.strip() for x in excl_cats.splitlines() if x.strip()],
+            "products": [x.strip() for x in excl_prods.splitlines() if x.strip()],
+        }
+        pushed, info = save_exclusions(new_excl, "Victron uitsluitingen bijgewerkt")
+        st.success(f"✓ Opgeslagen{' + GitHub ' + info if pushed else ' (lokaal)'}")
+        st.rerun()
+
+excl = load_exclusions()
+excl_prod_set = set(excl.get("products", []))
+excl_cat_set = set(excl.get("categories", []))
+
+
+def _is_excluded(code: str, category: str) -> bool:
+    return code in excl_prod_set or (category or "") in excl_cat_set
+
 
 # ============ 2. DEKKING BEPALEN ============
 codes = sorted(master.keys())
@@ -120,24 +166,29 @@ with st.spinner("Dekking bepalen (Odoo + leveranciers)..."):
 rows = []
 for code in codes:
     p = master[code]
+    cat = p.get("category", "")
     rows.append({
         "code": code,
+        "nieuw": bool(p.get("is_new")),
         "naam": p.get("name", ""),
-        "categorie": p.get("category", ""),
+        "categorie": cat,
         "advies_excl": p.get("advice_price"),
         "in_odoo": code in in_odoo,
         "top_systems": code in in_ts,
         "all_spark": code in in_as,
+        "uitgesloten": _is_excluded(code, cat),
     })
 df = pd.DataFrame(rows)
+df_act = df[~df["uitgesloten"]]   # actieve (niet-uitgesloten) producten
 
 # ============ 3. DASHBOARD ============
-m = st.columns(5)
+m = st.columns(6)
 m[0].metric("Victron-producten", len(df))
-m[1].metric("In Odoo", int(df["in_odoo"].sum()))
-m[2].metric("Bij Top Systems", int(df["top_systems"].sum()))
-m[3].metric("Bij All-Spark", int(df["all_spark"].sum()))
-m[4].metric("Nergens te koop", int((~df["top_systems"] & ~df["all_spark"]).sum()))
+m[1].metric("Nieuw 🆕", int(df["nieuw"].sum()))
+m[2].metric("In Odoo", int(df_act["in_odoo"].sum()))
+m[3].metric("Bij Top Systems", int(df_act["top_systems"].sum()))
+m[4].metric("Bij All-Spark", int(df_act["all_spark"].sum()))
+m[5].metric("Nergens te koop", int((~df_act["top_systems"] & ~df_act["all_spark"]).sum()))
 
 st.divider()
 tab_overzicht, tab_missing, tab_detail = st.tabs(
@@ -155,7 +206,21 @@ with tab_overzicht:
     with fc3:
         fsupp = st.selectbox("Leverancier", ["(alle)", "Top Systems", "All-Spark",
                                              "Geen leverancier"], key="ov_supp")
+    fc4, fc5, fc6 = st.columns([3, 1.5, 1.5])
+    with fc4:
+        zoek = st.text_input("🔍 Zoek (code of naam)", key="ov_zoek",
+                             placeholder="bv. MultiPlus, PMP12, SolarSense…")
+    with fc5:
+        fnew = st.selectbox("Nieuw", ["(alle)", "Alleen nieuw", "Niet nieuw"], key="ov_new")
+    with fc6:
+        fexcl = st.selectbox("Uitsluiting", ["Verberg uitgesloten", "Toon alles",
+                                             "Alleen uitgesloten"], key="ov_excl")
+
     view = df.copy()
+    if fexcl == "Verberg uitgesloten":
+        view = view[~view["uitgesloten"]]
+    elif fexcl == "Alleen uitgesloten":
+        view = view[view["uitgesloten"]]
     if fcat != "(alle)":
         view = view[view["categorie"] == fcat]
     if fstatus == "Wel in Odoo":
@@ -168,35 +233,47 @@ with tab_overzicht:
         view = view[view["all_spark"]]
     elif fsupp == "Geen leverancier":
         view = view[~view["top_systems"] & ~view["all_spark"]]
+    if fnew == "Alleen nieuw":
+        view = view[view["nieuw"]]
+    elif fnew == "Niet nieuw":
+        view = view[~view["nieuw"]]
+    if zoek:
+        q = zoek.lower()
+        view = view[view["code"].str.lower().str.contains(q, na=False)
+                    | view["naam"].str.lower().str.contains(q, na=False)]
 
     st.caption(f"{len(view)} producten")
     st.dataframe(
         view, hide_index=True, use_container_width=True,
         column_config={
+            "nieuw": st.column_config.CheckboxColumn("🆕"),
             "advies_excl": st.column_config.NumberColumn("Advies (excl)", format="€ %.2f"),
             "in_odoo": st.column_config.CheckboxColumn("Odoo"),
             "top_systems": st.column_config.CheckboxColumn("Top Systems"),
             "all_spark": st.column_config.CheckboxColumn("All-Spark"),
+            "uitgesloten": st.column_config.CheckboxColumn("Uitgesloten"),
         })
     st.download_button("⬇️ Exporteer (CSV)", view.to_csv(index=False).encode("utf-8"),
                        "victron_dekking.csv", "text/csv")
 
 # ---- Ontbreekt in Odoo ----
 with tab_missing:
-    miss = df[~df["in_odoo"]].copy()
+    miss = df_act[~df_act["in_odoo"]].copy()   # uitgesloten producten niet importeren
     if miss.empty:
-        st.success("Alle Victron-producten uit de prijslijst staan al in Odoo.")
+        st.success("Alle (niet-uitgesloten) Victron-producten uit de prijslijst staan al in Odoo.")
     else:
-        st.caption("Importeer ontbrekende Victron-producten in Odoo. Kostprijs = "
-                   "adviesprijs (excl BTW); verkoopprijs = kostprijs × marge. "
-                   "Foto/kenmerken kun je daarna per product aanvullen.")
+        st.caption("Importeer ontbrekende Victron-producten in Odoo (uitgesloten producten "
+                   "worden hier niet getoond). Kostprijs = adviesprijs (excl BTW); "
+                   "verkoopprijs = kostprijs × marge. Foto/kenmerken kun je daarna per "
+                   "product aanvullen.")
         margin = st.slider("Marge (×)", 1.0, 3.0, DEFAULT_MARGIN, 0.05, key="vpl_margin")
         miss.insert(0, "Selecteer", False)
         edited = st.data_editor(
-            miss[["Selecteer", "code", "naam", "categorie", "advies_excl"]],
+            miss[["Selecteer", "nieuw", "code", "naam", "categorie", "advies_excl"]],
             hide_index=True, use_container_width=True,
-            disabled=["code", "naam", "categorie", "advies_excl"],
+            disabled=["nieuw", "code", "naam", "categorie", "advies_excl"],
             column_config={
+                "nieuw": st.column_config.CheckboxColumn("🆕"),
                 "advies_excl": st.column_config.NumberColumn("Advies (excl)", format="€ %.2f")},
             key="vpl_missing")
         sel = edited[edited["Selecteer"]]
@@ -232,6 +309,13 @@ with tab_detail:
 
     dc1, dc2 = st.columns([1, 1])
     with dc1:
+        badges = []
+        if p.get("is_new"):
+            badges.append("🆕 Nieuw")
+        if _is_excluded(code, p.get("category", "")):
+            badges.append("🚫 Uitgesloten")
+        if badges:
+            st.markdown(" · ".join(badges))
         st.markdown(f"**{code}** · {p.get('category', '')}")
         st.write(p.get("name", ""))
         st.caption(f"Afmetingen: {p.get('dimensions') or '—'} · "

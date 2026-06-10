@@ -35,6 +35,7 @@ st.caption("Overzicht van leverancier-syncs en de Victron-dekking in Odoo.")
 
 MASTER_FILE = "master_catalog.json"
 ALLSPARK_SNAPSHOT = "allspark_snapshot.json"
+EXCLUSIONS_FILE = "supplier_exclusions.json"
 TS_PARTNER_ID = 690
 
 
@@ -42,6 +43,15 @@ def get_odoo():
     return OdooClient(url=os.environ["ODOO_URL"], db=os.environ["ODOO_DB"],
                       login=os.environ["ODOO_LOGIN"],
                       api_key=os.environ.get("ODOO_API_KEY", ""))
+
+
+def load_exclusions() -> tuple[set[str], set[str]]:
+    """Lees de Victron-uitsluitingen (gedeeld supplier_exclusions.json)."""
+    raw = ghs.load_json(EXCLUSIONS_FILE, default={})
+    v = raw.get("victron", {}) if isinstance(raw, dict) else {}
+    prods = {str(c).strip() for c in v.get("products", []) if str(c).strip()}
+    cats = {str(c).strip() for c in v.get("categories", []) if str(c).strip()}
+    return prods, cats
 
 
 def odoo_present_codes(odoo, codes: list[str]) -> set[str]:
@@ -61,6 +71,13 @@ master_raw = ghs.load_json(MASTER_FILE, default={})
 master = master_raw.get("products", {}) if isinstance(master_raw, dict) else {}
 as_snap = ghs.load_json(ALLSPARK_SNAPSHOT, default={})
 as_products = as_snap.get("products", {}) or {}
+excl_prod, excl_cat = load_exclusions()
+
+
+def _is_excluded(code: str) -> bool:
+    p = master.get(code, {})
+    cat = (p.get("category", "") or "").strip()
+    return code in excl_prod or cat in excl_cat
 
 odoo = get_odoo()
 with st.spinner("Odoo-leveranciersdata laden..."):
@@ -75,21 +92,29 @@ in_ts = set(ts_index.keys())
 in_as_odoo = set(as_index.keys())
 in_as_scrape = set(as_products.keys())
 
+# Actieve (niet-uitgesloten) Victron-codes vormen de basis voor de dekking.
+active_codes = [c for c in master_codes if not _is_excluded(c)]
+n_excluded = len(master_codes) - len(active_codes)
+n_new = sum(1 for c, p in master.items() if p.get("is_new") and not _is_excluded(c))
+
 # ============ KPI's ============
-m = st.columns(5)
-m[0].metric("Victron-master", len(master))
-m[1].metric("In Odoo", len(in_odoo))
-m[2].metric("Top Systems (Odoo)", len(in_ts))
-m[3].metric("All-Spark (Odoo)", len(in_as_odoo))
+m = st.columns(6)
+m[0].metric("Victron-master", len(master),
+            help=f"{n_excluded} uitgesloten" if n_excluded else None)
+m[1].metric("Nieuw 🆕", n_new)
+m[2].metric("In Odoo", len([c for c in active_codes if c in in_odoo]))
+m[3].metric("Top Systems (Odoo)", len(in_ts))
+m[4].metric("All-Spark (Odoo)", len(in_as_odoo))
 if master:
-    nowhere = sum(1 for c in master_codes if c not in in_ts and c not in in_as_scrape)
-    m[4].metric("Victron nergens te koop", nowhere)
+    nowhere = sum(1 for c in active_codes if c not in in_ts and c not in in_as_scrape)
+    m[5].metric("Victron nergens te koop", nowhere)
 else:
-    m[4].metric("All-Spark scrape", len(in_as_scrape))
+    m[5].metric("All-Spark scrape", len(in_as_scrape))
 
 st.divider()
-tab_dekking, tab_lev, tab_goedkoop = st.tabs(
-    ["🔋 Victron-dekking", "🏷️ Per leverancier", "💸 Goedkoopste bron"])
+tab_dekking, tab_nieuw, tab_lev, tab_goedkoop = st.tabs(
+    ["🔋 Victron-dekking", "🆕 Nieuwe producten", "🏷️ Per leverancier",
+     "💸 Goedkoopste bron"])
 
 # ---- Victron-dekking per categorie ----
 with tab_dekking:
@@ -97,12 +122,17 @@ with tab_dekking:
         st.info("Nog geen Victron master-catalogus. Lees eerst de prijslijst in "
                 "op de pagina **Victron catalogus**.")
     else:
+        if n_excluded:
+            st.caption(f"Dekking berekend over {len(active_codes)} actieve producten "
+                       f"({n_excluded} uitgesloten genegeerd).")
         cats: dict[str, dict] = {}
-        for code in master_codes:
+        for code in active_codes:
             cat = master[code].get("category", "") or "(geen categorie)"
-            d = cats.setdefault(cat, {"totaal": 0, "in_odoo": 0, "top_systems": 0,
-                                      "all_spark": 0, "geen_leverancier": 0})
+            d = cats.setdefault(cat, {"totaal": 0, "nieuw": 0, "in_odoo": 0,
+                                      "top_systems": 0, "all_spark": 0,
+                                      "geen_leverancier": 0})
             d["totaal"] += 1
+            d["nieuw"] += int(bool(master[code].get("is_new")))
             d["in_odoo"] += int(code in in_odoo)
             d["top_systems"] += int(code in in_ts)
             d["all_spark"] += int(code in in_as_scrape)
@@ -110,19 +140,57 @@ with tab_dekking:
         rows = [{"categorie": cat, **d} for cat, d in sorted(cats.items())]
         ddf = pd.DataFrame(rows)
         ov = st.columns(4)
-        ov[0].metric("Dekking Odoo", f"{len(in_odoo)}/{len(master)}")
-        ov[1].metric("Via Top Systems", f"{len([c for c in master_codes if c in in_ts])}")
-        ov[2].metric("Via All-Spark", f"{len([c for c in master_codes if c in in_as_scrape])}")
+        ov[0].metric("Dekking Odoo",
+                     f"{len([c for c in active_codes if c in in_odoo])}/{len(active_codes)}")
+        ov[1].metric("Via Top Systems", f"{len([c for c in active_codes if c in in_ts])}")
+        ov[2].metric("Via All-Spark", f"{len([c for c in active_codes if c in in_as_scrape])}")
         ov[3].metric("Categorieën", len(cats))
         st.dataframe(ddf, hide_index=True, use_container_width=True,
                      column_config={
                          "categorie": st.column_config.TextColumn(width="large"),
-                         "totaal": "Totaal", "in_odoo": "In Odoo",
+                         "totaal": "Totaal", "nieuw": "Nieuw 🆕", "in_odoo": "In Odoo",
                          "top_systems": "Top Systems", "all_spark": "All-Spark",
                          "geen_leverancier": "Geen leverancier"})
         st.download_button("⬇️ Exporteer dekking (CSV)",
                            ddf.to_csv(index=False).encode("utf-8"),
                            "victron_dekking_per_categorie.csv", "text/csv")
+
+# ---- Nieuwe Victron-producten ----
+with tab_nieuw:
+    new_codes = [c for c in active_codes if master[c].get("is_new")]
+    if not master:
+        st.info("Nog geen Victron master-catalogus ingelezen.")
+    elif not new_codes:
+        st.info("Geen producten als nieuw gemarkeerd in de laatst ingelezen prijslijst.")
+    else:
+        st.caption("Producten die in de Victron-prijslijst als nieuw (🆕) zijn "
+                   "gemarkeerd. Handig om proactief in te kopen / aan te maken.")
+        nc = st.columns(4)
+        nc[0].metric("Nieuw totaal", len(new_codes))
+        nc[1].metric("Al in Odoo", len([c for c in new_codes if c in in_odoo]))
+        nc[2].metric("Bij Top Systems", len([c for c in new_codes if c in in_ts]))
+        nc[3].metric("Bij All-Spark", len([c for c in new_codes if c in in_as_scrape]))
+        nrows = [{
+            "code": c,
+            "naam": master[c].get("name", ""),
+            "categorie": master[c].get("category", "") or "(geen categorie)",
+            "adviesprijs": master[c].get("advice_price"),
+            "in_odoo": c in in_odoo,
+            "top_systems": c in in_ts,
+            "all_spark": c in in_as_scrape,
+        } for c in sorted(new_codes)]
+        ndf = pd.DataFrame(nrows)
+        st.dataframe(ndf, hide_index=True, use_container_width=True,
+                     column_config={
+                         "naam": st.column_config.TextColumn(width="large"),
+                         "adviesprijs": st.column_config.NumberColumn(
+                             "Adviesprijs", format="€ %.2f"),
+                         "in_odoo": st.column_config.CheckboxColumn("In Odoo"),
+                         "top_systems": st.column_config.CheckboxColumn("Top Systems"),
+                         "all_spark": st.column_config.CheckboxColumn("All-Spark")})
+        st.download_button("⬇️ Exporteer nieuwe producten (CSV)",
+                           ndf.to_csv(index=False).encode("utf-8"),
+                           "victron_nieuwe_producten.csv", "text/csv")
 
 # ---- Per leverancier ----
 with tab_lev:
