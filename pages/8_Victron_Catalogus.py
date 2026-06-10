@@ -99,6 +99,36 @@ def save_exclusions(victron_excl, msg):
     return ghs.save_json(EXCLUSIONS_FILE, data, msg)
 
 
+def odoo_active_template_ids(odoo, codes: list[str]) -> dict[str, int]:
+    """Map elke (actieve) code op zijn product.template-id in Odoo.
+
+    Zoekt eerst op default_code, daarna voor de rest via supplierinfo
+    (product_code → product_tmpl_id). Gearchiveerde templates worden door Odoo
+    standaard niet teruggegeven, dus we krijgen enkel actieve producten.
+    """
+    result: dict[str, int] = {}
+    todo = list(codes)
+    for i in range(0, len(todo), 200):
+        chunk = todo[i:i + 200]
+        for r in odoo.search_read("product.template",
+                                  [["default_code", "in", chunk]],
+                                  ["id", "default_code"], limit=len(chunk)):
+            dc = (r.get("default_code") or "").strip()
+            if dc:
+                result[dc] = r["id"]
+    rest = [c for c in codes if c not in result]
+    for i in range(0, len(rest), 200):
+        chunk = rest[i:i + 200]
+        for s in odoo.search_read("product.supplierinfo",
+                                  [["product_code", "in", chunk]],
+                                  ["product_code", "product_tmpl_id"], limit=len(chunk)):
+            pc = (s.get("product_code") or "").strip()
+            tid = s["product_tmpl_id"][0] if s.get("product_tmpl_id") else None
+            if pc and tid and pc not in result:
+                result[pc] = tid
+    return result
+
+
 def odoo_present_codes(odoo, codes: list[str]) -> set[str]:
     """Welke codes bestaan al als product (default_code óf supplierinfo-code)?"""
     present: set[str] = set()
@@ -384,6 +414,51 @@ with tab_excluded:
         st.download_button("⬇️ Exporteer uitgesloten (CSV)",
                            exc.to_csv(index=False).encode("utf-8"),
                            "victron_uitgesloten.csv", "text/csv")
+
+        # --- Archiveren in Odoo ---
+        st.divider()
+        st.markdown("##### 📦 Uitgesloten producten archiveren in Odoo")
+        in_odoo_exc = exc[exc["in_odoo"]].copy()
+        if in_odoo_exc.empty:
+            st.caption("Geen van de uitgesloten producten staat (actief) in Odoo — "
+                       "niets te archiveren.")
+        else:
+            st.caption(f"{len(in_odoo_exc)} uitgesloten product(en) staan nog actief in "
+                       "Odoo. Archiveren zet `active=False`: het product verdwijnt uit de "
+                       "standaardlijsten maar behoudt z'n historie en is later weer te "
+                       "activeren. Er wordt niets definitief verwijderd.")
+            in_odoo_exc.insert(0, "Selecteer", False)
+            arch_ed = st.data_editor(
+                in_odoo_exc[["Selecteer", "code", "naam", "categorie", "via_categorie"]],
+                hide_index=True, use_container_width=True,
+                disabled=["code", "naam", "categorie", "via_categorie"],
+                column_config={
+                    "via_categorie": st.column_config.CheckboxColumn("Via categorie")},
+                key="arch_editor")
+            arch_sel = arch_ed[arch_ed["Selecteer"]]
+            if not arch_sel.empty and st.button(
+                    f"📦 Archiveer {len(arch_sel)} in Odoo", type="primary", key="arch_btn"):
+                tmap = odoo_active_template_ids(odoo, [str(c) for c in arch_sel["code"]])
+                ok = err = miss_t = 0
+                for _, r in arch_sel.iterrows():
+                    tid = tmap.get(str(r["code"]))
+                    if not tid:
+                        miss_t += 1
+                        continue
+                    try:
+                        odoo.write("product.template", [tid], {"active": False})
+                        ok += 1
+                    except Exception as e:
+                        err += 1
+                        st.error(f"{r['code']}: {e}")
+                msg = f"✓ {ok} gearchiveerd"
+                if err:
+                    msg += f" · {err} fout"
+                if miss_t:
+                    msg += f" · {miss_t} zonder template (overgeslagen)"
+                st.success(msg)
+                if ok:
+                    st.rerun()
 
 # ---- Ontbreekt in Odoo ----
 with tab_missing:
