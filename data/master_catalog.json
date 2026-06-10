@@ -1,5 +1,5 @@
 {
-  "parsed_at": "2026-06-10T19:16:22",
+  "parsed_at": "2026-06-10T19:26:07",
   "source_file": "Pricelist_Victron_EUR_C_2026-Q2_web.pdf",
   "products": {
     "PIN121251200": {
@@ -10,6 +10,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 93.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121371200": {
@@ -20,6 +21,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 120.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121501200": {
@@ -30,6 +32,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 150.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121801200": {
@@ -40,6 +43,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 243.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122121210": {
@@ -50,6 +54,7 @@
       "dimensions": "117 x 232 x 362",
       "weight": 7.4,
       "advice_price": 286.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122161200": {
@@ -60,6 +65,7 @@
       "dimensions": "117 x 231 x 395",
       "weight": 7.4,
       "advice_price": 333.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241251200": {
@@ -70,6 +76,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 103.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241371200": {
@@ -80,6 +87,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241501200": {
@@ -90,6 +98,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 166.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241801200": {
@@ -100,6 +109,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 270.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242121200": {
@@ -110,6 +120,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 340.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIN121220000": {
@@ -120,6 +131,7 @@
       "dimensions": "375 x 214 x 110",
       "weight": 10.0,
       "advice_price": 418.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIN122160000": {
@@ -130,6 +142,7 @@
       "dimensions": "375 x 214 x 110",
       "weight": 10.0,
       "advice_price": 588.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122161000": {
@@ -140,6 +153,7 @@
       "dimensions": "485 x 219 x 125",
       "weight": 12.0,
       "advice_price": 574.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIN122200000": {
@@ -150,6 +164,7 @@
       "dimensions": "520 x 255 x 125",
       "weight": 13.0,
       "advice_price": 675.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122201000": {
@@ -160,6 +175,7 @@
       "dimensions": "485 x 219 x 125",
       "weight": 13.0,
       "advice_price": 650.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN123020000": {
@@ -170,6 +186,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1020.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122300000": {
@@ -180,6 +197,7 @@
       "dimensions": "533 x 285 x 150",
       "weight": 18.0,
       "advice_price": 875.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIN242160000": {
@@ -190,6 +208,7 @@
       "dimensions": "375 x 214 x 110",
       "weight": 10.0,
       "advice_price": 588.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242161000": {
@@ -200,6 +219,7 @@
       "dimensions": "485 x 219 x 125",
       "weight": 12.0,
       "advice_price": 574.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIN242200000": {
@@ -210,6 +230,7 @@
       "dimensions": "520 x 255 x 125",
       "weight": 13.0,
       "advice_price": 711.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242201000": {
@@ -220,6 +241,7 @@
       "dimensions": "485 x 219 x 125",
       "weight": 13.0,
       "advice_price": 684.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN243020000": {
@@ -230,6 +252,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1020.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242300000": {
@@ -240,6 +263,7 @@
       "dimensions": "485 x 285 x 150",
       "weight": 19.0,
       "advice_price": 921.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN245020000": {
@@ -250,6 +274,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 28.0,
       "advice_price": 1778.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242501000": {
@@ -260,6 +285,7 @@
       "dimensions": "595 x 295 x 160",
       "weight": 29.0,
       "advice_price": 1611.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481251200": {
@@ -270,6 +296,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 103.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481371200": {
@@ -280,6 +307,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481501200": {
@@ -290,6 +318,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 166.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481801200": {
@@ -300,6 +329,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.8,
       "advice_price": 270.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482121200": {
@@ -310,6 +340,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 357.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482201000": {
@@ -320,6 +351,7 @@
       "dimensions": "485 x 219 x 125",
       "weight": 13.0,
       "advice_price": 499.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN483020000": {
@@ -330,6 +362,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 647.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482300000": {
@@ -340,6 +373,7 @@
       "dimensions": "485 x 285 x 150",
       "weight": 19.0,
       "advice_price": 638.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN485020000": {
@@ -350,6 +384,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 28.0,
       "advice_price": 960.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482500000": {
@@ -360,6 +395,7 @@
       "dimensions": "555 x 295 x 160",
       "weight": 28.0,
       "advice_price": 956.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482600000": {
@@ -370,6 +406,7 @@
       "dimensions": "425 x 440 x 125",
       "weight": 10.0,
       "advice_price": 1233.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SIN121251100": {
@@ -380,6 +417,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.7,
       "advice_price": 114.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SIN241251100": {
@@ -390,6 +428,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.7,
       "advice_price": 114.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482601000": {
@@ -400,6 +439,7 @@
       "dimensions": "425 x 440 x 125",
       "weight": 11.0,
       "advice_price": 1709.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP121500000": {
@@ -410,6 +450,7 @@
       "dimensions": "311 x 182 x 100",
       "weight": 4.4,
       "advice_price": 330.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP121800000": {
@@ -420,6 +461,7 @@
       "dimensions": "360 x 240 x 100",
       "weight": 6.4,
       "advice_price": 425.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122120000": {
@@ -430,6 +472,7 @@
       "dimensions": "406 x 250 x 100",
       "weight": 8.2,
       "advice_price": 520.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122160000": {
@@ -440,6 +483,7 @@
       "dimensions": "465 x 270 x 120",
       "weight": 10.0,
       "advice_price": 601.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122200000": {
@@ -450,6 +494,7 @@
       "dimensions": "506 x 234 x 146",
       "weight": 15.0,
       "advice_price": 937.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CMP121800000": {
@@ -460,6 +505,7 @@
       "dimensions": "375 x 214 x 110",
       "weight": 10.0,
       "advice_price": 530.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CMP122120000": {
@@ -470,6 +516,7 @@
       "dimensions": "375 x 214 x 110",
       "weight": 10.0,
       "advice_price": 712.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CMP122160000": {
@@ -480,6 +527,7 @@
       "dimensions": "375 x 214 x 110",
       "weight": 10.0,
       "advice_price": 798.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CMP122200000": {
@@ -490,6 +538,7 @@
       "dimensions": "520 x 255 x 125",
       "weight": 13.0,
       "advice_price": 974.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122300001": {
@@ -500,6 +549,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1267.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP123021010": {
@@ -510,6 +560,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1367.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122305010": {
@@ -520,6 +571,7 @@
       "dimensions": "546 x 275 x 147",
       "weight": 19.0,
       "advice_price": 1176.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122405010": {
@@ -530,6 +582,7 @@
       "dimensions": "595 x 275 x 160",
       "weight": 23.0,
       "advice_price": 1372.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122505012": {
@@ -540,6 +593,7 @@
       "dimensions": "702 x 345 x 152",
       "weight": 30.0,
       "advice_price": 1873.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA123020010": {
@@ -550,6 +604,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 19.0,
       "advice_price": 1744.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA125020000": {
@@ -560,6 +615,7 @@
       "dimensions": "470 x 350 x 280",
       "weight": 34.0,
       "advice_price": 2572.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP241500000": {
@@ -570,6 +626,7 @@
       "dimensions": "311 x 182 x 100",
       "weight": 4.4,
       "advice_price": 330.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP241800000": {
@@ -580,6 +637,7 @@
       "dimensions": "360 x 240 x 100",
       "weight": 6.4,
       "advice_price": 425.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242120000": {
@@ -590,6 +648,7 @@
       "dimensions": "406 x 250 x 100",
       "weight": 8.2,
       "advice_price": 520.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242160000": {
@@ -600,6 +659,7 @@
       "dimensions": "465 x 270 x 120",
       "weight": 10.0,
       "advice_price": 668.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242200000": {
@@ -610,6 +670,7 @@
       "dimensions": "506 x 234 x 146",
       "weight": 15.0,
       "advice_price": 874.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CMP242160000": {
@@ -620,6 +681,7 @@
       "dimensions": "375 x 214 x 110",
       "weight": 10.0,
       "advice_price": 758.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CMP242200000": {
@@ -630,6 +692,7 @@
       "dimensions": "520 x 255 x 125",
       "weight": 13.0,
       "advice_price": 971.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242300001": {
@@ -640,6 +703,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1200.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242301011": {
@@ -650,6 +714,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1295.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242305010": {
@@ -660,6 +725,7 @@
       "dimensions": "499 x 268 x 141",
       "weight": 19.0,
       "advice_price": 894.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242306000": {
@@ -670,6 +736,7 @@
       "dimensions": "499 x 268 x 141",
       "weight": 20.0,
       "advice_price": 970.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP245021010": {
@@ -680,6 +747,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 30.0,
       "advice_price": 1804.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242505010": {
@@ -690,6 +758,7 @@
       "dimensions": "607 x 330 x 149",
       "weight": 30.0,
       "advice_price": 1681.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA243020010": {
@@ -700,6 +769,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 19.0,
       "advice_price": 1501.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA245021010": {
@@ -710,6 +780,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 30.0,
       "advice_price": 2057.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA242505010": {
@@ -720,6 +791,7 @@
       "dimensions": "607 x 330 x 149",
       "weight": 31.0,
       "advice_price": 1821.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA248020010": {
@@ -730,6 +802,7 @@
       "dimensions": "470 x 350 x 280",
       "weight": 41.0,
       "advice_price": 2597.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP481500000": {
@@ -740,6 +813,7 @@
       "dimensions": "311 x 182 x 100",
       "weight": 4.4,
       "advice_price": 276.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP481800000": {
@@ -750,6 +824,7 @@
       "dimensions": "360 x 240 x 100",
       "weight": 6.4,
       "advice_price": 325.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482120000": {
@@ -760,6 +835,7 @@
       "dimensions": "406 x 250 x 100",
       "weight": 8.2,
       "advice_price": 454.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482160000": {
@@ -770,6 +846,7 @@
       "dimensions": "465 x 270 x 120",
       "weight": 10.0,
       "advice_price": 515.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482200000": {
@@ -780,6 +857,7 @@
       "dimensions": "506 x 234 x 146",
       "weight": 15.0,
       "advice_price": 574.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP483020001": {
@@ -790,6 +868,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 875.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP483021010": {
@@ -800,6 +879,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 914.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482305010": {
@@ -810,6 +890,7 @@
       "dimensions": "499 x 268 x 141",
       "weight": 19.0,
       "advice_price": 624.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482306000": {
@@ -820,6 +901,7 @@
       "dimensions": "499 x 268 x 141",
       "weight": 20.0,
       "advice_price": 711.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482405012": {
@@ -830,6 +912,7 @@
       "dimensions": "590 x 275 x 149",
       "weight": 19.0,
       "advice_price": 769.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482406000": {
@@ -840,6 +923,7 @@
       "dimensions": "590 x 275 x 149",
       "weight": 21.0,
       "advice_price": 905.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482505012": {
@@ -850,6 +934,7 @@
       "dimensions": "565 x 320 x 149",
       "weight": 30.0,
       "advice_price": 844.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482506000": {
@@ -860,6 +945,7 @@
       "dimensions": "565 x 320 x 149",
       "weight": 31.0,
       "advice_price": 1041.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482605012": {
@@ -870,6 +956,7 @@
       "dimensions": "644 x 320 x 150",
       "weight": 30.0,
       "advice_price": 977.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482606000": {
@@ -880,6 +967,7 @@
       "dimensions": "644 x 320 x 150",
       "weight": 29.0,
       "advice_price": 1162.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP485021010": {
@@ -890,6 +978,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 30.0,
       "advice_price": 1239.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMR482602020": {
@@ -900,6 +989,7 @@
       "dimensions": "425 x 440 x 125",
       "weight": 12.0,
       "advice_price": 1635.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482805000": {
@@ -910,6 +1000,7 @@
       "dimensions": "642 x 363 x 206",
       "weight": 42.0,
       "advice_price": 1551.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP483105000": {
@@ -920,6 +1011,7 @@
       "dimensions": "677 x 363 x 206",
       "weight": 49.0,
       "advice_price": 1853.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP483150000": {
@@ -930,6 +1022,7 @@
       "dimensions": "810 x 404 x 210",
       "weight": 75.0,
       "advice_price": 2585.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA485021010": {
@@ -940,6 +1033,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 29.0,
       "advice_price": 1764.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA482504010": {
@@ -950,6 +1044,7 @@
       "dimensions": "565 x 320 x 149",
       "weight": 31.0,
       "advice_price": 1191.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA488024000": {
@@ -960,6 +1055,7 @@
       "dimensions": "470 x 350 x 280",
       "weight": 41.0,
       "advice_price": 1996.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA481030010": {
@@ -970,6 +1066,7 @@
       "dimensions": "470 x 350 x 280",
       "weight": 45.0,
       "advice_price": 2385.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA483150000": {
@@ -980,6 +1077,7 @@
       "dimensions": "572 x 488 x 344",
       "weight": 72.0,
       "advice_price": 3133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMC483200400": {
@@ -990,6 +1088,7 @@
       "dimensions": "572 x 488 x 344",
       "weight": 70.0,
       "advice_price": 3048.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "CEP122160000": {
@@ -1000,6 +1099,7 @@
       "dimensions": "510 x 214 x 110",
       "weight": 11.0,
       "advice_price": 871.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CEP122161000": {
@@ -1010,6 +1110,7 @@
       "dimensions": "745 x 214 x 110",
       "weight": 12.0,
       "advice_price": 1140.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CEP242161010": {
@@ -1020,6 +1121,7 @@
       "dimensions": "745 x 214 x 110",
       "weight": 12.0,
       "advice_price": 1140.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242307010": {
@@ -1030,6 +1132,7 @@
       "dimensions": "499 x 268 x 237",
       "weight": 26.0,
       "advice_price": 1278.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482307010": {
@@ -1040,6 +1143,7 @@
       "dimensions": "499 x 268 x 237",
       "weight": 26.0,
       "advice_price": 1278.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482507010": {
@@ -1050,6 +1154,7 @@
       "dimensions": "604 x 323 x 253",
       "weight": 39.0,
       "advice_price": 1803.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030537010": {
@@ -1060,6 +1165,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 100.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122510500": {
@@ -1070,6 +1176,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 93.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN123750500": {
@@ -1080,6 +1187,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 113.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN125010500": {
@@ -1090,6 +1198,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 142.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121800500": {
@@ -1100,6 +1209,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 231.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122122500": {
@@ -1110,6 +1220,7 @@
       "dimensions": "117 x 232 x 362",
       "weight": 8.5,
       "advice_price": 285.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122161500": {
@@ -1120,6 +1231,7 @@
       "dimensions": "117 x 231 x 395",
       "weight": 9.0,
       "advice_price": 333.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122510510": {
@@ -1130,6 +1242,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 101.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN123750510": {
@@ -1140,6 +1253,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 123.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN125010510": {
@@ -1150,6 +1264,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 153.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121800510": {
@@ -1160,6 +1275,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 250.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122122510": {
@@ -1170,6 +1286,7 @@
       "dimensions": "117 x 232 x 362",
       "weight": 8.5,
       "advice_price": 293.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242510500": {
@@ -1180,6 +1297,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 98.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241370500": {
@@ -1190,6 +1308,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 120.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN245010500": {
@@ -1200,6 +1319,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 150.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241800500": {
@@ -1210,6 +1330,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 218.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242122500": {
@@ -1220,6 +1341,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 322.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242161500": {
@@ -1230,6 +1352,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 8.0,
       "advice_price": 356.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242510510": {
@@ -1240,6 +1363,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 101.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN245010510": {
@@ -1250,6 +1374,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 153.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241800510": {
@@ -1260,6 +1385,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 212.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242122510": {
@@ -1270,6 +1396,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 334.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482510500": {
@@ -1280,6 +1407,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 103.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN483750500": {
@@ -1290,6 +1418,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 126.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN485010500": {
@@ -1300,6 +1429,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 150.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481800500": {
@@ -1310,6 +1440,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 256.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482122500": {
@@ -1320,6 +1451,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 322.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482161500": {
@@ -1330,6 +1462,7 @@
       "dimensions": "117 x 231 x 365",
       "weight": 9.0,
       "advice_price": 356.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "PIN482122510": {
@@ -1340,6 +1473,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 334.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN123020100": {
@@ -1350,6 +1484,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1056.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN243020100": {
@@ -1360,6 +1495,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1056.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP121500100": {
@@ -1370,6 +1506,7 @@
       "dimensions": "311 x 182 x 100",
       "weight": 4.4,
       "advice_price": 283.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP121800100": {
@@ -1380,6 +1517,7 @@
       "dimensions": "360 x 240 x 100",
       "weight": 6.5,
       "advice_price": 364.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122120100": {
@@ -1390,6 +1528,7 @@
       "dimensions": "406 x 250 x 100",
       "weight": 8.2,
       "advice_price": 446.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CMP122200102": {
@@ -1400,6 +1539,7 @@
       "dimensions": "520 x 255 x 125",
       "weight": 13.0,
       "advice_price": 965.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122200102": {
@@ -1410,6 +1550,7 @@
       "dimensions": "506 x 234 x 147",
       "weight": 15.0,
       "advice_price": 920.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP123021102": {
@@ -1420,6 +1561,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1071.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "PMP122301102": {
@@ -1430,6 +1572,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1247.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122305120": {
@@ -1440,6 +1583,7 @@
       "dimensions": "578 x 277 x 148",
       "weight": null,
       "advice_price": 905.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "PMP122305122": {
@@ -1450,6 +1594,7 @@
       "dimensions": "578 x 277 x 148",
       "weight": 19.0,
       "advice_price": 970.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122305100": {
@@ -1460,6 +1605,7 @@
       "dimensions": "578 x 277 x 148",
       "weight": null,
       "advice_price": 995.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "PMP122305102": {
@@ -1470,6 +1616,7 @@
       "dimensions": "578 x 277 x 148",
       "weight": 22.0,
       "advice_price": 1048.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP122405100": {
@@ -1480,6 +1627,7 @@
       "dimensions": "639 x 277 x 164",
       "weight": null,
       "advice_price": 1143.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "PMP122405200": {
@@ -1490,6 +1638,7 @@
       "dimensions": "659 x 277 x 166",
       "weight": null,
       "advice_price": 1238.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "QUA122305130": {
@@ -1500,6 +1649,7 @@
       "dimensions": "579 x 319 x 168",
       "weight": 24.0,
       "advice_price": 1260.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA125021100": {
@@ -1510,6 +1660,7 @@
       "dimensions": "470 x 350 x 280",
       "weight": 34.0,
       "advice_price": 2593.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA125021102": {
@@ -1520,6 +1671,7 @@
       "dimensions": "470 x 350 x 280",
       "weight": 36.0,
       "advice_price": 2874.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CMP242200100": {
@@ -1530,6 +1682,7 @@
       "dimensions": "520 x 255 x 125",
       "weight": 13.0,
       "advice_price": 825.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242200102": {
@@ -1540,6 +1693,7 @@
       "dimensions": "506 x 234 x 147",
       "weight": 15.0,
       "advice_price": 838.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242301102": {
@@ -1550,6 +1704,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1265.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242305100": {
@@ -1560,6 +1715,7 @@
       "dimensions": "536 x 277 x 147",
       "weight": 19.0,
       "advice_price": 952.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242305102": {
@@ -1570,6 +1726,7 @@
       "dimensions": "536 x 277 x 147",
       "weight": 19.0,
       "advice_price": 1064.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242305132": {
@@ -1580,6 +1737,7 @@
       "dimensions": "536 x 277 x 147",
       "weight": 19.0,
       "advice_price": 1222.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP242505110": {
@@ -1590,6 +1748,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 32.0,
       "advice_price": 1730.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA242305130": {
@@ -1600,6 +1759,7 @@
       "dimensions": "579 x 319 x 168",
       "weight": 23.0,
       "advice_price": 1197.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA245023110": {
@@ -1610,6 +1770,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 30.0,
       "advice_price": 2282.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482200100": {
@@ -1620,6 +1781,7 @@
       "dimensions": "506 x 234 x 147",
       "weight": 15.0,
       "advice_price": 949.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482305100": {
@@ -1630,6 +1792,7 @@
       "dimensions": "536 x 277 x 147",
       "weight": 20.0,
       "advice_price": 950.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482305102": {
@@ -1640,6 +1803,7 @@
       "dimensions": "572 x 277 x 147",
       "weight": 19.0,
       "advice_price": 1016.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482505110": {
@@ -1650,6 +1814,7 @@
       "dimensions": "676 x 330 x 164",
       "weight": 32.0,
       "advice_price": 1268.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482505120": {
@@ -1660,6 +1825,7 @@
       "dimensions": "676 x 330 x 164",
       "weight": 32.0,
       "advice_price": 1409.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA483021100": {
@@ -1670,6 +1836,7 @@
       "dimensions": "362 x 258 x 218",
       "weight": 18.0,
       "advice_price": 1271.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA485021100": {
@@ -1680,6 +1847,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 30.0,
       "advice_price": 1469.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA482501102": {
@@ -1690,6 +1858,7 @@
       "dimensions": "444 x 328 x 240",
       "weight": 30.0,
       "advice_price": 1633.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA483100100": {
@@ -1700,6 +1869,7 @@
       "dimensions": "572 x 488 x 344",
       "weight": 58.0,
       "advice_price": 2378.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA483100102": {
@@ -1710,6 +1880,7 @@
       "dimensions": "572 x 488 x 344",
       "weight": 58.0,
       "advice_price": 2531.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA483150100": {
@@ -1720,6 +1891,7 @@
       "dimensions": "572 x 488 x 344",
       "weight": 72.0,
       "advice_price": 3133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PMP482505300": {
@@ -1730,6 +1902,7 @@
       "dimensions": "676 x 330 x 164",
       "weight": 32.0,
       "advice_price": 1557.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "QUA483100300": {
@@ -1740,6 +1913,7 @@
       "dimensions": "572 x 488 x 344",
       "weight": 58.0,
       "advice_price": 2952.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120134034R": {
@@ -1750,6 +1924,7 @@
       "dimensions": "38 x 64 x 153",
       "weight": 0.4,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120433064R": {
@@ -1760,6 +1935,7 @@
       "dimensions": "45 x 81 x 182",
       "weight": 0.6,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120533064R": {
@@ -1770,6 +1946,7 @@
       "dimensions": "45 x 81 x 182",
       "weight": 0.6,
       "advice_price": 90.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120731064R": {
@@ -1780,6 +1957,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121031064R": {
@@ -1790,6 +1968,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 127.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121531064R": {
@@ -1800,6 +1979,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122531064": {
@@ -1810,6 +1990,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 185.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240531064R": {
@@ -1820,6 +2001,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240831064R": {
@@ -1830,6 +2012,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241331064": {
@@ -1840,6 +2023,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 185.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900100014": {
@@ -1850,6 +2034,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 8.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900110014": {
@@ -1860,6 +2045,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 8.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900500014": {
@@ -1870,6 +2056,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 43.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900520014": {
@@ -1880,6 +2067,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 43.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900200014": {
@@ -1890,6 +2078,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900250014": {
@@ -1900,6 +2089,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 17.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900300014": {
@@ -1910,6 +2100,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 14.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900400014": {
@@ -1920,6 +2111,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 13.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900110114": {
@@ -1930,6 +2122,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 23.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC900120114": {
@@ -1940,6 +2133,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 14.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC920100100": {
@@ -1950,6 +2144,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 7.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC920100110": {
@@ -1960,6 +2155,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 11.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC920100200": {
@@ -1970,6 +2166,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 5.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC920100210": {
@@ -1980,6 +2177,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121542002": {
@@ -1990,6 +2188,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 135.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121544002": {
@@ -2000,6 +2199,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 141.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122042002": {
@@ -2010,6 +2210,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 146.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122044002": {
@@ -2020,6 +2221,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 165.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC123047002": {
@@ -2030,6 +2232,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 176.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC123048002": {
@@ -2040,6 +2243,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 188.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240842002": {
@@ -2050,6 +2254,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 135.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241242002": {
@@ -2060,6 +2265,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 151.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241647002": {
@@ -2070,6 +2276,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241648002": {
@@ -2080,6 +2287,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 194.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120713006": {
@@ -2090,6 +2298,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 100.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121313006": {
@@ -2100,6 +2309,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121713006": {
@@ -2110,6 +2320,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 147.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122547006": {
@@ -2120,6 +2331,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122514006": {
@@ -2130,6 +2342,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 200.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240513006": {
@@ -2140,6 +2353,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 112.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240813006": {
@@ -2150,6 +2364,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 147.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241247006": {
@@ -2160,6 +2375,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241214006": {
@@ -2170,6 +2386,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 200.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120134124R": {
@@ -2180,6 +2397,7 @@
       "dimensions": "38 x 64 x 153",
       "weight": 0.4,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120531104R": {
@@ -2190,6 +2408,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 90.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120731104R": {
@@ -2200,6 +2419,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 119.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121031104R": {
@@ -2210,6 +2430,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 140.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121531104R": {
@@ -2220,6 +2441,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 154.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122531124": {
@@ -2230,6 +2452,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240531104R": {
@@ -2240,6 +2463,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 119.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240831104R": {
@@ -2250,6 +2474,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 154.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241331124": {
@@ -2260,6 +2485,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120715106": {
@@ -2270,6 +2496,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 100.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121315106": {
@@ -2280,6 +2507,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121715106": {
@@ -2290,6 +2518,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 147.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122547106": {
@@ -2300,6 +2529,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240515106": {
@@ -2310,6 +2540,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 112.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240815106": {
@@ -2320,6 +2551,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 147.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241247106": {
@@ -2330,6 +2562,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121545102": {
@@ -2340,6 +2573,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 135.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121546102": {
@@ -2350,6 +2584,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 156.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122045102": {
@@ -2360,6 +2595,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 162.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122046102": {
@@ -2370,6 +2606,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 183.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC123047102": {
@@ -2380,6 +2617,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 195.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC123048102": {
@@ -2390,6 +2628,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 208.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241245102": {
@@ -2400,6 +2639,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 166.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241647102": {
@@ -2410,6 +2650,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 199.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241648102": {
@@ -2420,6 +2661,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 203.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PSC123051095": {
@@ -2430,6 +2672,7 @@
       "dimensions": "180 x 249 x 100",
       "weight": 3.5,
       "advice_price": 340.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PSC123053095": {
@@ -2440,6 +2683,7 @@
       "dimensions": "180 x 249 x 100",
       "weight": 3.5,
       "advice_price": 365.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PSC125051095": {
@@ -2450,6 +2694,7 @@
       "dimensions": "180 x 249 x 100",
       "weight": 3.5,
       "advice_price": 433.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PSC125053095": {
@@ -2460,6 +2705,7 @@
       "dimensions": "180 x 249 x 100",
       "weight": 3.5,
       "advice_price": 458.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PSC241651095": {
@@ -2470,6 +2716,7 @@
       "dimensions": "180 x 249 x 100",
       "weight": 3.5,
       "advice_price": 340.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PSC242551095": {
@@ -2480,6 +2727,7 @@
       "dimensions": "180 x 249 x 100",
       "weight": 3.5,
       "advice_price": 433.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PSC242553095": {
@@ -2490,6 +2738,7 @@
       "dimensions": "180 x 249 x 100",
       "weight": 3.5,
       "advice_price": 458.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PSC361550095": {
@@ -2500,6 +2749,7 @@
       "dimensions": "180 x 249 x 116",
       "weight": null,
       "advice_price": 500.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "PSC481350095": {
@@ -2510,6 +2760,7 @@
       "dimensions": "180 x 249 x 116",
       "weight": null,
       "advice_price": 500.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "ADA010100100": {
@@ -2520,6 +2771,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 9.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ADA010100200": {
@@ -2530,6 +2782,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 9.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ADA010100300": {
@@ -2540,6 +2793,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 9.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ADA010100400": {
@@ -2550,6 +2804,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 9.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ADA010100500": {
@@ -2560,6 +2815,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 9.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH012020000": {
@@ -2570,6 +2826,7 @@
       "dimensions": "355 x 215 x 110",
       "weight": 3.8,
       "advice_price": 369.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH012030000": {
@@ -2580,6 +2837,7 @@
       "dimensions": "355 x 215 x 110",
       "weight": 3.8,
       "advice_price": 410.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH012040000": {
@@ -2590,6 +2848,7 @@
       "dimensions": "426 x 239 x 135",
       "weight": 5.0,
       "advice_price": 503.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH012050000": {
@@ -2600,6 +2859,7 @@
       "dimensions": "426 x 239 x 135",
       "weight": 5.0,
       "advice_price": 523.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH012060000": {
@@ -2610,6 +2870,7 @@
       "dimensions": "426 x 239 x 135",
       "weight": 5.0,
       "advice_price": 544.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH012080000": {
@@ -2620,6 +2881,7 @@
       "dimensions": "505 x 255 x 130",
       "weight": 12.0,
       "advice_price": 902.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH012100000": {
@@ -2630,6 +2892,7 @@
       "dimensions": "505 x 255 x 130",
       "weight": 12.0,
       "advice_price": 1047.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH024016000": {
@@ -2640,6 +2903,7 @@
       "dimensions": "355 x 215 x 110",
       "weight": 3.8,
       "advice_price": 453.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH024030000": {
@@ -2650,6 +2914,7 @@
       "dimensions": "426 x 239 x 135",
       "weight": 5.0,
       "advice_price": 634.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH024040000": {
@@ -2660,6 +2925,7 @@
       "dimensions": "505 x 255 x 130",
       "weight": 12.0,
       "advice_price": 828.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CCH024060000": {
@@ -2670,6 +2936,7 @@
       "dimensions": "505 x 255 x 130",
       "weight": 12.0,
       "advice_price": 900.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PCH012050001": {
@@ -2680,6 +2947,7 @@
       "dimensions": "350 x 200 x 108",
       "weight": 3.8,
       "advice_price": 663.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PCH024016001": {
@@ -2690,6 +2958,7 @@
       "dimensions": "350 x 200 x 108",
       "weight": 3.8,
       "advice_price": 362.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PCH024025001": {
@@ -2700,6 +2969,7 @@
       "dimensions": "350 x 200 x 108",
       "weight": 3.8,
       "advice_price": 663.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SKY012070000": {
@@ -2710,6 +2980,7 @@
       "dimensions": "401 x 265 x 151",
       "weight": 6.0,
       "advice_price": 731.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SKY012070100": {
@@ -2720,6 +2991,7 @@
       "dimensions": "401 x 265 x 151",
       "weight": 6.0,
       "advice_price": 805.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SKY024035000": {
@@ -2730,6 +3002,7 @@
       "dimensions": "401 x 265 x 151",
       "weight": 6.0,
       "advice_price": 731.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SKY024035100": {
@@ -2740,6 +3013,7 @@
       "dimensions": "401 x 265 x 151",
       "weight": 6.0,
       "advice_price": 805.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG2400301": {
@@ -2750,6 +3024,7 @@
       "dimensions": "365 x 250 x 147",
       "weight": 5.5,
       "advice_price": 654.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG2400501": {
@@ -2760,6 +3035,7 @@
       "dimensions": "365 x 250 x 147",
       "weight": 5.5,
       "advice_price": 708.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG2400801": {
@@ -2770,6 +3046,7 @@
       "dimensions": "365 x 250 x 257",
       "weight": 10.0,
       "advice_price": 1160.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG2401001": {
@@ -2780,6 +3057,7 @@
       "dimensions": "365 x 250 x 257",
       "weight": 10.0,
       "advice_price": 1330.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "STG024050300": {
@@ -2790,6 +3068,7 @@
       "dimensions": "365 x 250 x 257",
       "weight": 13.0,
       "advice_price": 1285.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "STG024100300": {
@@ -2800,6 +3079,7 @@
       "dimensions": "515 x 260 x 265",
       "weight": 23.0,
       "advice_price": 2055.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG2400303": {
@@ -2810,6 +3090,7 @@
       "dimensions": "365 x 250 x 147",
       "weight": 5.5,
       "advice_price": 799.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG2400503": {
@@ -2820,6 +3101,7 @@
       "dimensions": "365 x 250 x 147",
       "weight": 5.5,
       "advice_price": 864.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG2401003": {
@@ -2830,6 +3112,7 @@
       "dimensions": "365 x 250 x 257",
       "weight": 10.0,
       "advice_price": 1622.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG2400302": {
@@ -2840,6 +3123,7 @@
       "dimensions": "485 x 250 x 147",
       "weight": 6.0,
       "advice_price": 999.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG2400504": {
@@ -2850,6 +3134,7 @@
       "dimensions": "485 x 250 x 147",
       "weight": 6.0,
       "advice_price": 1257.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG4800251": {
@@ -2860,6 +3145,7 @@
       "dimensions": "365 x 250 x 147",
       "weight": 5.5,
       "advice_price": 850.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDTG4800501": {
@@ -2870,6 +3156,7 @@
       "dimensions": "365 x 250 x 257",
       "weight": 10.0,
       "advice_price": 1434.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SKI024080000": {
@@ -2880,6 +3167,7 @@
       "dimensions": "402 x 250 x 140",
       "weight": 8.0,
       "advice_price": 1111.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SKI024080002": {
@@ -2890,6 +3178,7 @@
       "dimensions": "402 x 250 x 140",
       "weight": 8.0,
       "advice_price": 1295.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SKI024100000": {
@@ -2900,6 +3189,7 @@
       "dimensions": "402 x 250 x 140",
       "weight": 8.0,
       "advice_price": 1275.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SKI024100002": {
@@ -2910,6 +3200,7 @@
       "dimensions": "402 x 250 x 140",
       "weight": 8.0,
       "advice_price": 1494.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030550400": {
@@ -2920,6 +3211,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 22.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP302501500": {
@@ -2930,6 +3222,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 179.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP302502500": {
@@ -2940,6 +3233,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 242.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP304001500": {
@@ -2950,6 +3244,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 230.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP306002500": {
@@ -2960,6 +3255,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 448.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP301603000": {
@@ -2970,6 +3266,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 70.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP301602000": {
@@ -2980,6 +3277,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 101.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP303202000": {
@@ -2990,6 +3288,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 131.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP301604000": {
@@ -3000,6 +3299,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 80.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP303204000": {
@@ -3010,6 +3310,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 108.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP307700220": {
@@ -3020,6 +3321,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 25.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP307700260": {
@@ -3030,6 +3332,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 24.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP307700240": {
@@ -3040,6 +3343,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP307700280": {
@@ -3050,6 +3354,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 35.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHP307700300": {
@@ -3060,6 +3365,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 49.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR040202041": {
@@ -3070,6 +3376,7 @@
       "dimensions": "375 x 214 x 135",
       "weight": 10.0,
       "advice_price": 424.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR040252042": {
@@ -3080,6 +3387,7 @@
       "dimensions": "446 x 214 x 135",
       "weight": 12.0,
       "advice_price": 382.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR040362041": {
@@ -3090,6 +3398,7 @@
       "dimensions": "362 x 258 x 221",
       "weight": 23.0,
       "advice_price": 638.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR040362042": {
@@ -3100,6 +3409,7 @@
       "dimensions": "362 x 258 x 221",
       "weight": 22.0,
       "advice_price": 517.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR000702001": {
@@ -3110,6 +3420,7 @@
       "dimensions": "362 x 258 x 221",
       "weight": 30.0,
       "advice_price": 871.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR000802002": {
@@ -3120,6 +3431,7 @@
       "dimensions": "362 x 258 x 243",
       "weight": 28.0,
       "advice_price": 784.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR050362041": {
@@ -3130,6 +3442,7 @@
       "dimensions": "362 x 258 x 221",
       "weight": 23.0,
       "advice_price": 674.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR050362042": {
@@ -3140,6 +3453,7 @@
       "dimensions": "362 x 258 x 221",
       "weight": 22.0,
       "advice_price": 546.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR000100001": {
@@ -3150,6 +3464,7 @@
       "dimensions": "375 x 214 x 110",
       "weight": 10.0,
       "advice_price": 481.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR000100052": {
@@ -3160,6 +3475,7 @@
       "dimensions": "375 x 214 x 110",
       "weight": 12.0,
       "advice_price": 500.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ITR000100101": {
@@ -3170,6 +3486,7 @@
       "dimensions": "425 x 214 x 110",
       "weight": 14.0,
       "advice_price": 543.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "GDI000016000": {
@@ -3180,6 +3497,7 @@
       "dimensions": "60 x 120 x 200",
       "weight": 1.0,
       "advice_price": 117.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "GDI000032000": {
@@ -3190,6 +3508,7 @@
       "dimensions": "63 x 164 x 235",
       "weight": 2.0,
       "advice_price": 266.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "GDI000064000": {
@@ -3200,6 +3519,7 @@
       "dimensions": "64 x 164 x 224",
       "weight": 2.0,
       "advice_price": 326.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "EVC300400300": {
@@ -3210,6 +3530,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 542.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "EVC200300200": {
@@ -3220,6 +3541,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 542.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "EVC200300310": {
@@ -3230,6 +3552,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "EVC200300410": {
@@ -3240,6 +3563,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241205260": {
@@ -3250,6 +3574,7 @@
       "dimensions": "25 x 43 x 20",
       "weight": 0.1,
       "advice_price": 23.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241210260": {
@@ -3260,6 +3585,7 @@
       "dimensions": "74 x 74 x 32",
       "weight": 0.4,
       "advice_price": 37.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241220260": {
@@ -3270,6 +3596,7 @@
       "dimensions": "74 x 74 x 32",
       "weight": 0.5,
       "advice_price": 48.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122421226": {
@@ -3280,6 +3607,7 @@
       "dimensions": "340 x 127 x 63",
       "weight": 3.1,
       "advice_price": 292.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241221226": {
@@ -3290,6 +3618,7 @@
       "dimensions": "265 x 127 x 63",
       "weight": 2.2,
       "advice_price": 243.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241205200": {
@@ -3300,6 +3629,7 @@
       "dimensions": "53 x 51 x 27",
       "weight": 0.1,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241210200": {
@@ -3310,6 +3640,7 @@
       "dimensions": "73 x 94 x 37",
       "weight": 0.2,
       "advice_price": 35.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241215200": {
@@ -3320,6 +3651,7 @@
       "dimensions": "73 x 94 x 45",
       "weight": 0.3,
       "advice_price": 40.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241220200": {
@@ -3330,6 +3662,7 @@
       "dimensions": "73 x 94 x 45",
       "weight": 0.3,
       "advice_price": 45.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241225020": {
@@ -3340,6 +3673,7 @@
       "dimensions": "65 x 88 x 160",
       "weight": 0.7,
       "advice_price": 66.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241230022": {
@@ -3350,6 +3684,7 @@
       "dimensions": "65 x 88 x 160",
       "weight": 0.7,
       "advice_price": 73.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241240021": {
@@ -3360,6 +3695,7 @@
       "dimensions": "65 x 88 x 185",
       "weight": 0.9,
       "advice_price": 90.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241260020": {
@@ -3370,6 +3706,7 @@
       "dimensions": "65 x 88 x 185",
       "weight": 0.9,
       "advice_price": 99.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241270020": {
@@ -3380,6 +3717,7 @@
       "dimensions": "65 x 88 x 195",
       "weight": 0.9,
       "advice_price": 114.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241270030": {
@@ -3390,6 +3728,7 @@
       "dimensions": "65 x 88 x 195",
       "weight": 0.9,
       "advice_price": 114.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241280020": {
@@ -3400,6 +3739,7 @@
       "dimensions": "65 x 88 x 195",
       "weight": 0.9,
       "advice_price": 126.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241280030": {
@@ -3410,6 +3750,7 @@
       "dimensions": "65 x 88 x 195",
       "weight": 0.9,
       "advice_price": 126.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI481260020": {
@@ -3420,6 +3761,7 @@
       "dimensions": "65 x 88 x 195",
       "weight": 0.9,
       "advice_price": 138.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122408020": {
@@ -3430,6 +3772,7 @@
       "dimensions": "45 x 90 x 115",
       "weight": 0.3,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122410020": {
@@ -3440,6 +3783,7 @@
       "dimensions": "45 x 90 x 125",
       "weight": 0.4,
       "advice_price": 66.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122420020": {
@@ -3450,6 +3794,7 @@
       "dimensions": "65 x 88 x 195",
       "weight": 0.9,
       "advice_price": 122.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI303025000": {
@@ -3460,6 +3805,7 @@
       "dimensions": "165 x 120 x 30",
       "weight": 0.9,
       "advice_price": 578.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI303050000": {
@@ -3470,6 +3816,7 @@
       "dimensions": "213 x 120 x 30",
       "weight": 1.1,
       "advice_price": 718.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI303100000": {
@@ -3480,6 +3827,7 @@
       "dimensions": "288 x 162 x 50",
       "weight": 4.0,
       "advice_price": 1256.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS000200100": {
@@ -3490,6 +3838,7 @@
       "dimensions": "58 x 40 x 16",
       "weight": 0.0,
       "advice_price": 140.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI121236140": {
@@ -3500,6 +3849,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 230.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122436140": {
@@ -3510,6 +3860,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 230.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241236140": {
@@ -3520,6 +3871,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 230.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI242440140": {
@@ -3530,6 +3882,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.6,
       "advice_price": 230.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI121217050": {
@@ -3540,6 +3893,7 @@
       "dimensions": "138 x 123 x 40",
       "weight": 0.3,
       "advice_price": 332.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI242417040": {
@@ -3550,6 +3904,7 @@
       "dimensions": "138 x 123 x 40",
       "weight": 0.6,
       "advice_price": 380.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI121210110": {
@@ -3560,6 +3915,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 68.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI121222110": {
@@ -3570,6 +3926,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 122.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI121240110": {
@@ -3580,6 +3937,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122410110": {
@@ -3590,6 +3948,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 68.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122424110": {
@@ -3600,6 +3959,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 122.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122441110": {
@@ -3610,6 +3970,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI124838110": {
@@ -3620,6 +3981,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI121222120": {
@@ -3630,6 +3992,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI121236120": {
@@ -3640,6 +4003,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 261.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122424120": {
@@ -3650,6 +4014,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI122436120": {
@@ -3660,6 +4025,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 261.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI124838120": {
@@ -3670,6 +4036,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 261.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241210110": {
@@ -3680,6 +4047,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 68.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241224110": {
@@ -3690,6 +4058,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 122.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241240110": {
@@ -3700,6 +4069,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI242410110": {
@@ -3710,6 +4080,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 68.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI242428110": {
@@ -3720,6 +4091,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 122.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI242441110": {
@@ -3730,6 +4102,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.6,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI244810110": {
@@ -3740,6 +4113,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 68.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI244828110": {
@@ -3750,6 +4124,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 122.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI244841110": {
@@ -3760,6 +4135,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.6,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241224120": {
@@ -3770,6 +4146,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI241236120": {
@@ -3780,6 +4157,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 261.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI242428120": {
@@ -3790,6 +4168,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI242440120": {
@@ -3800,6 +4179,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.6,
       "advice_price": 261.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI244840120": {
@@ -3810,6 +4190,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.8,
       "advice_price": 261.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI481210110": {
@@ -3820,6 +4201,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 68.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI481224110": {
@@ -3830,6 +4212,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 122.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI481240110": {
@@ -3840,6 +4223,7 @@
       "dimensions": "130 x 186 x 80",
       "weight": 1.8,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI482410110": {
@@ -3850,6 +4234,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 68.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI482428110": {
@@ -3860,6 +4245,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 122.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI482441110": {
@@ -3870,6 +4256,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.6,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI484810110": {
@@ -3880,6 +4267,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 68.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI484828110": {
@@ -3890,6 +4278,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 122.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI484841110": {
@@ -3900,6 +4289,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.6,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI481224120": {
@@ -3910,6 +4300,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.2,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI481238120": {
@@ -3920,6 +4311,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.8,
       "advice_price": 261.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI482438120": {
@@ -3930,6 +4322,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.8,
       "advice_price": 261.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI484838120": {
@@ -3940,6 +4333,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.8,
       "advice_price": 261.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI110123610": {
@@ -3950,6 +4344,7 @@
       "dimensions": "64 x 163 x 160",
       "weight": 1.4,
       "advice_price": 390.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ORI110243610": {
@@ -3960,6 +4355,7 @@
       "dimensions": "64 x 163 x 160",
       "weight": 1.4,
       "advice_price": 390.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS070300100": {
@@ -3970,6 +4366,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 20.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDFI0000000": {
@@ -3980,6 +4377,7 @@
       "dimensions": "120 x 255 x 75",
       "weight": 0.8,
       "advice_price": 276.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SDFI0000110": {
@@ -3990,6 +4388,7 @@
       "dimensions": "120 x 255 x 75",
       "weight": 0.8,
       "advice_price": 276.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "COS230502100": {
@@ -4000,6 +4399,7 @@
       "dimensions": "175 x 215 x 120",
       "weight": 1.4,
       "advice_price": 330.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "COS230103100": {
@@ -4010,6 +4410,7 @@
       "dimensions": "175 x 215 x 120",
       "weight": 1.5,
       "advice_price": 409.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "LYN020102010": {
@@ -4020,6 +4421,7 @@
       "dimensions": "170 x 290 x 80",
       "weight": 2.1,
       "advice_price": 150.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "LYN060404010": {
@@ -4030,6 +4432,7 @@
       "dimensions": "170 x 280 x 97",
       "weight": 2.1,
       "advice_price": 181.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "LYN034160200": {
@@ -4040,6 +4443,7 @@
       "dimensions": "170 x 186 x 80",
       "weight": 2.2,
       "advice_price": 697.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "LYN034160210": {
@@ -4050,6 +4454,7 @@
       "dimensions": "170 x 186 x 80",
       "weight": 2.2,
       "advice_price": 729.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "LYN034160310": {
@@ -4060,6 +4465,7 @@
       "dimensions": "170 x 186 x 80",
       "weight": 2.2,
       "advice_price": 729.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "LYN034170210": {
@@ -4070,6 +4476,7 @@
       "dimensions": "170 x 186 x 80",
       "weight": 2.5,
       "advice_price": 971.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "LYN034170310": {
@@ -4080,6 +4487,7 @@
       "dimensions": "170 x 186 x 80",
       "weight": 2.5,
       "advice_price": 971.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "LYN040102110": {
@@ -4090,6 +4498,7 @@
       "dimensions": "170 x 186 x 80",
       "weight": 1.4,
       "advice_price": 379.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "LYN060102010": {
@@ -4100,6 +4509,7 @@
       "dimensions": "170 x 290 x 80",
       "weight": 2.3,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB413020010": {
@@ -4110,6 +4520,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 23.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB115021020": {
@@ -4120,6 +4531,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 20.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB115022020": {
@@ -4130,6 +4542,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 31.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB115040020": {
@@ -4140,6 +4553,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 20.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB115060020": {
@@ -4150,6 +4564,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 30.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB125020620": {
@@ -4160,6 +4575,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 47.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB125021220": {
@@ -4170,6 +4586,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 54.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB125040010": {
@@ -4180,6 +4597,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 61.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB125060020": {
@@ -4190,6 +4608,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 66.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB160040010": {
@@ -4200,6 +4619,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 139.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBB160080010": {
@@ -4210,6 +4630,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 216.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VBS127010010": {
@@ -4220,6 +4641,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 37.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP132100010": {
@@ -4230,6 +4652,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP132125010": {
@@ -4240,6 +4663,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP132200010": {
@@ -4250,6 +4674,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP133050010": {
@@ -4260,6 +4685,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 5.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP133060010": {
@@ -4270,6 +4696,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 5.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP133080010": {
@@ -4280,6 +4707,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 5.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP133100010": {
@@ -4290,6 +4718,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 5.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP134030020": {
@@ -4300,6 +4729,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 12.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP134040020": {
@@ -4310,6 +4740,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 12.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP134060020": {
@@ -4320,6 +4751,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 12.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP134080020": {
@@ -4330,6 +4762,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 12.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP134100020": {
@@ -4340,6 +4773,7 @@
       "dimensions": "8 x 12 x 42",
       "weight": null,
       "advice_price": 12.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP000050001": {
@@ -4350,6 +4784,7 @@
       "dimensions": "25 x 30 x 52",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP136400010": {
@@ -4360,6 +4795,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP136500010": {
@@ -4370,6 +4806,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138040020": {
@@ -4380,6 +4817,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138060020": {
@@ -4390,6 +4828,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138080020": {
@@ -4400,6 +4839,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138100020": {
@@ -4410,6 +4850,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138125020": {
@@ -4420,6 +4861,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138150020": {
@@ -4430,6 +4872,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138175020": {
@@ -4440,6 +4883,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138200020": {
@@ -4450,6 +4894,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138225020": {
@@ -4460,6 +4905,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138250020": {
@@ -4470,6 +4916,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138300020": {
@@ -4480,6 +4927,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138400020": {
@@ -4490,6 +4938,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP138500020": {
@@ -4500,6 +4949,7 @@
       "dimensions": "9 x 19 x 67",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP000100001": {
@@ -4510,6 +4960,7 @@
       "dimensions": "39 x 39 x 97",
       "weight": null,
       "advice_price": 12.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP050060000": {
@@ -4520,6 +4971,7 @@
       "dimensions": "50 x 182 x 80",
       "weight": null,
       "advice_price": 30.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP100200100": {
@@ -4530,6 +4982,7 @@
       "dimensions": "45 x 33 x 73",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP100400070": {
@@ -4540,6 +4993,7 @@
       "dimensions": "5 x 40 x 180",
       "weight": null,
       "advice_price": 41.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP143300020": {
@@ -4550,6 +5004,7 @@
       "dimensions": "10 x 20 x 81",
       "weight": null,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP143400020": {
@@ -4560,6 +5015,7 @@
       "dimensions": "10 x 20 x 81",
       "weight": null,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP143500020": {
@@ -4570,6 +5026,7 @@
       "dimensions": "10 x 20 x 81",
       "weight": null,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP106100000": {
@@ -4580,6 +5037,7 @@
       "dimensions": "44 x 25 x 87",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CIP140325000": {
@@ -4590,6 +5048,7 @@
       "dimensions": "15 x 82 x 20",
       "weight": null,
       "advice_price": 53.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900480100": {
@@ -4600,6 +5059,7 @@
       "dimensions": "124 x 187 x 33",
       "weight": null,
       "advice_price": 602.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900495100": {
@@ -4610,6 +5070,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 23.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900451100": {
@@ -4620,6 +5081,7 @@
       "dimensions": "48 x 154 x 78",
       "weight": 0.4,
       "advice_price": 265.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900450110": {
@@ -4630,6 +5092,7 @@
       "dimensions": "48 x 154 x 78",
       "weight": 0.4,
       "advice_price": 265.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900455050": {
@@ -4640,6 +5103,7 @@
       "dimensions": "87 x 128 x 12",
       "weight": null,
       "advice_price": 235.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900455150": {
@@ -4650,6 +5114,7 @@
       "dimensions": "97 x 136 x 12",
       "weight": null,
       "advice_price": 262.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900460050": {
@@ -4660,6 +5125,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 26.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900465050": {
@@ -4670,6 +5136,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900455070": {
@@ -4680,6 +5147,7 @@
       "dimensions": "113 x 176 x 13",
       "weight": null,
       "advice_price": 346.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900455170": {
@@ -4690,6 +5158,7 @@
       "dimensions": "120 x 184 x 13",
       "weight": null,
       "advice_price": 386.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900465070": {
@@ -4700,6 +5169,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 22.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900800150": {
@@ -4710,6 +5180,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900400100": {
@@ -4720,6 +5191,7 @@
       "dimensions": "46 x 142 x 96",
       "weight": null,
       "advice_price": 190.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS000001000": {
@@ -4730,6 +5202,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 22.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900100200": {
@@ -4740,6 +5213,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 24.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900200400": {
@@ -4750,6 +5224,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 142.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "VPN000200000": {
@@ -4760,6 +5235,7 @@
       "dimensions": "65 x 120 x 40",
       "weight": null,
       "advice_price": 198.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP900600100": {
@@ -4770,6 +5246,7 @@
       "dimensions": "48 x 109 x 25",
       "weight": null,
       "advice_price": 354.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPP920140100": {
@@ -4780,6 +5257,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 105.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REC020005010": {
@@ -4790,6 +5268,7 @@
       "dimensions": "65 x 120 x 40",
       "weight": null,
       "advice_price": 142.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "DMC000200010R": {
@@ -4800,6 +5279,7 @@
       "dimensions": "65 x 120 x 40",
       "weight": null,
       "advice_price": 125.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REC030001210": {
@@ -4810,6 +5290,7 @@
       "dimensions": "65 x 60 x 40",
       "weight": null,
       "advice_price": 93.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REC010001110": {
@@ -4820,6 +5301,7 @@
       "dimensions": "65 x 120 x 40",
       "weight": null,
       "advice_price": 80.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REC040010210R": {
@@ -4830,6 +5312,7 @@
       "dimensions": "65 x 60 x 40",
       "weight": null,
       "advice_price": 22.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REC000300010R": {
@@ -4840,6 +5323,7 @@
       "dimensions": "65 x 120 x 40",
       "weight": null,
       "advice_price": 139.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPA000100010R": {
@@ -4850,6 +5334,7 @@
       "dimensions": "65 x 120 x 40",
       "weight": null,
       "advice_price": 62.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "GSM100100400": {
@@ -4860,6 +5345,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 213.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "GSM100200400": {
@@ -4870,6 +5356,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 213.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "GSM100300400": {
@@ -4880,6 +5367,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 213.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "GSM900100100": {
@@ -4890,6 +5378,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 32.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "GSM900100400": {
@@ -4900,6 +5389,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 32.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "GSM900200100": {
@@ -4910,6 +5400,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 32.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ANT100200100": {
@@ -4920,6 +5411,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 55.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ANT100200200": {
@@ -4930,6 +5422,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 60.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030543020": {
@@ -4940,6 +5433,7 @@
       "dimensions": "23 x 123 x 66",
       "weight": null,
       "advice_price": 231.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030540010": {
@@ -4950,6 +5444,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 94.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS050300010": {
@@ -4960,6 +5455,7 @@
       "dimensions": "80 x 150 x 50",
       "weight": null,
       "advice_price": 27.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPA000100000R": {
@@ -4970,6 +5466,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": null,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REC000300000R": {
@@ -4980,6 +5477,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": null,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "DMC000200000R": {
@@ -4990,6 +5488,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": null,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS050400000": {
@@ -5000,6 +5499,7 @@
       "dimensions": "165 x 135 x 65",
       "weight": null,
       "advice_price": 36.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS050500000": {
@@ -5010,6 +5510,7 @@
       "dimensions": "130 x 85 x 45",
       "weight": null,
       "advice_price": 25.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS050600000": {
@@ -5020,6 +5521,7 @@
       "dimensions": "245 x 135 x 65",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS060000100": {
@@ -5030,6 +5532,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 8.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030530203": {
@@ -5040,6 +5543,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030530209": {
@@ -5050,6 +5554,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030530218": {
@@ -5060,6 +5565,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030530230": {
@@ -5070,6 +5576,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030530250": {
@@ -5080,6 +5587,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 18.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030530310": {
@@ -5090,6 +5598,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 21.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030531203": {
@@ -5100,6 +5609,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030531209": {
@@ -5110,6 +5620,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030531218": {
@@ -5120,6 +5631,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030531230": {
@@ -5130,6 +5642,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030531250": {
@@ -5140,6 +5653,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 18.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030531320": {
@@ -5150,6 +5664,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 21.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030560100": {
@@ -5160,6 +5675,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 35.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030560200": {
@@ -5170,6 +5686,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 37.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030560300": {
@@ -5180,6 +5697,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 40.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030560500": {
@@ -5190,6 +5708,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 45.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030530010": {
@@ -5200,6 +5719,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 30.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030530030": {
@@ -5210,6 +5730,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 30.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030130010": {
@@ -5220,6 +5741,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 83.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030140000": {
@@ -5230,6 +5752,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 73.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030140030": {
@@ -5240,6 +5763,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 64.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030532010": {
@@ -5250,6 +5774,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 546.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030520200": {
@@ -5260,6 +5785,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 75.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030120210": {
@@ -5270,6 +5796,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 58.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030200000": {
@@ -5280,6 +5807,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 31.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030520500": {
@@ -5290,6 +5818,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 29.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030710118": {
@@ -5300,6 +5829,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030710150": {
@@ -5310,6 +5840,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030720018": {
@@ -5320,6 +5851,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030720050": {
@@ -5330,6 +5862,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030700000": {
@@ -5340,6 +5873,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030520115": {
@@ -5350,6 +5884,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 151.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030550120": {
@@ -5360,6 +5895,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030550220": {
@@ -5370,6 +5906,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030550320": {
@@ -5380,6 +5917,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 20.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030510120": {
@@ -5390,6 +5928,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030065510": {
@@ -5400,6 +5939,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 20.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CSE000100000": {
@@ -5410,6 +5950,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 52.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CTR110000500": {
@@ -5420,6 +5961,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 29.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CTR110000550": {
@@ -5430,6 +5972,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 32.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CTR110002050": {
@@ -5440,6 +5983,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CTR120000500": {
@@ -5450,6 +5994,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 29.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CTR120000550": {
@@ -5460,6 +6005,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 32.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CTR120002050": {
@@ -5470,6 +6016,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CTR140050100": {
@@ -5480,6 +6027,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 42.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS000020000": {
@@ -5490,6 +6038,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 22.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS000100000": {
@@ -5500,6 +6049,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS070400100": {
@@ -5510,6 +6060,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ADA500100100": {
@@ -5520,6 +6071,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 15.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ADA500140100": {
@@ -5530,6 +6082,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 17.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ADA500180100": {
@@ -5540,6 +6093,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 19.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030536011": {
@@ -5550,6 +6104,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 42.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REL100100000": {
@@ -5560,6 +6115,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 880.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REL300100000": {
@@ -5570,6 +6126,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 48.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REL300300000": {
@@ -5580,6 +6137,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 84.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REL200100100": {
@@ -5590,6 +6148,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 112.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REL200200100": {
@@ -5600,6 +6159,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "REL200300100": {
@@ -5610,6 +6170,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 183.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030572018": {
@@ -5620,6 +6181,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 30.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030572050": {
@@ -5630,6 +6192,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS300420100": {
@@ -5640,6 +6203,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 121.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS300420200": {
@@ -5650,6 +6214,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 105.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "RCD000300200": {
@@ -5660,6 +6225,7 @@
       "dimensions": "230 x 380 x 100",
       "weight": null,
       "advice_price": 1245.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAM010700000": {
@@ -5670,6 +6236,7 @@
       "dimensions": "65 x 65 x 30",
       "weight": 0.3,
       "advice_price": 106.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAM010702000": {
@@ -5680,6 +6247,7 @@
       "dimensions": "65 x 65 x 30",
       "weight": 0.3,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAM010702200": {
@@ -5690,6 +6258,7 @@
       "dimensions": "65 x 65 x 30",
       "weight": 0.3,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAM030712000": {
@@ -5700,6 +6269,7 @@
       "dimensions": "65 x 65 x 30",
       "weight": 0.3,
       "advice_price": 152.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAM030712200": {
@@ -5710,6 +6280,7 @@
       "dimensions": "65 x 65 x 30",
       "weight": 0.3,
       "advice_price": 152.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAM010700100": {
@@ -5720,6 +6291,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 541.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAM030710100": {
@@ -5730,6 +6302,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 566.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU050130050": {
@@ -5740,6 +6313,7 @@
       "dimensions": "44 x 120 x 44",
       "weight": null,
       "advice_price": 76.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU050150050": {
@@ -5750,6 +6324,7 @@
       "dimensions": "46 x 120 x 54",
       "weight": null,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU050210050": {
@@ -5760,6 +6335,7 @@
       "dimensions": "68 x 120 x 54",
       "weight": null,
       "advice_price": 177.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU050220050": {
@@ -5770,6 +6346,7 @@
       "dimensions": "68 x 120 x 76",
       "weight": null,
       "advice_price": 241.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU065130050": {
@@ -5780,6 +6357,7 @@
       "dimensions": "44 x 120 x 38",
       "weight": null,
       "advice_price": 76.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU065150050": {
@@ -5790,6 +6368,7 @@
       "dimensions": "46 x 120 x 54",
       "weight": null,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU065210050": {
@@ -5800,6 +6379,7 @@
       "dimensions": "68 x 120 x 54",
       "weight": null,
       "advice_price": 177.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU065220050": {
@@ -5810,6 +6390,7 @@
       "dimensions": "68 x 120 x 76",
       "weight": null,
       "advice_price": 241.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU500050100": {
@@ -5820,6 +6401,7 @@
       "dimensions": "45 x 28 x 120",
       "weight": null,
       "advice_price": 24.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU102050200": {
@@ -5830,6 +6412,7 @@
       "dimensions": "80 x 30 x 168",
       "weight": null,
       "advice_price": 79.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU202050200": {
@@ -5840,6 +6423,7 @@
       "dimensions": "80 x 50 x 168",
       "weight": null,
       "advice_price": 124.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHU602050200": {
@@ -5850,6 +6434,7 @@
       "dimensions": "135 x 60 x 168",
       "weight": null,
       "advice_price": 218.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG080202000": {
@@ -5860,6 +6445,7 @@
       "dimensions": "60 x 120 x 75",
       "weight": 0.5,
       "advice_price": 42.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG080201000": {
@@ -5870,6 +6456,7 @@
       "dimensions": "60 x 120 x 90",
       "weight": 0.6,
       "advice_price": 53.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG100301000R": {
@@ -5880,6 +6467,7 @@
       "dimensions": "60 x 120 x 115",
       "weight": 0.8,
       "advice_price": 72.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG120201020R": {
@@ -5890,6 +6478,7 @@
       "dimensions": "60 x 120 x 115",
       "weight": 0.8,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG140301020R": {
@@ -5900,6 +6489,7 @@
       "dimensions": "60 x 120 x 150",
       "weight": 1.1,
       "advice_price": 102.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG160201020": {
@@ -5910,6 +6500,7 @@
       "dimensions": "60 x 120 x 150",
       "weight": 1.1,
       "advice_price": 96.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG180301020": {
@@ -5920,6 +6511,7 @@
       "dimensions": "60 x 120 x 200",
       "weight": 1.5,
       "advice_price": 117.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG100201020": {
@@ -5930,6 +6522,7 @@
       "dimensions": "65 x 120 x 200",
       "weight": 1.4,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG100301020": {
@@ -5940,6 +6533,7 @@
       "dimensions": "65 x 120 x 200",
       "weight": 1.4,
       "advice_price": 123.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG200201020": {
@@ -5950,6 +6544,7 @@
       "dimensions": "65 x 120 x 200",
       "weight": 1.4,
       "advice_price": 128.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ARG200301020": {
@@ -5960,6 +6555,7 @@
       "dimensions": "65 x 120 x 200",
       "weight": 1.4,
       "advice_price": 150.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010120011": {
@@ -5970,6 +6566,7 @@
       "dimensions": "46 x 46 x 80",
       "weight": 0.1,
       "advice_price": 52.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010120110R": {
@@ -5980,6 +6577,7 @@
       "dimensions": "46 x 46 x 80",
       "weight": 0.1,
       "advice_price": 104.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010230010": {
@@ -5990,6 +6588,7 @@
       "dimensions": "65 x 100 x 50",
       "weight": 0.3,
       "advice_price": 129.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010400000": {
@@ -6000,6 +6599,7 @@
       "dimensions": "78 x 102 x 110",
       "weight": 0.9,
       "advice_price": 275.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR020400000": {
@@ -6010,6 +6610,7 @@
       "dimensions": "78 x 102 x 110",
       "weight": 0.9,
       "advice_price": 275.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BCD000402000": {
@@ -6020,6 +6621,7 @@
       "dimensions": "60 x 120 x 75",
       "weight": 0.6,
       "advice_price": 39.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BCD000802000": {
@@ -6030,6 +6632,7 @@
       "dimensions": "60 x 120 x 75",
       "weight": 0.8,
       "advice_price": 48.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BBA000100100": {
@@ -6040,6 +6643,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 52.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPR000065400": {
@@ -6050,6 +6654,7 @@
       "dimensions": "40 x 48 x 106",
       "weight": 0.2,
       "advice_price": 39.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPR000100400": {
@@ -6060,6 +6665,7 @@
       "dimensions": "59 x 42 x 115",
       "weight": 0.6,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPR000220400": {
@@ -6070,6 +6676,7 @@
       "dimensions": "62 x 123 x 120",
       "weight": 0.8,
       "advice_price": 94.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPR048100400": {
@@ -6080,6 +6687,7 @@
       "dimensions": "62 x 123 x 120",
       "weight": 0.8,
       "advice_price": 128.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPR065022000": {
@@ -6090,6 +6698,7 @@
       "dimensions": "40 x 48 x 106",
       "weight": 0.2,
       "advice_price": 58.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPR110022000": {
@@ -6100,6 +6709,7 @@
       "dimensions": "59 x 42 x 115",
       "weight": 0.6,
       "advice_price": 76.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPR122022000": {
@@ -6110,6 +6720,7 @@
       "dimensions": "62 x 123 x 120",
       "weight": 0.8,
       "advice_price": 113.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPR110048000": {
@@ -6120,6 +6731,7 @@
       "dimensions": "62 x 123 x 120",
       "weight": 0.8,
       "advice_price": 147.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC145110512": {
@@ -6130,6 +6742,7 @@
       "dimensions": "440 x 313 x 126",
       "weight": 8.0,
       "advice_price": 1182.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC145120510": {
@@ -6140,6 +6753,7 @@
       "dimensions": "487 x 434 x 146",
       "weight": 14.0,
       "advice_price": 2069.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010005000": {
@@ -6150,6 +6764,7 @@
       "dimensions": "70 x 133 x 34",
       "weight": 0.2,
       "advice_price": 19.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010010000": {
@@ -6160,6 +6775,7 @@
       "dimensions": "70 x 133 x 34",
       "weight": 0.2,
       "advice_price": 22.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010020020": {
@@ -6170,6 +6786,7 @@
       "dimensions": "70 x 133 x 34",
       "weight": 0.2,
       "advice_price": 29.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010030020": {
@@ -6180,6 +6797,7 @@
       "dimensions": "70 x 133 x 34",
       "weight": 0.2,
       "advice_price": 41.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010005050": {
@@ -6190,6 +6808,7 @@
       "dimensions": "96 x 169 x 36",
       "weight": 0.2,
       "advice_price": 26.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010010050": {
@@ -6200,6 +6819,7 @@
       "dimensions": "96 x 169 x 36",
       "weight": 0.2,
       "advice_price": 29.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010020050": {
@@ -6210,6 +6830,7 @@
       "dimensions": "96 x 169 x 36",
       "weight": 0.2,
       "advice_price": 37.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010020060": {
@@ -6220,6 +6841,7 @@
       "dimensions": "102 x 184 x 48",
       "weight": 0.2,
       "advice_price": 60.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010030050": {
@@ -6230,6 +6852,7 @@
       "dimensions": "102 x 184 x 48",
       "weight": 0.2,
       "advice_price": 48.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC040010050": {
@@ -6240,6 +6863,7 @@
       "dimensions": "102 x 184 x 48",
       "weight": 0.2,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC040020050": {
@@ -6250,6 +6874,7 @@
       "dimensions": "102 x 184 x 48",
       "weight": 0.2,
       "advice_price": 39.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC040030050": {
@@ -6260,6 +6885,7 @@
       "dimensions": "102 x 184 x 48",
       "weight": 0.2,
       "advice_price": 44.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010005010": {
@@ -6270,6 +6896,7 @@
       "dimensions": "70 x 138 x 37",
       "weight": 0.2,
       "advice_price": 26.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010010010": {
@@ -6280,6 +6907,7 @@
       "dimensions": "70 x 138 x 37",
       "weight": 0.2,
       "advice_price": 29.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010020110": {
@@ -6290,6 +6918,7 @@
       "dimensions": "82 x 160 x 48",
       "weight": 0.3,
       "advice_price": 51.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010030010": {
@@ -6300,6 +6929,7 @@
       "dimensions": "100 x 200 x 57",
       "weight": 0.5,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC900300000": {
@@ -6310,6 +6940,7 @@
       "dimensions": "49 x 113 x 113",
       "weight": 0.2,
       "advice_price": 44.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC940100100": {
@@ -6320,6 +6951,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 12.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC940100200": {
@@ -6330,6 +6962,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 12.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010010050R": {
@@ -6340,6 +6973,7 @@
       "dimensions": "100 x 113 x 40",
       "weight": 0.4,
       "advice_price": 46.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010015050R": {
@@ -6350,6 +6984,7 @@
       "dimensions": "100 x 113 x 40",
       "weight": 0.5,
       "advice_price": 51.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010015200R": {
@@ -6360,6 +6995,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 66.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC110020170R": {
@@ -6370,6 +7006,7 @@
       "dimensions": "100 x 113 x 50",
       "weight": 0.7,
       "advice_price": 78.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC020030200": {
@@ -6380,6 +7017,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 119.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC020050200": {
@@ -6390,6 +7028,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 179.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC020035000": {
@@ -6400,6 +7039,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 179.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115045222": {
@@ -6410,6 +7050,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 215.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010060200": {
@@ -6420,6 +7061,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 340.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010060300": {
@@ -6430,6 +7072,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 340.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010070200": {
@@ -6440,6 +7083,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 375.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC010070300": {
@@ -6450,6 +7094,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 375.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115110420": {
@@ -6460,6 +7105,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 531.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125070441": {
@@ -6470,6 +7116,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 531.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125110441": {
@@ -6480,6 +7127,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 651.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC075010060R": {
@@ -6490,6 +7138,7 @@
       "dimensions": "100 x 113 x 40",
       "weight": 0.4,
       "advice_price": 63.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC075015060R": {
@@ -6500,6 +7149,7 @@
       "dimensions": "100 x 113 x 40",
       "weight": 0.5,
       "advice_price": 68.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC110015060R": {
@@ -6510,6 +7160,7 @@
       "dimensions": "100 x 113 x 47",
       "weight": 0.6,
       "advice_price": 84.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC110020160R": {
@@ -6520,6 +7171,7 @@
       "dimensions": "100 x 113 x 50",
       "weight": 0.7,
       "advice_price": 96.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC110030210": {
@@ -6530,6 +7182,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 137.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC110050210": {
@@ -6540,6 +7193,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 197.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115035210": {
@@ -6550,6 +7204,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 197.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115045212": {
@@ -6560,6 +7215,7 @@
       "dimensions": "130 x 186 x 70",
       "weight": 1.3,
       "advice_price": 233.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115060211": {
@@ -6570,6 +7226,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 375.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115060311": {
@@ -6580,6 +7237,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 375.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115070211": {
@@ -6590,6 +7248,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 409.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115070411": {
@@ -6600,6 +7259,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 443.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115070511": {
@@ -6610,6 +7270,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 443.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115085411": {
@@ -6620,6 +7281,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 483.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115085511": {
@@ -6630,6 +7292,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 494.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115110411": {
@@ -6640,6 +7303,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 552.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC115110511": {
@@ -6650,6 +7314,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 562.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125060221": {
@@ -6660,6 +7325,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 443.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125060321": {
@@ -6670,6 +7336,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 443.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125070221": {
@@ -6680,6 +7347,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 511.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125070421": {
@@ -6690,6 +7358,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 545.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125070521": {
@@ -6700,6 +7369,7 @@
       "dimensions": "200 x 250 x 95",
       "weight": 3.0,
       "advice_price": 545.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125085411": {
@@ -6710,6 +7380,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 586.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125085511": {
@@ -6720,6 +7391,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 596.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125110412": {
@@ -6730,6 +7402,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 654.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC125110512": {
@@ -6740,6 +7413,7 @@
       "dimensions": "216 x 295 x 103",
       "weight": 4.5,
       "advice_price": 664.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS030550500": {
@@ -6750,6 +7424,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC900650010": {
@@ -6760,6 +7435,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 34.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC900500000": {
@@ -6770,6 +7446,7 @@
       "dimensions": "65 x 65 x 30",
       "weight": 0.3,
       "advice_price": 54.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SBS050150200": {
@@ -6780,6 +7457,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 42.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHS121409230": {
@@ -6790,6 +7468,7 @@
       "dimensions": "148 x 204 x 67",
       "weight": 0.4,
       "advice_price": 87.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHS900120050": {
@@ -6800,6 +7479,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 12.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SHS800300300": {
@@ -6810,6 +7490,7 @@
       "dimensions": "268 x 207 x 364",
       "weight": null,
       "advice_price": 46.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC950100000": {
@@ -6820,6 +7501,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 25.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC950120000": {
@@ -6830,6 +7512,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 25.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC950140000": {
@@ -6840,6 +7523,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 25.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC950200000": {
@@ -6850,6 +7534,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 31.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC950300210": {
@@ -6860,6 +7545,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC950300310": {
@@ -6870,6 +7556,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC950400210": {
@@ -6880,6 +7567,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCC950400310": {
@@ -6890,6 +7578,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 38.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT406225084": {
@@ -6900,6 +7589,7 @@
       "dimensions": "320 x 176 x 247",
       "weight": 31.0,
       "advice_price": 332.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT212070084": {
@@ -6910,6 +7600,7 @@
       "dimensions": "151 x 65 x 101",
       "weight": 2.3,
       "advice_price": 24.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT212120086": {
@@ -6920,6 +7611,7 @@
       "dimensions": "151 x 98 x 101",
       "weight": 4.4,
       "advice_price": 42.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT212200084": {
@@ -6930,6 +7622,7 @@
       "dimensions": "181 x 77 x 167",
       "weight": 5.8,
       "advice_price": 60.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412350084": {
@@ -6940,6 +7633,7 @@
       "dimensions": "197 x 165 x 170",
       "weight": 15.0,
       "advice_price": 141.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412550084": {
@@ -6950,6 +7644,7 @@
       "dimensions": "229 x 138 x 227",
       "weight": 80.0,
       "advice_price": 162.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412800084": {
@@ -6960,6 +7655,7 @@
       "dimensions": "350 x 167 x 183",
       "weight": 130.0,
       "advice_price": 239.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412101084": {
@@ -6970,6 +7666,7 @@
       "dimensions": "330 x 171 x 220",
       "weight": 170.0,
       "advice_price": 300.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412121084": {
@@ -6980,6 +7677,7 @@
       "dimensions": "410 x 176 x 227",
       "weight": 200.0,
       "advice_price": 353.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412151084": {
@@ -6990,6 +7688,7 @@
       "dimensions": "485 x 172 x 240",
       "weight": 220.0,
       "advice_price": 448.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412201084": {
@@ -7000,6 +7699,7 @@
       "dimensions": "522 x 238 x 240",
       "weight": 250.0,
       "advice_price": 548.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412800085": {
@@ -7010,6 +7710,7 @@
       "dimensions": "350 x 167 x 183",
       "weight": 130.0,
       "advice_price": 239.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412101085": {
@@ -7020,6 +7721,7 @@
       "dimensions": "330 x 171 x 220",
       "weight": 170.0,
       "advice_price": 285.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412151085": {
@@ -7030,6 +7732,7 @@
       "dimensions": "485 x 172 x 240",
       "weight": 220.0,
       "advice_price": 448.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412201085": {
@@ -7040,6 +7743,7 @@
       "dimensions": "522 x 238 x 240",
       "weight": 250.0,
       "advice_price": 548.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412124081": {
@@ -7050,6 +7754,7 @@
       "dimensions": "522 x 240 x 224",
       "weight": 250.0,
       "advice_price": 558.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412015081": {
@@ -7060,6 +7765,7 @@
       "dimensions": "151 x 100 x 103",
       "weight": 4.1,
       "advice_price": 45.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412025081": {
@@ -7070,6 +7776,7 @@
       "dimensions": "181 x 77 x 175",
       "weight": 6.5,
       "advice_price": 64.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412038081": {
@@ -7080,6 +7787,7 @@
       "dimensions": "267 x 77 x 175",
       "weight": 9.5,
       "advice_price": 116.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412060082": {
@@ -7090,6 +7798,7 @@
       "dimensions": "224 x 135 x 178",
       "weight": 14.0,
       "advice_price": 169.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412110081": {
@@ -7100,6 +7809,7 @@
       "dimensions": "260 x 168 x 215",
       "weight": 170.0,
       "advice_price": 297.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412112081": {
@@ -7110,6 +7820,7 @@
       "dimensions": "330 x 171 x 214",
       "weight": 220.0,
       "advice_price": 377.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412117081": {
@@ -7120,6 +7831,7 @@
       "dimensions": "339 x 172 x 281",
       "weight": 290.0,
       "advice_price": 475.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412123081": {
@@ -7130,6 +7842,7 @@
       "dimensions": "532 x 207 x 226",
       "weight": 400.0,
       "advice_price": 629.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412105164": {
@@ -7140,6 +7853,7 @@
       "dimensions": "395 x 110 x 293",
       "weight": 200.0,
       "advice_price": 331.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412151164": {
@@ -7150,6 +7864,7 @@
       "dimensions": "548 x 105 x 316",
       "weight": 220.0,
       "advice_price": 462.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412181164": {
@@ -7160,6 +7875,7 @@
       "dimensions": "546 x 125 x 323",
       "weight": 250.0,
       "advice_price": 527.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412550104": {
@@ -7170,6 +7886,7 @@
       "dimensions": "229 x 138 x 227",
       "weight": 70.0,
       "advice_price": 187.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412800104": {
@@ -7180,6 +7897,7 @@
       "dimensions": "350 x 167 x 183",
       "weight": 120.0,
       "advice_price": 246.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412101104": {
@@ -7190,6 +7908,7 @@
       "dimensions": "330 x 171 x 220",
       "weight": 150.0,
       "advice_price": 305.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412121104": {
@@ -7200,6 +7919,7 @@
       "dimensions": "410 x 176 x 227",
       "weight": 180.0,
       "advice_price": 358.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412151104": {
@@ -7210,6 +7930,7 @@
       "dimensions": "485 x 172 x 240",
       "weight": 200.0,
       "advice_price": 461.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412201104": {
@@ -7220,6 +7941,7 @@
       "dimensions": "522 x 238 x 240",
       "weight": 220.0,
       "advice_price": 564.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT412126101": {
@@ -7230,6 +7952,7 @@
       "dimensions": "520 x 268 x 223",
       "weight": 250.0,
       "advice_price": 745.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT612110081": {
@@ -7240,6 +7963,7 @@
       "dimensions": "410 x 180 x 210",
       "weight": 36.0,
       "advice_price": 336.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT612116081": {
@@ -7250,6 +7974,7 @@
       "dimensions": "532 x 207 x 226",
       "weight": 55.0,
       "advice_price": 503.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512050610": {
@@ -7260,6 +7985,7 @@
       "dimensions": "199 x 187 x 147",
       "weight": 7.0,
       "advice_price": 444.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512110610": {
@@ -7270,6 +7996,7 @@
       "dimensions": "197 x 321 x 152",
       "weight": 14.0,
       "advice_price": 729.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512110620": {
@@ -7280,6 +8007,7 @@
       "dimensions": "235 x 197 x 160",
       "weight": 9.5,
       "advice_price": 624.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512115620": {
@@ -7290,6 +8018,7 @@
       "dimensions": "205 x 250 x 205",
       "weight": 15.0,
       "advice_price": 766.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512118610": {
@@ -7300,6 +8029,7 @@
       "dimensions": "237 x 321 x 152",
       "weight": 21.0,
       "advice_price": 791.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512120610": {
@@ -7310,6 +8040,7 @@
       "dimensions": "237 x 321 x 152",
       "weight": 20.0,
       "advice_price": 1068.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512120620": {
@@ -7320,6 +8051,7 @@
       "dimensions": "235 x 341 x 160",
       "weight": 18.0,
       "advice_price": 1015.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512130620": {
@@ -7330,6 +8062,7 @@
       "dimensions": "206 x 447 x 205",
       "weight": 28.0,
       "advice_price": 1589.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT524110610": {
@@ -7340,6 +8073,7 @@
       "dimensions": "197 x 650 x 163",
       "weight": 27.0,
       "advice_price": 1340.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT524110620": {
@@ -7350,6 +8084,7 @@
       "dimensions": "235 x 341 x 160",
       "weight": 19.0,
       "advice_price": 1120.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT524120610": {
@@ -7360,6 +8095,7 @@
       "dimensions": "237 x 650 x 163",
       "weight": 38.0,
       "advice_price": 2043.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT524120620": {
@@ -7370,6 +8106,7 @@
       "dimensions": "235 x 648 x 162",
       "weight": 37.0,
       "advice_price": 1941.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT524130620": {
@@ -7380,6 +8117,7 @@
       "dimensions": "206 x 841 x 205",
       "weight": 55.0,
       "advice_price": 2695.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT548110620": {
@@ -7390,6 +8128,7 @@
       "dimensions": "235 x 648 x 162",
       "weight": 37.0,
       "advice_price": 2135.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BMS300200000": {
@@ -7400,6 +8139,7 @@
       "dimensions": "30 x 105 x 72",
       "weight": 0.2,
       "advice_price": 125.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BMS300200200": {
@@ -7410,6 +8150,7 @@
       "dimensions": "24 x 95 x 106",
       "weight": 0.2,
       "advice_price": 166.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BMS300200300": {
@@ -7420,6 +8161,7 @@
       "dimensions": "24 x 95 x 106",
       "weight": 0.2,
       "advice_price": 158.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BMS400100000": {
@@ -7430,6 +8172,7 @@
       "dimensions": "43 x 106 x 23",
       "weight": 0.1,
       "advice_price": 52.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BMS400100300": {
@@ -7440,6 +8183,7 @@
       "dimensions": "43 x 106 x 23",
       "weight": 0.1,
       "advice_price": 86.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BMS800200104": {
@@ -7450,6 +8194,7 @@
       "dimensions": "23 x 67 x 58",
       "weight": null,
       "advice_price": 42.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010120450": {
@@ -7460,6 +8205,7 @@
       "dimensions": "46 x 46 x 80",
       "weight": 0.1,
       "advice_price": 70.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR020120450": {
@@ -7470,6 +8216,7 @@
       "dimensions": "46 x 46 x 80",
       "weight": 0.1,
       "advice_price": 70.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010120430": {
@@ -7480,6 +8227,7 @@
       "dimensions": "46 x 46 x 80",
       "weight": 0.1,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR020120430": {
@@ -7490,6 +8238,7 @@
       "dimensions": "46 x 46 x 80",
       "weight": 0.1,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010120412": {
@@ -7500,6 +8249,7 @@
       "dimensions": "46 x 46 x 80",
       "weight": 0.1,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010230450": {
@@ -7510,6 +8260,7 @@
       "dimensions": "65 x 100 x 50",
       "weight": 0.3,
       "advice_price": 173.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR020230450": {
@@ -7520,6 +8271,7 @@
       "dimensions": "65 x 100 x 50",
       "weight": 0.3,
       "advice_price": 173.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010230430": {
@@ -7530,6 +8282,7 @@
       "dimensions": "65 x 100 x 50",
       "weight": 0.3,
       "advice_price": 173.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR020230430": {
@@ -7540,6 +8293,7 @@
       "dimensions": "65 x 100 x 50",
       "weight": 0.3,
       "advice_price": 173.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "CYR010230412": {
@@ -7550,6 +8304,7 @@
       "dimensions": "65 x 100 x 50",
       "weight": 0.3,
       "advice_price": 173.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BMS210055000": {
@@ -7560,6 +8315,7 @@
       "dimensions": "65 x 120 x 340",
       "weight": 1.8,
       "advice_price": 249.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BMS110022000": {
@@ -7570,6 +8326,7 @@
       "dimensions": "65 x 120 x 224",
       "weight": 1.6,
       "advice_price": 145.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "ASS070200100": {
@@ -7580,6 +8337,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PPP012020000": {
@@ -7590,6 +8348,7 @@
       "dimensions": "132 x 190 x 172",
       "weight": 3.8,
       "advice_price": 407.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PPP012030000": {
@@ -7600,6 +8359,7 @@
       "dimensions": "172 x 190 x 172",
       "weight": 5.4,
       "advice_price": 565.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PPP012040000": {
@@ -7610,6 +8370,7 @@
       "dimensions": "212 x 190 x 172",
       "weight": 8.6,
       "advice_price": 706.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512020705": {
@@ -7620,6 +8381,7 @@
       "dimensions": "167 x 181 x 77",
       "weight": 3.5,
       "advice_price": 182.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512060705": {
@@ -7630,6 +8392,7 @@
       "dimensions": "213 x 229 x 138",
       "weight": 9.5,
       "advice_price": 411.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512110712": {
@@ -7640,6 +8403,7 @@
       "dimensions": "220 x 330 x 172",
       "weight": 14.0,
       "advice_price": 545.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512110740": {
@@ -7650,6 +8414,7 @@
       "dimensions": "273 x 173 x 173",
       "weight": null,
       "advice_price": 700.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "BAT512120705": {
@@ -7660,6 +8425,7 @@
       "dimensions": "208 x 520 x 269",
       "weight": 21.0,
       "advice_price": 960.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT512120740": {
@@ -7670,6 +8436,7 @@
       "dimensions": "466 x 198 x 173",
       "weight": null,
       "advice_price": 1143.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "BAT524050705": {
@@ -7680,6 +8447,7 @@
       "dimensions": "220 x 330 x 172",
       "weight": 14.0,
       "advice_price": 779.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BAT524110740": {
@@ -7690,6 +8458,7 @@
       "dimensions": "466 x 198 x 173",
       "weight": null,
       "advice_price": 1262.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "ASS032300010": {
@@ -7700,6 +8469,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 48.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "ASS032300030": {
@@ -7710,6 +8480,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 48.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "SPM040201200": {
@@ -7720,6 +8491,7 @@
       "dimensions": "",
       "weight": 1.9,
       "advice_price": 29.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM040301200": {
@@ -7730,6 +8502,7 @@
       "dimensions": "",
       "weight": 2.2,
       "advice_price": 34.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM040303603": {
@@ -7740,6 +8513,7 @@
       "dimensions": "",
       "weight": 1.8,
       "advice_price": 34.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM040401200": {
@@ -7750,6 +8524,7 @@
       "dimensions": "",
       "weight": 3.1,
       "advice_price": 43.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM040551200": {
@@ -7760,6 +8535,7 @@
       "dimensions": "",
       "weight": 4.0,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM040553603": {
@@ -7770,6 +8546,7 @@
       "dimensions": "",
       "weight": 3.4,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM040901200": {
@@ -7780,6 +8557,7 @@
       "dimensions": "",
       "weight": 6.1,
       "advice_price": 86.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM040953003": {
@@ -7790,6 +8568,7 @@
       "dimensions": "",
       "weight": 5.4,
       "advice_price": 86.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM041301200": {
@@ -7800,6 +8579,7 @@
       "dimensions": "",
       "weight": 8.0,
       "advice_price": 109.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM041501200": {
@@ -7810,6 +8590,7 @@
       "dimensions": "",
       "weight": 9.0,
       "advice_price": 109.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM041851200": {
@@ -7820,6 +8601,7 @@
       "dimensions": "",
       "weight": 11.0,
       "advice_price": 127.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM042152402": {
@@ -7830,6 +8612,7 @@
       "dimensions": "",
       "weight": 12.0,
       "advice_price": 154.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM043456803": {
@@ -7840,6 +8623,7 @@
       "dimensions": "",
       "weight": 17.0,
       "advice_price": 221.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPM043657203": {
@@ -7850,6 +8634,7 @@
       "dimensions": "",
       "weight": 18.0,
       "advice_price": 212.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPP040201200": {
@@ -7860,6 +8645,7 @@
       "dimensions": "",
       "weight": 1.9,
       "advice_price": 28.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPP040301200": {
@@ -7870,6 +8656,7 @@
       "dimensions": "",
       "weight": 2.8,
       "advice_price": 33.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPP040451200": {
@@ -7880,6 +8667,7 @@
       "dimensions": "",
       "weight": 3.1,
       "advice_price": 45.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPP041301200": {
@@ -7890,6 +8678,7 @@
       "dimensions": "",
       "weight": 9.0,
       "advice_price": 79.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPP041751200": {
@@ -7900,6 +8689,7 @@
       "dimensions": "",
       "weight": 11.0,
       "advice_price": 96.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPP042802000": {
@@ -7910,6 +8700,7 @@
       "dimensions": "",
       "weight": 18.0,
       "advice_price": 131.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SPP043302402": {
@@ -7920,6 +8711,7 @@
       "dimensions": "",
       "weight": 23.0,
       "advice_price": 143.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SLS300175100": {
@@ -7930,6 +8722,7 @@
       "dimensions": "",
       "weight": 0.1,
       "advice_price": 86.0,
+      "is_new": true,
       "source": "victron_pricelist"
     },
     "SCA000100000": {
@@ -7940,6 +8733,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 7.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA000300000": {
@@ -7950,6 +8744,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 11.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA000500000": {
@@ -7960,6 +8755,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 16.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA000100100": {
@@ -7970,6 +8766,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 9.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA000300100": {
@@ -7980,6 +8777,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 13.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA000500100": {
@@ -7990,6 +8788,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 20.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA001000100": {
@@ -8000,6 +8799,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 43.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA002000100": {
@@ -8010,6 +8810,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 80.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA500100000": {
@@ -8020,6 +8821,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 7.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA500200000": {
@@ -8030,6 +8832,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 7.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA520500000": {
@@ -8040,6 +8843,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 14.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "SCA520300000": {
@@ -8050,6 +8854,7 @@
       "dimensions": "",
       "weight": null,
       "advice_price": 10.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121251100": {
@@ -8060,6 +8865,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 93.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121251300": {
@@ -8070,6 +8876,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 93.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121251400": {
@@ -8080,6 +8887,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 93.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121371100": {
@@ -8090,6 +8898,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 120.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121371300": {
@@ -8100,6 +8909,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 120.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121371400": {
@@ -8110,6 +8920,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 120.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121501100": {
@@ -8120,6 +8931,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 150.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121501300": {
@@ -8130,6 +8942,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 150.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121501400": {
@@ -8140,6 +8953,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 150.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121801100": {
@@ -8150,6 +8964,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 243.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121801300": {
@@ -8160,6 +8975,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 243.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN121801400": {
@@ -8170,6 +8986,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 243.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122121110": {
@@ -8180,6 +8997,7 @@
       "dimensions": "117 x 232 x 362",
       "weight": 7.4,
       "advice_price": 286.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122121310": {
@@ -8190,6 +9008,7 @@
       "dimensions": "117 x 232 x 362",
       "weight": 7.4,
       "advice_price": 286.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122121410": {
@@ -8200,6 +9019,7 @@
       "dimensions": "117 x 232 x 362",
       "weight": 7.4,
       "advice_price": 286.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122161100": {
@@ -8210,6 +9030,7 @@
       "dimensions": "117 x 231 x 395",
       "weight": 7.4,
       "advice_price": 333.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122161300": {
@@ -8220,6 +9041,7 @@
       "dimensions": "117 x 231 x 395",
       "weight": 7.4,
       "advice_price": 333.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN122161400": {
@@ -8230,6 +9052,7 @@
       "dimensions": "117 x 231 x 395",
       "weight": 7.4,
       "advice_price": 333.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241251100": {
@@ -8240,6 +9063,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 103.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241251300": {
@@ -8250,6 +9074,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 103.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241251400": {
@@ -8260,6 +9085,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 103.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241371100": {
@@ -8270,6 +9096,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241371300": {
@@ -8280,6 +9107,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241371400": {
@@ -8290,6 +9118,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241501100": {
@@ -8300,6 +9129,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 166.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241501300": {
@@ -8310,6 +9140,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 166.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241501400": {
@@ -8320,6 +9151,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 166.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241801100": {
@@ -8330,6 +9162,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 270.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241801300": {
@@ -8340,6 +9173,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 270.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN241801400": {
@@ -8350,6 +9184,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 270.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242121100": {
@@ -8360,6 +9195,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 340.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242121300": {
@@ -8370,6 +9206,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 340.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN242121400": {
@@ -8380,6 +9217,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 340.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481251100": {
@@ -8390,6 +9228,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 103.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481251300": {
@@ -8400,6 +9239,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 2.4,
       "advice_price": 103.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481371100": {
@@ -8410,6 +9250,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481371300": {
@@ -8420,6 +9261,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481371400": {
@@ -8430,6 +9272,7 @@
       "dimensions": "86 x 165 x 260",
       "weight": 3.0,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481501100": {
@@ -8440,6 +9283,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 166.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481501300": {
@@ -8450,6 +9294,7 @@
       "dimensions": "86 x 172 x 275",
       "weight": 3.9,
       "advice_price": 166.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481801100": {
@@ -8460,6 +9305,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 270.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481801300": {
@@ -8470,6 +9316,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 270.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN481801400": {
@@ -8480,6 +9327,7 @@
       "dimensions": "105 x 216 x 305",
       "weight": 5.5,
       "advice_price": 270.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "PIN482121100": {
@@ -8490,6 +9338,7 @@
       "dimensions": "117 x 232 x 327",
       "weight": 7.4,
       "advice_price": 357.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120134024R": {
@@ -8500,6 +9349,7 @@
       "dimensions": "36 x 65 x 149",
       "weight": 0.4,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120433024R": {
@@ -8510,6 +9360,7 @@
       "dimensions": "45 x 81 x 182",
       "weight": 0.6,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120533024R": {
@@ -8520,6 +9371,7 @@
       "dimensions": "45 x 81 x 182",
       "weight": 0.6,
       "advice_price": 90.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120731024R": {
@@ -8530,6 +9382,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121031024R": {
@@ -8540,6 +9393,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 127.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121531024R": {
@@ -8550,6 +9404,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.8,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122531024": {
@@ -8560,6 +9415,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 185.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240831024R": {
@@ -8570,6 +9426,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241331024": {
@@ -8580,6 +9437,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 185.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121542022": {
@@ -8590,6 +9448,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 135.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121544022": {
@@ -8600,6 +9459,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 141.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122042022": {
@@ -8610,6 +9470,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 146.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122043022": {
@@ -8620,6 +9481,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 165.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC123047022": {
@@ -8630,6 +9492,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 176.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC123048022": {
@@ -8640,6 +9503,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 188.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241242022": {
@@ -8650,6 +9514,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 151.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241647022": {
@@ -8660,6 +9525,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241648022": {
@@ -8670,6 +9536,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 194.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120747026": {
@@ -8680,6 +9547,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 100.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121347026": {
@@ -8690,6 +9558,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121747026": {
@@ -8700,6 +9569,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 147.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122547026": {
@@ -8710,6 +9580,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241247026": {
@@ -8720,6 +9591,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120134014R": {
@@ -8730,6 +9602,7 @@
       "dimensions": "36 x 65 x 149",
       "weight": 0.4,
       "advice_price": 57.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120433014R": {
@@ -8740,6 +9613,7 @@
       "dimensions": "45 x 81 x 182",
       "weight": 0.8,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120533014R": {
@@ -8750,6 +9624,7 @@
       "dimensions": "45 x 81 x 182",
       "weight": 0.6,
       "advice_price": 90.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120731014R": {
@@ -8760,6 +9635,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121031014R": {
@@ -8770,6 +9646,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 127.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121531014R": {
@@ -8780,6 +9657,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122531014": {
@@ -8790,6 +9668,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 185.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240531014R": {
@@ -8800,6 +9679,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240831014R": {
@@ -8810,6 +9690,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241331014": {
@@ -8820,6 +9701,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 185.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121542012": {
@@ -8830,6 +9712,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 135.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121544012": {
@@ -8840,6 +9723,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 141.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122042012": {
@@ -8850,6 +9734,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 146.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122044012": {
@@ -8860,6 +9745,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 165.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC123047012": {
@@ -8870,6 +9756,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 176.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC123048012": {
@@ -8880,6 +9767,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 188.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241647012": {
@@ -8890,6 +9778,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241648012": {
@@ -8900,6 +9789,7 @@
       "dimensions": "235 x 108 x 65",
       "weight": 1.4,
       "advice_price": 194.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120713016": {
@@ -8910,6 +9800,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 100.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121347016": {
@@ -8920,6 +9811,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 1.8,
       "advice_price": 133.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121713016": {
@@ -8930,6 +9822,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 147.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122547016": {
@@ -8940,6 +9833,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240547016": {
@@ -8950,6 +9844,7 @@
       "dimensions": "85 x 211 x 60",
       "weight": 2.4,
       "advice_price": 112.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240847016": {
@@ -8960,6 +9855,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 147.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241247016": {
@@ -8970,6 +9866,7 @@
       "dimensions": "99 x 219 x 65",
       "weight": 2.4,
       "advice_price": 171.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120433034R": {
@@ -8980,6 +9877,7 @@
       "dimensions": "45 x 81 x 182",
       "weight": 0.6,
       "advice_price": 81.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120533034R": {
@@ -8990,6 +9888,7 @@
       "dimensions": "45 x 81 x 182",
       "weight": 0.6,
       "advice_price": 90.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC120731034R": {
@@ -9000,6 +9899,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121031034R": {
@@ -9010,6 +9910,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 127.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC121531034R": {
@@ -9020,6 +9921,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC122531034": {
@@ -9030,6 +9932,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 185.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240531034R": {
@@ -9040,6 +9943,7 @@
       "dimensions": "47 x 95 x 190",
       "weight": 0.8,
       "advice_price": 107.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC240831034R": {
@@ -9050,6 +9954,7 @@
       "dimensions": "60 x 105 x 190",
       "weight": 0.9,
       "advice_price": 132.0,
+      "is_new": false,
       "source": "victron_pricelist"
     },
     "BPC241331034": {
@@ -9060,6 +9965,7 @@
       "dimensions": "75 x 140 x 240",
       "weight": 1.9,
       "advice_price": 185.0,
+      "is_new": false,
       "source": "victron_pricelist"
     }
   }
