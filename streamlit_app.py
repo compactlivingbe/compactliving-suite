@@ -57,6 +57,9 @@ PAGES = {
     "reimo_bestellen": st.Page("pages/3_Reimo_Bestellen.py", title="Reimo bestellen",       icon="🛒"),
     "reimo_sync":      st.Page("pages/2_Reimo_Sync.py",      title="Reimo beschikbaarheid", icon="📦"),
     "topsystems":      st.Page("pages/4_TopSystems_Prijzen.py", title="Top Systems prijzen", icon="💰"),
+    "allspark":        st.Page("pages/9_AllSpark_Sync.py",     title="All-Spark sync",        icon="🔌"),
+    "victron":         st.Page("pages/8_Victron_Catalogus.py", title="Victron catalogus",     icon="🔋"),
+    "sync_dashboard":  st.Page("pages/10_Sync_Dashboard.py",   title="Sync-dashboard",        icon="📊"),
     "vbd":             st.Page("pages/6_VBD_Standkachels.py", title="VBD Standkachels",     icon="🔥"),
     "so_opvolging":    st.Page("pages/7_SO_Opvolging.py",    title="SO Opvolging",          icon="📊"),
     "product_groepen": st.Page("pages/5_Product_Groepen.py", title="Product groepen",       icon="🔗"),
@@ -116,7 +119,7 @@ def render_home():
 
     # ---- 2. Leverancier-sync (prijzen & beschikbaarheid) ----
     st.markdown("### 🔄 Leverancier-sync — prijzen & beschikbaarheid")
-    s1, s2, s3 = st.columns(3)
+    s1, s2, s3, s4 = st.columns(4)
     with s1:
         card_internal("📦", "Reimo beschikbaarheid", "Scrape Reimo Profiweb en schrijf een "
                       "beschikbaarheids-waarschuwing per Odoo-product.",
@@ -126,22 +129,35 @@ def render_home():
                       "update Victron kost- en verkoopprijzen.",
                       "Maandelijks automatisch of handmatig.", PAGES["topsystems"])
     with s3:
+        card_internal("🔌", "All-Spark sync", "Scrape de publieke All-Spark webshop, bereken "
+                      "inkoopprijs via instelbare korting en zie wijzigingen + Odoo-verschillen.",
+                      "Korting per merk/categorie/product.", PAGES["allspark"])
+    with s4:
         card_internal("🔥", "VBD Standkachels", "Scrape vbdservices.nl (Autoterm) → importeer "
                       "ontbrekende producten, update kost- en verkoopprijzen.",
                       "Prijzen incl BTW; kost = excl BTW (NL 21%).", PAGES["vbd"])
+    sd1, _sd2, _sd3, _sd4 = st.columns(4)
+    with sd1:
+        card_internal("📊", "Sync-dashboard", "Overzicht van alle leverancier-syncs en de "
+                      "Victron-dekking in Odoo, plus waar je het goedkoopst inkoopt.",
+                      "Read-only overzicht.", PAGES["sync_dashboard"])
 
     # ---- 3. Producten & orders ----
     st.markdown("### 📦 Producten & orders")
-    p1, p2, p3 = st.columns(3)
+    p1, p2, p3, p4 = st.columns(4)
     with p1:
+        card_internal("🔋", "Victron catalogus", "Officiële Victron-prijslijst als bron van waarheid: "
+                      "welke producten bestaan, of ze in Odoo staan en bij welke leverancier(s).",
+                      "PDF inlezen · dekking · verrijken.", PAGES["victron"])
+    with p2:
         card_internal("📊", "SO Opvolging", "Per sales order: op voorraad, gekoppelde PO + status, "
                       "en verwachte levertijd bij Reimo.",
                       "Enkel fysieke producten; live Reimo-check.", PAGES["so_opvolging"])
-    with p2:
+    with p3:
         card_internal("🔗", "Product groepen", "Gelijkaardige producten van verschillende leveranciers "
                       "groeperen en prijzen vergelijken.",
                       "AI suggereert mogelijke groepen.", PAGES["product_groepen"])
-    with p3:
+    with p4:
         card_external("🛠️", "Product beheer", "Producten beheren en bewerken in Odoo.",
                       "Odoo-tool", PRODUCTBEHEER_URL)
 
@@ -163,8 +179,9 @@ home_page = st.Page(render_home, title="Home", icon="🏠", default=True)
 nav = st.navigation({
     "": [home_page],
     "Inkoop & facturen": [PAGES["facturen"], PAGES["reimo_bestellen"]],
-    "Leverancier-sync": [PAGES["reimo_sync"], PAGES["topsystems"], PAGES["vbd"]],
-    "Producten & orders": [PAGES["so_opvolging"], PAGES["product_groepen"]],
+    "Leverancier-sync": [PAGES["reimo_sync"], PAGES["topsystems"], PAGES["allspark"],
+                         PAGES["vbd"], PAGES["sync_dashboard"]],
+    "Producten & orders": [PAGES["victron"], PAGES["so_opvolging"], PAGES["product_groepen"]],
 })
 
 

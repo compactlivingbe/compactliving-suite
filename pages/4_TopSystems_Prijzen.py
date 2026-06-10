@@ -281,20 +281,24 @@ if st.session_state.get("_ts_analyzed") or any(REPORTS_DIR.glob("missing_*.csv")
     miss_csv = latest_csv("missing")
     cost_csv = latest_csv("cost_diffs")
     sale_csv = latest_csv("sale_diffs")
+    extra_csv = latest_csv("extra")
 
     miss_df = pd.read_csv(miss_csv) if miss_csv else pd.DataFrame()
     cost_df = pd.read_csv(cost_csv) if cost_csv else pd.DataFrame()
     sale_df = pd.read_csv(sale_csv) if sale_csv else pd.DataFrame()
+    extra_df = pd.read_csv(extra_csv) if extra_csv else pd.DataFrame()
 
-    cm1, cm2, cm3 = st.columns(3)
+    cm1, cm2, cm3, cm4 = st.columns(4)
     cm1.metric("Ontbrekend in Odoo", len(miss_df))
     cm2.metric("Kostprijs verschillen", len(cost_df))
     cm3.metric("Verkoopprijs verschillen", len(sale_df))
+    cm4.metric("Niet meer in XML", len(extra_df))
 
     tabs = st.tabs([
         f"❓ Ontbrekend ({len(miss_df)})",
         f"📥 Kostprijs ({len(cost_df)})",
         f"📤 Verkoopprijs ({len(sale_df)})",
+        f"❌ Verdwenen ({len(extra_df)})",
     ])
 
     odoo = get_odoo()
@@ -459,3 +463,41 @@ if st.session_state.get("_ts_analyzed") or any(REPORTS_DIR.glob("missing_*.csv")
                         err += 1
                         st.error(f"{r['code']}: {e}")
                 st.success(f"✓ {ok} updates toegepast, {err} fout")
+
+    # --------- TAB 4: VERDWENEN (niet meer in XML) ---------
+    with tabs[3]:
+        if extra_df.empty:
+            st.success("Alle Top Systems producten in Odoo staan nog in de XML 🎉")
+        else:
+            st.caption("Deze producten hebben een Top Systems supplierinfo in Odoo maar "
+                       "staan niet meer in de XML. Kandidaten om te archiveren.")
+            df_show = extra_df.copy()
+            df_show.insert(0, "Selecteer", False)
+            edited = st.data_editor(
+                df_show, hide_index=True, use_container_width=True,
+                disabled=[c for c in df_show.columns if c != "Selecteer"],
+                column_config={
+                    "current_supplier_price": st.column_config.NumberColumn("Inkoop", format="€ %.2f"),
+                    "supplierinfo_id": None,
+                },
+                key="extra_editor",
+            )
+            sel = edited[edited["Selecteer"]]
+            st.markdown(f"**{len(sel)} geselecteerd**")
+            if not sel.empty and st.button(f"📦 Archiveer {len(sel)} in Odoo",
+                                            type="primary", key="archive_extra"):
+                ok = err = 0
+                for _, r in sel.iterrows():
+                    try:
+                        si = odoo.read("product.supplierinfo", [int(r["supplierinfo_id"])],
+                                       ["product_tmpl_id"])
+                        tid = si[0]["product_tmpl_id"][0] if si and si[0].get("product_tmpl_id") else None
+                        if tid:
+                            odoo.write("product.template", [tid], {"active": False})
+                            ok += 1
+                        else:
+                            err += 1
+                    except Exception as e:
+                        err += 1
+                        st.error(f"{r['code']}: {e}")
+                st.success(f"✓ {ok} gearchiveerd · {err} fout")

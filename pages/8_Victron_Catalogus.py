@@ -1,0 +1,296 @@
+"""Victron master-catalogus — dé lijst van bestaande Victron-producten.
+
+Bron = de officiële Victron-prijslijst (PDF). Hier zie je per Victron-product
+of het al in Odoo staat en bij welke leverancier(s) (Top Systems / All-Spark)
+het te koop is — ook producten die geen enkele leverancier voert blijven
+zichtbaar. Per product kun je foto/omschrijving/kenmerken aanvullen en naar
+Odoo pushen (kenmerken worden Odoo-attributen, zoals nu het geval is).
+"""
+import os
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import streamlit as st
+import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from odoo_client import OdooClient
+import gh_storage as ghs
+import odoo_products as op
+import victron_pricelist as vpl
+
+try:
+    st.set_page_config(page_title="Victron catalogus", page_icon="🔋", layout="wide")
+except Exception:
+    pass
+
+from auth import require_auth
+require_auth()
+
+st.title("🔋 Victron master-catalogus")
+st.caption("De officiële Victron-prijslijst als bron van waarheid: welke producten "
+           "bestaan, of ze in Odoo staan en bij welke leverancier(s) ze te koop zijn.")
+
+MASTER_FILE = "master_catalog.json"
+ALLSPARK_SNAPSHOT = "allspark_snapshot.json"
+TS_PARTNER_ID = 690          # Top Systems res.partner
+VICTRON_CATEG_DEFAULT = 154  # Victron-categorie in Odoo (zie topsystems_sync)
+DEFAULT_MARGIN = 1.32
+
+
+def get_odoo():
+    return OdooClient(url=os.environ["ODOO_URL"], db=os.environ["ODOO_DB"],
+                      login=os.environ["ODOO_LOGIN"],
+                      api_key=os.environ.get("ODOO_API_KEY", ""))
+
+
+def load_master() -> dict:
+    data = ghs.load_json(MASTER_FILE, default={})
+    return data.get("products", {}) if isinstance(data, dict) else {}
+
+
+def odoo_present_codes(odoo, codes: list[str]) -> set[str]:
+    """Welke codes bestaan al als product (default_code óf supplierinfo-code)?"""
+    present: set[str] = set()
+    for i in range(0, len(codes), 200):
+        chunk = codes[i:i + 200]
+        for r in odoo.search_read("product.template",
+                                  [["default_code", "in", chunk]],
+                                  ["default_code"], limit=len(chunk)):
+            if r.get("default_code"):
+                present.add(r["default_code"].strip())
+        for r in odoo.search_read("product.supplierinfo",
+                                  [["product_code", "in", chunk]],
+                                  ["product_code"], limit=len(chunk)):
+            if r.get("product_code"):
+                present.add(r["product_code"].strip())
+    return present
+
+
+# ============ 1. PRIJSLIJST INLEZEN ============
+with st.expander("📄 Victron-prijslijst (PDF) inlezen", expanded=not load_master()):
+    st.caption("Upload de officiële Victron-prijslijst (EX VAT). De catalogus wordt "
+               "geparset en opgeslagen in de suite-repo.")
+    up = st.file_uploader("Victron Pricelist PDF", type=["pdf"], key="vpl_pdf")
+    if up is not None and st.button("📥 Parse + opslaan", type="primary"):
+        log_box = st.empty()
+        logs: list[str] = []
+
+        def log(msg):
+            logs.append(str(msg))
+            log_box.code("\n".join(logs[-15:]), language="")
+
+        with st.spinner("PDF parsen..."):
+            try:
+                prods = vpl.parse_pdf_bytes(up.getvalue(), log=log)
+            except Exception as e:
+                st.error(f"Parsen mislukt: {e}")
+                prods = None
+        if prods:
+            payload = {"parsed_at": datetime.now().isoformat(timespec="seconds"),
+                       "source_file": up.name, "products": prods}
+            pushed, info = ghs.save_json(MASTER_FILE, payload,
+                                         f"Victron master-catalogus {len(prods)} producten")
+            st.success(f"✓ {len(prods)} producten ingelezen · opgeslagen"
+                       f"{' + GitHub ' + info if pushed else ' (lokaal)'}")
+            st.rerun()
+
+
+master = load_master()
+if not master:
+    st.info("Nog geen master-catalogus. Lees hierboven eerst de Victron-prijslijst (PDF) in.")
+    st.stop()
+
+saved = ghs.load_json(MASTER_FILE, default={})
+st.caption(f"Master-catalogus: **{len(master)}** Victron-producten · "
+           f"ingelezen {saved.get('parsed_at', '?')} uit `{saved.get('source_file', '?')}`")
+
+# ============ 2. DEKKING BEPALEN ============
+codes = sorted(master.keys())
+odoo = get_odoo()
+
+with st.spinner("Dekking bepalen (Odoo + leveranciers)..."):
+    in_odoo = odoo_present_codes(odoo, codes)
+    ts_index = op.build_supplier_index(odoo, TS_PARTNER_ID)
+    in_ts = set(ts_index.keys())
+    as_snap = ghs.load_json(ALLSPARK_SNAPSHOT, default={})
+    in_as = set((as_snap.get("products") or {}).keys())
+
+rows = []
+for code in codes:
+    p = master[code]
+    rows.append({
+        "code": code,
+        "naam": p.get("name", ""),
+        "categorie": p.get("category", ""),
+        "advies_excl": p.get("advice_price"),
+        "in_odoo": code in in_odoo,
+        "top_systems": code in in_ts,
+        "all_spark": code in in_as,
+    })
+df = pd.DataFrame(rows)
+
+# ============ 3. DASHBOARD ============
+m = st.columns(5)
+m[0].metric("Victron-producten", len(df))
+m[1].metric("In Odoo", int(df["in_odoo"].sum()))
+m[2].metric("Bij Top Systems", int(df["top_systems"].sum()))
+m[3].metric("Bij All-Spark", int(df["all_spark"].sum()))
+m[4].metric("Nergens te koop", int((~df["top_systems"] & ~df["all_spark"]).sum()))
+
+st.divider()
+tab_overzicht, tab_missing, tab_detail = st.tabs(
+    ["📋 Overzicht & dekking", "➕ Ontbreekt in Odoo", "✏️ Product verrijken"])
+
+# ---- Overzicht ----
+with tab_overzicht:
+    fc1, fc2, fc3 = st.columns([2, 2, 2])
+    with fc1:
+        cats = ["(alle)"] + sorted({r["categorie"] for r in rows if r["categorie"]})
+        fcat = st.selectbox("Categorie", cats, key="ov_cat")
+    with fc2:
+        fstatus = st.selectbox("Odoo-status", ["(alle)", "Wel in Odoo", "Niet in Odoo"],
+                               key="ov_status")
+    with fc3:
+        fsupp = st.selectbox("Leverancier", ["(alle)", "Top Systems", "All-Spark",
+                                             "Geen leverancier"], key="ov_supp")
+    view = df.copy()
+    if fcat != "(alle)":
+        view = view[view["categorie"] == fcat]
+    if fstatus == "Wel in Odoo":
+        view = view[view["in_odoo"]]
+    elif fstatus == "Niet in Odoo":
+        view = view[~view["in_odoo"]]
+    if fsupp == "Top Systems":
+        view = view[view["top_systems"]]
+    elif fsupp == "All-Spark":
+        view = view[view["all_spark"]]
+    elif fsupp == "Geen leverancier":
+        view = view[~view["top_systems"] & ~view["all_spark"]]
+
+    st.caption(f"{len(view)} producten")
+    st.dataframe(
+        view, hide_index=True, use_container_width=True,
+        column_config={
+            "advies_excl": st.column_config.NumberColumn("Advies (excl)", format="€ %.2f"),
+            "in_odoo": st.column_config.CheckboxColumn("Odoo"),
+            "top_systems": st.column_config.CheckboxColumn("Top Systems"),
+            "all_spark": st.column_config.CheckboxColumn("All-Spark"),
+        })
+    st.download_button("⬇️ Exporteer (CSV)", view.to_csv(index=False).encode("utf-8"),
+                       "victron_dekking.csv", "text/csv")
+
+# ---- Ontbreekt in Odoo ----
+with tab_missing:
+    miss = df[~df["in_odoo"]].copy()
+    if miss.empty:
+        st.success("Alle Victron-producten uit de prijslijst staan al in Odoo.")
+    else:
+        st.caption("Importeer ontbrekende Victron-producten in Odoo. Kostprijs = "
+                   "adviesprijs (excl BTW); verkoopprijs = kostprijs × marge. "
+                   "Foto/kenmerken kun je daarna per product aanvullen.")
+        margin = st.slider("Marge (×)", 1.0, 3.0, DEFAULT_MARGIN, 0.05, key="vpl_margin")
+        miss.insert(0, "Selecteer", False)
+        edited = st.data_editor(
+            miss[["Selecteer", "code", "naam", "categorie", "advies_excl"]],
+            hide_index=True, use_container_width=True,
+            disabled=["code", "naam", "categorie", "advies_excl"],
+            column_config={
+                "advies_excl": st.column_config.NumberColumn("Advies (excl)", format="€ %.2f")},
+            key="vpl_missing")
+        sel = edited[edited["Selecteer"]]
+        as_cost = st.checkbox("Kostprijs = adviesprijs (anders leeg laten)", value=True,
+                              key="vpl_ascost")
+        if not sel.empty and st.button(f"➕ Importeer {len(sel)} in Odoo", type="primary"):
+            added = errs = 0
+            for _, r in sel.iterrows():
+                try:
+                    cost = (None if pd.isna(r["advies_excl"]) or not as_cost
+                            else float(r["advies_excl"]))
+                    sale = round(cost * margin, 2) if cost is not None else None
+                    op.create_product(odoo, TS_PARTNER_ID, str(r["code"]),
+                                      str(r["naam"]), cost, sale,
+                                      categ_id=VICTRON_CATEG_DEFAULT)
+                    added += 1
+                except Exception as e:
+                    errs += 1
+                    st.error(f"{r['code']}: {e}")
+            st.success(f"✓ {added} geïmporteerd · {errs} fout")
+            if added:
+                st.rerun()
+
+# ---- Product verrijken ----
+with tab_detail:
+    st.caption("Kies een product en vul foto, omschrijving en kenmerken aan. "
+               "Kenmerken worden als Odoo-attributen (no-variant) gezet.")
+    pick = st.selectbox("Product (code — naam)",
+                        [f"{c} — {master[c].get('name', '')[:50]}" for c in codes],
+                        key="vpl_pick")
+    code = pick.split(" — ")[0].strip()
+    p = master.get(code, {})
+
+    dc1, dc2 = st.columns([1, 1])
+    with dc1:
+        st.markdown(f"**{code}** · {p.get('category', '')}")
+        st.write(p.get("name", ""))
+        st.caption(f"Afmetingen: {p.get('dimensions') or '—'} · "
+                   f"Gewicht: {p.get('weight') or '—'} kg · "
+                   f"Advies (excl): € {p.get('advice_price') or '—'}")
+        in_odoo_now = code in in_odoo
+        st.write(("✅ Staat in Odoo" if in_odoo_now else "❌ Nog niet in Odoo"))
+
+    with dc2:
+        image_url = st.text_input("Foto-URL", value=p.get("image_url", ""), key="vpl_img")
+        description = st.text_area("Omschrijving", value=p.get("description", ""),
+                                   height=100, key="vpl_desc")
+
+    st.markdown("**Kenmerken (attributen)**")
+    specs = p.get("specs") or {}
+    spec_rows = [{"kenmerk": k, "waarde": v} for k, v in specs.items()] or \
+                [{"kenmerk": "", "waarde": ""}]
+    spec_ed = st.data_editor(pd.DataFrame(spec_rows), hide_index=True, num_rows="dynamic",
+                             use_container_width=True, key="vpl_specs")
+    new_specs = {}
+    for _, r in spec_ed.iterrows():
+        k = str(r["kenmerk"]).strip()
+        v = str(r["waarde"]).strip()
+        if k and v:
+            new_specs[k] = v
+
+    bc1, bc2 = st.columns(2)
+    with bc1:
+        if st.button("💾 Opslaan in master", key="vpl_save_master"):
+            master[code]["image_url"] = image_url.strip()
+            master[code]["description"] = description.strip()
+            master[code]["specs"] = new_specs
+            payload = {"parsed_at": saved.get("parsed_at"),
+                       "source_file": saved.get("source_file"), "products": master}
+            pushed, info = ghs.save_json(MASTER_FILE, payload,
+                                         f"Victron {code} verrijkt")
+            st.success(f"✓ Opgeslagen{' + GitHub ' + info if pushed else ' (lokaal)'}")
+
+    with bc2:
+        if st.button("⬆️ Naar Odoo pushen", type="primary", key="vpl_push"):
+            try:
+                # Bestaand template ophalen of aanmaken
+                existing = odoo.search_read("product.template",
+                                            [["default_code", "=", code]], ["id"], 1)
+                img_b64 = op.download_image_b64(image_url) if image_url.strip() else None
+                if existing:
+                    tid = existing[0]["id"]
+                    if description.strip():
+                        op.update_description(odoo, tid, description.strip())
+                    if img_b64:
+                        op.update_image(odoo, tid, img_b64)
+                else:
+                    cost = p.get("advice_price")
+                    sale = round(cost * DEFAULT_MARGIN, 2) if cost is not None else None
+                    tid = op.create_product(odoo, TS_PARTNER_ID, code, p.get("name", ""),
+                                            cost, sale, image_b64=img_b64,
+                                            categ_id=VICTRON_CATEG_DEFAULT,
+                                            description=description.strip())
+                n = op.set_specs_attributes(odoo, tid, new_specs) if new_specs else 0
+                st.success(f"✓ Gepusht naar Odoo (template {tid}) · {n} kenmerk(en) gezet")
+            except Exception as e:
+                st.error(f"Push mislukt: {e}")

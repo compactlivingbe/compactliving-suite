@@ -8,3 +8,4 @@ beautifulsoup4>=4.12.0
 cloudscraper>=1.2.71
 streamlit-pdf-viewer>=0.0.19
 extra-streamlit-components>=0.1.71
+pdfplumber>=0.11.0
