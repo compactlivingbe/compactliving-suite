@@ -1,6 +1,8 @@
 {
   "default": 0.3,
-  "by_brand": {},
+  "by_brand": {
+    "Victron": 0.3
+  },
   "by_category": {},
   "by_product": {}
 }
