@@ -63,22 +63,51 @@ def _local_path(name: str) -> Path:
 # ---------------------------------------------------------------------------
 def pull(name: str) -> str | None:
     """Haal de laatst gecommitte versie van GitHub en schrijf lokaal.
-    Returns de tekstinhoud, of None als GH uit staat / bestand niet bestaat."""
+    Returns de tekstinhoud, of None als GH uit staat / bestand niet bestaat.
+
+    Gebruikt de 'raw'-mediatype zodat ook bestanden > 1 MB werken; de
+    standaard JSON-respons levert voor grote bestanden lege content (de
+    Contents-API-base64 is gelimiteerd tot 1 MB)."""
     c = _cfg()
     if not c["token"]:
         return None
+    url = f"{GH_API}/repos/{c['repo']}/contents/{_repo_path(name)}"
     try:
         r = requests.get(
-            f"{GH_API}/repos/{c['repo']}/contents/{_repo_path(name)}",
-            headers=_headers(c["token"]), params={"ref": c["branch"]},
-            timeout=_TIMEOUT,
+            url,
+            headers={**_headers(c["token"]), "Accept": "application/vnd.github.raw"},
+            params={"ref": c["branch"]}, timeout=_TIMEOUT,
         )
         if r.status_code == 200:
-            content = base64.b64decode(r.json()["content"]).decode("utf-8")
+            content = r.text
             lp = _local_path(name)
             lp.parent.mkdir(parents=True, exist_ok=True)
             lp.write_text(content, encoding="utf-8")
             return content
+    except Exception:
+        pass
+    # Terugval: klassieke JSON+base64 (kleine bestanden) als raw faalt.
+    try:
+        r = requests.get(
+            url, headers=_headers(c["token"]),
+            params={"ref": c["branch"]}, timeout=_TIMEOUT,
+        )
+        if r.status_code == 200:
+            j = r.json()
+            if j.get("content"):
+                content = base64.b64decode(j["content"]).decode("utf-8")
+                lp = _local_path(name)
+                lp.parent.mkdir(parents=True, exist_ok=True)
+                lp.write_text(content, encoding="utf-8")
+                return content
+            dl = j.get("download_url")
+            if dl:
+                rr = requests.get(dl, timeout=_TIMEOUT)
+                if rr.status_code == 200:
+                    lp = _local_path(name)
+                    lp.parent.mkdir(parents=True, exist_ok=True)
+                    lp.write_text(rr.text, encoding="utf-8")
+                    return rr.text
     except Exception:
         pass
     return None
