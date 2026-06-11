@@ -344,9 +344,8 @@
     ]
   },
   "allspark": {
-    "categories": [
-      "AIKO Solar"
-    ],
+    "categories": [],
+    "category_ids": [],
     "products": []
   }
 }
