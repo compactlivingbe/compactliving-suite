@@ -29,6 +29,10 @@ from .base import Supplier, SupplierProduct, register
 BASE = "https://www.all-spark.eu"
 SHOP = BASE + "/en/shop"
 
+# Vangnet tegen een doorlopende categorie-paginatie (shop die out-of-range
+# pagina's naar de laatste pagina klemt). Ruim boven elke realistische categorie.
+MAX_CATEGORY_PAGES = 60
+
 # Merken die All-Spark voert; gedetecteerd uit het categorie-pad.
 BRAND_KEYWORDS = {
     "victron": "Victron",
@@ -183,7 +187,8 @@ def crawl_category_map(log: Callable[[str], None] = print,
         cat_url = f"{BASE}/en/shop/category/{slug}"
         brand = _brand_from_path(slug)
         page = 1
-        while True:
+        seen_here: set[str] = set()   # tids al gezien in DEZE categorie
+        while page <= MAX_CATEGORY_PAGES:
             u = cat_url if page == 1 else f"{cat_url}/page/{page}"
             try:
                 r = s.get(u, timeout=25)
@@ -194,19 +199,24 @@ def crawl_category_map(log: Callable[[str], None] = print,
             cards = BeautifulSoup(r.text, "html.parser").select(".oe_product")
             if not cards:
                 break
-            got = False
+            page_tids: list[str] = []
             for card in cards:
                 tid_in = card.select_one("input[name=product_template_id]")
                 tid = tid_in.get("value") if tid_in else None
                 if not tid:
                     continue
-                got = True
+                page_tids.append(tid)
                 prev = tid_map.get(tid)
                 # diepere/langere slug => specifiekere categorie
                 if not prev or len(slug) > prev["_slug_len"]:
                     tid_map[tid] = {"category": label, "category_path": slug,
                                     "brand": brand, "_slug_len": len(slug)}
-            if not got or len(cards) < 16:
+            # Stop zodra een pagina geen NIEUWE producten meer toont: de shop
+            # klemt out-of-range pagina's naar de laatste/eerste pagina, dus
+            # zonder deze check zou de lus eindeloos dezelfde kaarten ophalen.
+            new_here = [t for t in page_tids if t not in seen_here]
+            seen_here.update(page_tids)
+            if not new_here or len(cards) < 16:
                 break
             page += 1
             if pause:
