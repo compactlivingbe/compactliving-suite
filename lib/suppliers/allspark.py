@@ -165,12 +165,52 @@ def crawl_catalog(log: Callable[[str], None] = print,
     return products
 
 
+def _build_category_tree(soup) -> list[dict]:
+    """Lees het geneste categoriemenu uit → platte lijst van knopen met niveau.
+
+    Elke knoop: {id, label, parent, level}. De id is het getal achter de slug
+    (uniek per categorie); parent verwijst naar de id van de bovenliggende
+    categorie ("" voor niveau 1). Hiermee kun je de hele boom reconstrueren en
+    een tak (parent + alle kinderen) in één keer uitsluiten.
+    """
+    root = soup.select_one(".products_categories")
+    if not root:
+        return []
+    top = root.find("ul")
+    if not top:
+        return []
+    nodes: list[dict] = []
+
+    def _walk(ul, level: int, parent_id: str):
+        for li in ul.find_all("li", recursive=False):
+            a = li.find("a", href=True)
+            if not a:
+                continue
+            href = a.get("href") or ""
+            label = a.get_text(strip=True)
+            slug = href.rstrip("/").split("/shop/category/")[-1] \
+                if "/shop/category/" in href else ""
+            m = _SLUG_ID_RE.search(slug)
+            cid = m.group(1) if m else ""
+            if label and cid:
+                nodes.append({"id": cid, "label": label,
+                              "parent": parent_id, "level": level})
+            sub = li.find("ul", recursive=False)
+            if sub:
+                _walk(sub, level + 1, cid)
+
+    _walk(top, 1, "")
+    return nodes
+
+
 def crawl_category_map(log: Callable[[str], None] = print,
-                       pause: float = 0.0) -> dict[str, dict]:
+                       pause: float = 0.0) -> tuple[dict[str, dict], list[dict]]:
     """Bouw {template_id: {category, category_path, brand}} door per categorie
-    de productkaarten te bekijken. Het diepste (langste slug) wint per product."""
+    de productkaarten te bekijken. Het diepste (langste slug) wint per product.
+    Geeft ook de categorieboom (lijst knopen met niveau) terug."""
     s = _scraper()
     soup = BeautifulSoup(s.get(SHOP, timeout=40).text, "html.parser")
+    tree = _build_category_tree(soup)
     cats = {}
     for a in soup.select('a[href*="/shop/category/"]'):
         href = a.get("href") or ""
@@ -226,7 +266,7 @@ def crawl_category_map(log: Callable[[str], None] = print,
                 f"({len(tid_map)} producten gekoppeld)")
     for v in tid_map.values():
         v.pop("_slug_len", None)
-    return tid_map
+    return tid_map, tree
 
 
 class AllSparkSupplier(Supplier):
@@ -237,6 +277,7 @@ class AllSparkSupplier(Supplier):
         products = crawl_catalog(log, max_pages=max_pages)
         log(f"All-Spark: {len(products)} producten in catalogus")
 
+        self.last_category_tree = []   # caller leest dit voor de snapshot
         if with_categories:
             log("All-Spark: categorieën + merken in kaart brengen...")
             # tid per product opbouwen uit de foto-URL
@@ -245,13 +286,18 @@ class AllSparkSupplier(Supplier):
                 m = re.search(r"product\.template/(\d+)/", p.get("image_url", ""))
                 if m:
                     tid_by_code[code] = m.group(1)
-            cat_map = crawl_category_map(log)
+            cat_map, tree = crawl_category_map(log)
+            self.last_category_tree = tree
             for code, p in products.items():
                 info = cat_map.get(tid_by_code.get(code, ""))
                 if info:
                     p["category"] = info["category"]
                     p["category_path"] = info["category_path"]
                     p["brand"] = info["brand"]
+            # leaf-categorie-id afleiden uit het slug-pad (voor uitsluiten per tak)
+            for p in products.values():
+                m = _SLUG_ID_RE.search(p.get("category_path", "") or "")
+                p["category_id"] = m.group(1) if m else ""
 
         # merk-fallback via Victron-codeprefix
         for code, p in products.items():

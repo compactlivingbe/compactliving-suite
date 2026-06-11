@@ -65,6 +65,51 @@ ALL_CATEGORIES = sorted({(p.get("category") or "").strip()
                          for p in _snap_prods.values() if (p.get("category") or "").strip()})
 ALL_CODES = sorted(_snap_prods.keys())
 
+# Categorieboom uit de scrape (lijst knopen met niveau). Hiermee kunnen we
+# categorieën hiërarchisch tonen en een hele tak in één keer uitsluiten.
+CAT_TREE = _snap_now.get("categories_tree", []) or []
+CAT_BY_ID = {n["id"]: n for n in CAT_TREE}
+CAT_CHILDREN: dict[str, list[str]] = {}
+for _n in CAT_TREE:
+    CAT_CHILDREN.setdefault(_n.get("parent", ""), []).append(_n["id"])
+
+
+def cat_path_label(cid: str) -> str:
+    """'ESS Batterijen ▸ Voltsmile Batterijen ▸ Batterijen' voor een knoop."""
+    parts, seen = [], set()
+    while cid and cid in CAT_BY_ID and cid not in seen:
+        seen.add(cid)
+        n = CAT_BY_ID[cid]
+        parts.append(n["label"])
+        cid = n.get("parent", "")
+    return " ▸ ".join(reversed(parts))
+
+
+def cat_descendants(cid: str) -> set[str]:
+    """Alle id's onder een knoop (inclusief de knoop zelf)."""
+    out, stack = set(), [cid]
+    while stack:
+        c = stack.pop()
+        if c in out:
+            continue
+        out.add(c)
+        stack.extend(CAT_CHILDREN.get(c, []))
+    return out
+
+
+def ordered_cat_ids() -> list[str]:
+    """Boom-volgorde (depth-first) zodat de keuzelijst per tak gegroepeerd is."""
+    out: list[str] = []
+
+    def _rec(cid):
+        out.append(cid)
+        for ch in CAT_CHILDREN.get(cid, []):
+            _rec(ch)
+
+    for root in CAT_CHILDREN.get("", []):
+        _rec(root)
+    return out
+
 
 # ============ INSTELLINGEN ============
 with st.expander("⚙️ Korting-instellingen (inkoop = publiek × (1 − korting))", expanded=False):
@@ -131,17 +176,39 @@ with st.expander("🚫 Uitsluitingen (categorieën / producten niet syncen)", ex
                 "Tot dan kun je codes vrij intypen.")
     cc1, cc2 = st.columns(2)
     with cc1:
-        cat_opts = sorted(set(ALL_CATEGORIES) | set(excl.get("categories", [])))
-        excl_cats = st.multiselect(
-            f"Uitgesloten categorieën ({len(ALL_CATEGORIES)} beschikbaar)",
-            options=cat_opts, default=excl.get("categories", []),
-            help="Kies de categorieën die je niet wilt syncen.")
+        if CAT_TREE:
+            ordered = ordered_cat_ids()
+            st.markdown("**Uitgesloten categorieën** (per niveau)")
+            st.caption("Een bovenliggende categorie aanvinken sluit ook alle "
+                       "subcategorieën eronder uit.")
+            excl_cat_ids = st.multiselect(
+                f"Categorieën ({len(ordered)} in boom)",
+                options=ordered,
+                default=[c for c in excl.get("category_ids", []) if c in CAT_BY_ID],
+                format_func=lambda c: ("— " * (CAT_BY_ID[c]["level"] - 1)
+                                       + CAT_BY_ID[c]["label"]
+                                       + f"   ·  {cat_path_label(c)}"),
+                label_visibility="collapsed")
+            excl_cats_legacy = excl.get("categories", [])  # back-compat behouden
+        else:
+            cat_opts = sorted(set(ALL_CATEGORIES) | set(excl.get("categories", [])))
+            excl_cats_legacy = st.multiselect(
+                f"Uitgesloten categorieën ({len(ALL_CATEGORIES)} beschikbaar)",
+                options=cat_opts, default=excl.get("categories", []),
+                help="Kies de categorieën die je niet wilt syncen. Scrape opnieuw "
+                     "voor de niveau-weergave.")
+            excl_cat_ids = excl.get("category_ids", [])
     with cc2:
         excl_prods = st.text_area("Uitgesloten product-codes (één per regel)",
                                   value="\n".join(excl.get("products", [])), height=140)
+    if CAT_TREE and excl_cat_ids:
+        n_eff = len(set().union(*[cat_descendants(c) for c in excl_cat_ids]))
+        st.caption(f"Geselecteerd: {len(excl_cat_ids)} categorie(ën) → {n_eff} "
+                   "categorieën uitgesloten incl. subcategorieën.")
     if st.button("💾 Uitsluitingen opslaan"):
         new_excl = {
-            "categories": [x.strip() for x in excl_cats if x.strip()],
+            "categories": [x.strip() for x in excl_cats_legacy if x.strip()],
+            "category_ids": list(excl_cat_ids),
             "products": [x.strip() for x in excl_prods.splitlines() if x.strip()],
         }
         pushed, info = save_exclusions(new_excl, "All-Spark uitsluitingen bijgewerkt")
@@ -181,7 +248,8 @@ if st.button("🔄 Scrape All-Spark", type="primary"):
 
     prev = ghs.load_json(SNAPSHOT_FILE, default={}).get("products", {})
     snap = {"scraped_at": datetime.now().isoformat(timespec="seconds"),
-            "products": products}
+            "products": products,
+            "categories_tree": getattr(SUPPLIER, "last_category_tree", [])}
     pushed, info = ghs.save_json(SNAPSHOT_FILE, snap,
                                  f"All-Spark snapshot {len(products)} producten")
     st.session_state["_as_products"] = products
@@ -215,6 +283,11 @@ if products:
         st.warning("Geen All-Spark res.partner gevonden in Odoo. Stel "
                    "`ALLSPARK_PARTNER_ID` in als secret, of controleer de partnernaam.")
     excl = load_exclusions()
+    # Categorie-id's uitbreiden met alle subcategorieën (hele tak uitsluiten).
+    sel_ids = [c for c in excl.get("category_ids", []) if c in CAT_BY_ID]
+    if sel_ids:
+        expanded = set().union(*[cat_descendants(c) for c in sel_ids])
+        excl = {**excl, "category_ids": sorted(expanded)}
     vsodoo = sdiff.diff_vs_odoo(products, odoo_index, SUPPLIER.compute_cost, excl)
 
     n_pc = len(snap_diff["price_changes"]) if snap_diff else 0

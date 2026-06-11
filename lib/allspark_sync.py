@@ -59,6 +59,7 @@ def run(with_categories: bool = True, max_pages: int | None = None) -> int:
     snap = {
         "scraped_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "products": products,
+        "categories_tree": getattr(supplier, "last_category_tree", []),
     }
     pushed, info = ghs.save_json(
         SNAPSHOT_FILE, snap,

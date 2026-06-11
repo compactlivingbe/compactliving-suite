@@ -81,10 +81,14 @@ def diff_vs_odoo(new: dict, odoo_index: dict,
     """
     excl_products = set((exclusions or {}).get("products") or [])
     excl_categories = set((exclusions or {}).get("categories") or [])
+    # Hiërarchische uitsluiting: set van categorie-id's (al uitgebreid met
+    # subcategorieën door de aanroeper) gematcht op het leaf-category_id.
+    excl_cat_ids = {str(x) for x in ((exclusions or {}).get("category_ids") or [])}
 
     def _excluded(p) -> bool:
         return (p.get("code") in excl_products
-                or (p.get("category") or "") in excl_categories)
+                or (p.get("category") or "") in excl_categories
+                or str(p.get("category_id") or "") in excl_cat_ids)
 
     missing, cost_diffs = [], []
     for code, p in new.items():
