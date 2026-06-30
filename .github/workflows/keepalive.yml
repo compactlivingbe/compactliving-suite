@@ -1,0 +1,73 @@
+name: Keep Streamlit awake
+
+# Houdt de Streamlit-app wakker: opent de app als echte browser (Playwright),
+# wat de inactiviteits-/sessietimer van Streamlit Community Cloud reset. Slaapt
+# de app toch, dan wordt de "Yes, get this app back up!"-knop geklikt.
+#
+# Standaard elke 2 uur. Slaapt de app toch nog af en toe? Zet de cron op
+# "0 * * * *" (elk uur) voor een strakkere marge (kost meer Actions-minuten).
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      APP_URL: "https://compactliving-suite.streamlit.app/"
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache Playwright-browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Bezoek de app (wakker houden)
+        run: |
+          python - <<'PY'
+          import os
+          from playwright.sync_api import sync_playwright
+
+          url = os.environ["APP_URL"]
+          with sync_playwright() as p:
+              browser = p.chromium.launch()
+              page = browser.new_page()
+              print("open:", url)
+              page.goto(url, wait_until="domcontentloaded", timeout=60000)
+
+              # Slaapt de app? Klik dan de wakker-knop.
+              woke = False
+              try:
+                  btn = page.get_by_role("button", name="get this app back up",
+                                         exact=False)
+                  if btn.count() == 0:
+                      btn = page.get_by_text("get this app back up")
+                  if btn.count() > 0:
+                      print("app sliep -> wakker maken")
+                      btn.first.click()
+                      woke = True
+                      page.wait_for_timeout(60000)  # geef de container tijd om te starten
+              except Exception as e:
+                  print("wake-check:", e)
+
+              # Wacht zodat de Streamlit-sessie (websocket) opgezet wordt en als
+              # actief telt; dat reset de inactiviteitstimer.
+              page.wait_for_timeout(20000)
+              print("titel:", page.title(), "| gewekt:", woke)
+              browser.close()
+          PY
