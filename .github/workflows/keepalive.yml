@@ -48,26 +48,46 @@ jobs:
               browser = p.chromium.launch()
               page = browser.new_page()
               print("open:", url)
-              page.goto(url, wait_until="domcontentloaded", timeout=60000)
+              page.goto(url, wait_until="networkidle", timeout=90000)
+              print("na load -> URL:", page.url, "| titel:", page.title())
 
-              # Slaapt de app? Klik dan de wakker-knop.
+              def is_asleep():
+                  try:
+                      body = page.inner_text("body", timeout=5000).lower()
+                  except Exception:
+                      body = ""
+                  return "gone to sleep" in body or "get this app back up" in body
+
               woke = False
-              try:
-                  btn = page.get_by_role("button", name="get this app back up",
-                                         exact=False)
-                  if btn.count() == 0:
-                      btn = page.get_by_text("get this app back up")
-                  if btn.count() > 0:
-                      print("app sliep -> wakker maken")
-                      btn.first.click()
-                      woke = True
-                      page.wait_for_timeout(60000)  # geef de container tijd om te starten
-              except Exception as e:
-                  print("wake-check:", e)
+              if is_asleep():
+                  print("DETECTIE: app slaapt -> wakker maken")
+                  clicked = False
+                  for loc in [
+                      page.get_by_role("button", name="get this app back up", exact=False),
+                      page.get_by_role("link", name="get this app back up", exact=False),
+                      page.get_by_text("get this app back up", exact=False),
+                  ]:
+                      try:
+                          if loc.count() > 0:
+                              loc.first.click(timeout=10000)
+                              clicked = True
+                              break
+                      except Exception as e:
+                          print("klikpoging faalde:", e)
+                  print("wakker-knop geklikt:", clicked)
+                  woke = True
+                  # wachten tot de container opgestart en de app geladen is
+                  page.wait_for_timeout(75000)
+                  try:
+                      page.reload(wait_until="networkidle", timeout=90000)
+                  except Exception as e:
+                      print("reload:", e)
+              else:
+                  print("DETECTIE: app was al wakker")
 
-              # Wacht zodat de Streamlit-sessie (websocket) opgezet wordt en als
-              # actief telt; dat reset de inactiviteitstimer.
+              # Sessie/websocket laten registreren als activiteit.
               page.wait_for_timeout(20000)
-              print("titel:", page.title(), "| gewekt:", woke)
+              print("EIND -> URL:", page.url, "| titel:", page.title(),
+                    "| slaapt nu:", is_asleep(), "| gewekt:", woke)
               browser.close()
           PY
