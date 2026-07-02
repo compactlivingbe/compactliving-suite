@@ -194,6 +194,9 @@ def _discontinued_rows(items: list[dict], suite_url: str = "") -> str:
         code = _td(d.get("reimo_code"))
         odoo_code = _td(d.get("odoo_code"))
         naam = _td(d.get("naam"))
+        det = _td(d.get("detail"))
+        naam_html = f"<div class='pname'>{naam}</div>" + (
+            f"<div class='pdesc'>Vervallen: {det}</div>" if det else "")
         prijs = f"&euro; {float(d.get('prijs') or 0):.2f}".replace(".", ",")
         vr = float(d.get("voorraad") or 0)
         vr_txt = f"{vr:g}"
@@ -225,7 +228,7 @@ def _discontinued_rows(items: list[dict], suite_url: str = "") -> str:
             f"<td class='ctr'>{thumb}</td>"
             f"<td class='sku'>{code}</td>"
             f"<td class='sku'>{odoo_code or '—'}</td>"
-            f"<td class='pname'>{naam}</td>"
+            f"<td>{naam_html}</td>"
             f"<td class='num'>{prijs}</td>"
             f"{vr_cell}"
             f"<td>{status}</td>"

@@ -17,6 +17,7 @@ import argparse
 import base64
 import json
 import os
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -54,6 +55,38 @@ def fetch_reimo_code_map(c: OdooClient) -> dict:
     return m
 
 
+_DATE_RE = re.compile(r"\d{1,2}\.\d{1,2}\.\d{2,4}")
+
+
+def classify_warning(msg: str) -> tuple[bool, str]:
+    """Onderscheid echt vervallen (Auslauf) van tijdelijke lange backorder.
+
+    De sync schrijft geblokkeerde varianten onder 'Niet leverbaar:'. Een regel
+    met een datum = tijdelijk uit voorraad (verwacht op ...); een regel zónder
+    datum / met 'niet meer leverbaar' = echt vervallen.
+
+    Returns (echt_vervallen, detail) waarbij detail de vervallen variant(en) is.
+    """
+    blocked = []
+    in_block = False
+    for ln in (msg or "").splitlines():
+        s = ln.strip().lstrip("•").strip()
+        low = s.lower()
+        if low.startswith("niet leverbaar"):
+            in_block = True
+            continue
+        if in_block:
+            if not s or low.startswith(("beperkt leverbaar", "op voorraad")):
+                break
+            blocked.append(s)
+    if not blocked:
+        return True, ""  # geen detail → conservatief als vervallen behandelen
+    auslauf = [b for b in blocked
+               if "niet meer leverbaar" in b.lower() or not _DATE_RE.search(b)]
+    detail = "; ".join(auslauf if auslauf else blocked)
+    return (len(auslauf) > 0), detail
+
+
 def fetch_discontinued(c: OdooClient) -> list[dict]:
     base = os.environ["ODOO_URL"].rstrip("/")
     sis = c.search_read("product.supplierinfo", [("partner_id", "=", REIMO_PARTNER_ID)],
@@ -75,7 +108,11 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
         {"limit": 100000, "order": "name", "context": {"active_test": False}})
     out = []
     for t in tmpls:
-        msg = (t.get("sale_line_warn_msg") or "").replace("\U0001F6AB", "").strip()
+        raw = (t.get("sale_line_warn_msg") or "")
+        echt_vervallen, detail = classify_warning(raw)
+        if not echt_vervallen:
+            # tijdelijk lang uit voorraad (backorder), geen Auslauf → niet tonen
+            continue
         heeft_foto = bool(t.get("image_128"))
         out.append({
             "tmpl_id": t["id"],
@@ -87,7 +124,7 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
             "actief": bool(t.get("active")),
             "op_website": bool(t.get("is_published")),
             "bestelbaar": bool(t.get("purchase_ok")),
-            "reden": msg.split("\n", 1)[0].strip() if msg else "",
+            "detail": detail,
             "foto": f"{base}/web/image/product.template/{t['id']}/image_128" if heeft_foto else "",
             "foto_groot": f"{base}/web/image/product.template/{t['id']}/image_512" if heeft_foto else "",
             "odoo_url": f"{base}/odoo/inventory/products/{t['id']}",
