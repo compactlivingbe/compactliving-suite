@@ -185,17 +185,28 @@ def _newcomer_rows(producten: list[dict], laatste_datum: str,
     return "".join(out)
 
 
-def _discontinued_rows(items: list[dict]) -> str:
+def _discontinued_rows(items: list[dict], suite_url: str = "") -> str:
     out = []
     for d in items:
         code = _td(d.get("reimo_code"))
         odoo_code = _td(d.get("odoo_code"))
         naam = _td(d.get("naam"))
         prijs = f"&euro; {float(d.get('prijs') or 0):.2f}".replace(".", ",")
+        vr = float(d.get("voorraad") or 0)
+        vr_txt = f"{vr:g}"
+        vr_cell = (f"<td class='num' style='color:#166534;font-weight:600'>{vr_txt}</td>"
+                   if vr > 0 else "<td class='num muted'>0</td>")
         reden = _td(d.get("reden") or "Niet meer leverbaar")
         thumb = _thumb_html(d.get("foto", ""), d.get("foto_groot", ""))
         url = html.escape(d.get("odoo_url", ""), quote=True)
-        link = f"<a class='btn' href='{url}' target='_blank' rel='noopener'>Open in Odoo &#8599;</a>" if url else "—"
+        link = f"<a class='btn' href='{url}' target='_blank' rel='noopener'>Open &#8599;</a>" if url else "—"
+        tmpl_id = d.get("tmpl_id")
+        if tmpl_id:
+            beheer_link = html.escape(f"{suite_url}/product_beheren?tmpl_id={tmpl_id}", quote=True)
+            beheer = (f"<a class='addbtn' href='{beheer_link}' target='_blank' rel='noopener'>"
+                      "&#9881; Beheren</a>")
+        else:
+            beheer = "—"
         search = html.escape(f"{code} {odoo_code} {naam}".lower(), quote=True)
         out.append(
             f"<tr data-s=\"{search}\">"
@@ -204,8 +215,10 @@ def _discontinued_rows(items: list[dict]) -> str:
             f"<td class='sku'>{odoo_code or '—'}</td>"
             f"<td class='pname'>{naam}</td>"
             f"<td class='num'>{prijs}</td>"
+            f"{vr_cell}"
             f"<td><span class='badge'>{reden}</span></td>"
             f"<td class='ctr'>{link}</td>"
+            f"<td class='ctr'>{beheer}</td>"
             "</tr>")
     return "".join(out)
 
@@ -222,8 +235,8 @@ def build_html(store: dict, discontinued: list[dict], gen_date: str,
 
     nc_rows = _newcomer_rows(producten, laatste_datum, odoo_codes, odoo_base, suite_url) or \
         "<tr><td colspan='10' class='muted'>Nog geen producten opgeslagen.</td></tr>"
-    dc_rows = _discontinued_rows(discontinued) or \
-        "<tr><td colspan='7' class='muted'>Geen producten op 'niet leverbaar'. \U0001F389</td></tr>"
+    dc_rows = _discontinued_rows(discontinued, suite_url) or \
+        "<tr><td colspan='9' class='muted'>Geen producten op 'niet leverbaar'. \U0001F389</td></tr>"
 
     laatste_lbl = _fmt_datum(laatste_datum) if laatste_datum else "—"
 
@@ -266,13 +279,14 @@ def build_html(store: dict, discontinued: list[dict], gen_date: str,
 
 <section id="p-uit" class="panel">
   <p class="muted">Reimo-producten die volgens de laatste Profiweb-sync niet meer leverbaar zijn
-  (Auslauf). Live uit Odoo.</p>
+  (Auslauf). Live uit Odoo. Gebruik <b>&#9881; Beheren</b> om te archiveren (bij 0 voorraad),
+  uit de webshop te halen (bij voorraad) of niet meer te bestellen.</p>
   <input class="search" placeholder="Zoek op naam of code&hellip;"
          id="q-uit" oninput="filterRows('q-uit','tbl-uit','cnt-uit')">
   <span class="muted" style="font-size:12px;">&nbsp;<b id="cnt-uit">{len(discontinued)}</b> getoond</span>
   <table id="tbl-uit"><thead><tr>
     <th class="ctr">Foto</th><th>Reimo-code</th><th>Odoo-code</th><th>Naam</th><th class="num">Verkoopprijs</th>
-    <th>Reden</th><th class="ctr">Odoo</th>
+    <th class="num">Voorraad</th><th>Reden</th><th class="ctr">Odoo</th><th class="ctr">Actie</th>
   </tr></thead><tbody>{dc_rows}</tbody></table>
 </section>
 

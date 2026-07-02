@@ -48,6 +48,9 @@ try:
     _art = st.query_params.get("artikelnr")
     if _art:
         st.session_state["pending_artikelnr"] = _art
+    _tmpl = st.query_params.get("tmpl_id")
+    if _tmpl:
+        st.session_state["pending_tmpl_id"] = _tmpl
 except Exception:
     pass
 
@@ -66,6 +69,7 @@ PAGES = {
     "facturen":        st.Page("pages/1_Facturen.py",        title="Facturen",              icon="📄"),
     "reimo_bestellen": st.Page("pages/3_Reimo_Bestellen.py", title="Reimo bestellen",       icon="🛒"),
     "reimo_product":   st.Page("pages/12_Reimo_Product_Toevoegen.py", title="Reimo product toevoegen", icon="➕", url_path="product_toevoegen"),
+    "reimo_beheren":   st.Page("pages/13_Reimo_Product_Beheren.py", title="Reimo product beheren", icon="🛠️", url_path="product_beheren"),
     "reimo_sync":      st.Page("pages/2_Reimo_Sync.py",      title="Reimo beschikbaarheid", icon="📦"),
     "topsystems":      st.Page("pages/4_TopSystems_Prijzen.py", title="Top Systems prijzen", icon="💰"),
     "allspark":        st.Page("pages/9_AllSpark_Sync.py",     title="All-Spark sync",        icon="🔌"),
@@ -79,16 +83,21 @@ PAGES = {
 
 # ============ LANDING ============
 def render_home():
-    # Kwam de gebruiker via ?artikelnr=... (knop in het Reimo-rapport) maar
+    # Kwam de gebruiker via een deep-link (knop in het Reimo-rapport) maar
     # belandde hij door de login-gate op de root (Home)? Stuur dan één keer door
-    # naar de 'product toevoegen'-pagina; het artikelnr staat in session_state.
-    if (st.session_state.get("pending_artikelnr")
-            and not st.session_state.get("_routed_to_product")):
-        st.session_state["_routed_to_product"] = True
-        try:
-            st.switch_page(PAGES["reimo_product"])
-        except Exception:
-            pass
+    # naar de juiste tool; de parameter staat in session_state.
+    if not st.session_state.get("_routed_deeplink"):
+        target = None
+        if st.session_state.get("pending_tmpl_id"):
+            target = PAGES["reimo_beheren"]
+        elif st.session_state.get("pending_artikelnr"):
+            target = PAGES["reimo_product"]
+        if target is not None:
+            st.session_state["_routed_deeplink"] = True
+            try:
+                st.switch_page(target)
+            except Exception:
+                pass
 
     def card_internal(icon, title, desc, caption, page):
         with st.container(border=True):
@@ -203,7 +212,8 @@ nav = st.navigation({
     "Inkoop & facturen": [PAGES["facturen"], PAGES["reimo_bestellen"], PAGES["reimo_product"]],
     "Leverancier-sync": [PAGES["reimo_sync"], PAGES["topsystems"], PAGES["allspark"],
                          PAGES["vbd"], PAGES["sync_dashboard"]],
-    "Producten & orders": [PAGES["victron"], PAGES["so_opvolging"], PAGES["product_groepen"]],
+    "Producten & orders": [PAGES["victron"], PAGES["so_opvolging"], PAGES["product_groepen"],
+                           PAGES["reimo_beheren"]],
 })
 
 

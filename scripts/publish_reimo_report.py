@@ -68,17 +68,20 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
     tmpls = c.search_read(
         "product.template",
         [("id", "in", list(code_by_tmpl)), ("sale_line_warn_msg", "ilike", DISCONTINUED_NEEDLE)],
-        ["name", "default_code", "list_price", "sale_line_warn_msg", "image_128"],
+        ["name", "default_code", "list_price", "sale_line_warn_msg", "image_128",
+         "qty_available"],
         limit=100000, order="name")
     out = []
     for t in tmpls:
         msg = (t.get("sale_line_warn_msg") or "").replace("\U0001F6AB", "").strip()
         heeft_foto = bool(t.get("image_128"))
         out.append({
+            "tmpl_id": t["id"],
             "naam": t.get("name", ""),
             "reimo_code": code_by_tmpl.get(t["id"], ""),
             "odoo_code": t.get("default_code") or "",
             "prijs": t.get("list_price") or 0.0,
+            "voorraad": t.get("qty_available") or 0.0,
             "reden": msg.split("\n", 1)[0].strip() if msg else "",
             "foto": f"{base}/web/image/product.template/{t['id']}/image_128" if heeft_foto else "",
             "foto_groot": f"{base}/web/image/product.template/{t['id']}/image_512" if heeft_foto else "",
