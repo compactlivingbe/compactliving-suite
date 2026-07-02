@@ -79,6 +79,17 @@ PAGES = {
 
 # ============ LANDING ============
 def render_home():
+    # Kwam de gebruiker via ?artikelnr=... (knop in het Reimo-rapport) maar
+    # belandde hij door de login-gate op de root (Home)? Stuur dan één keer door
+    # naar de 'product toevoegen'-pagina; het artikelnr staat in session_state.
+    if (st.session_state.get("pending_artikelnr")
+            and not st.session_state.get("_routed_to_product")):
+        st.session_state["_routed_to_product"] = True
+        try:
+            st.switch_page(PAGES["reimo_product"])
+        except Exception:
+            pass
+
     def card_internal(icon, title, desc, caption, page):
         with st.container(border=True):
             st.markdown(f"#### {icon} {title}")
