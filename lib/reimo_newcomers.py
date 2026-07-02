@@ -47,6 +47,29 @@ def _clean(txt: str) -> str:
     return re.sub(r"\s+", " ", (txt or "")).strip()
 
 
+def _categorie_uit_url(url: str) -> tuple[str, str]:
+    """Leidt (categoriepad, diepste categorie) af uit de product-URL.
+    Bv. .../nl/kampeerartikelen/water-artikelen/dompelpomp-12v-accessoires/75050/power-pomp
+        -> ("Kampeerartikelen › Water artikelen › Dompelpomp 12v accessoires",
+            "Dompelpomp 12v accessoires")"""
+    if not url:
+        return "", ""
+    path = re.sub(r"[?#].*$", "", url)
+    path = path.split("/nl/", 1)[-1] if "/nl/" in path else path
+    segs = [s for s in path.split("/") if s]
+    cats = []
+    for s in segs:
+        if s.isdigit():  # numeriek id = einde categoriepad, begin product-slug
+            break
+        cats.append(s)
+    cats = [s for s in cats if s not in ("nieuwigheden", "www.reimo.com", "nl")]
+    def hum(s):
+        return s.replace("-", " ").strip().capitalize()
+    pad = " › ".join(hum(s) for s in cats)
+    diepste = hum(cats[-1]) if cats else ""
+    return pad, diepste
+
+
 def _norm_image(url: str) -> str:
     """Maak beeld-URL absoluut; geef "" terug voor placeholders (no-picture)."""
     if not url:
@@ -159,6 +182,9 @@ def parse_box(box) -> dict | None:
     desc_el = box.select_one(".product--description")
     omschrijving = _clean(desc_el.get_text()) if desc_el else ""
 
+    # categorie (afgeleid uit de URL)
+    categorie_pad, categorie = _categorie_uit_url(url)
+
     return {
         "artikelnr": artikelnr,
         "naam": naam,
@@ -169,6 +195,8 @@ def parse_box(box) -> dict | None:
         "leverbaarheid": leverbaarheid,
         "voorraad_kleur": voorraad_kleur,
         "leverancier": leverancier,
+        "categorie": categorie,
+        "categorie_pad": categorie_pad,
         "omschrijving": omschrijving,
     }
 
@@ -237,6 +265,8 @@ def merge_store(store: dict, scraped: list[dict], today: str) -> dict:
                 "leverbaarheid": it["leverbaarheid"] or rec.get("leverbaarheid", ""),
                 "voorraad_kleur": it["voorraad_kleur"] or rec.get("voorraad_kleur", ""),
                 "leverancier": it["leverancier"] or rec.get("leverancier", ""),
+                "categorie": it.get("categorie") or rec.get("categorie", ""),
+                "categorie_pad": it.get("categorie_pad") or rec.get("categorie_pad", ""),
                 "omschrijving": it["omschrijving"] or rec.get("omschrijving", ""),
                 "laatst_gezien": today,
                 "op_nieuwigheden": True,
