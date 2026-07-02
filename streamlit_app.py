@@ -41,6 +41,16 @@ for key in ["ANTHROPIC_API_KEY", "ODOO_URL", "ODOO_DB", "ODOO_LOGIN", "ODOO_API_
 
 # ============ AUTH (Odoo-account) ============
 from auth import require_auth, current_user, logout
+
+# Deep-link parameter (bv. 'product toevoegen' vanuit het Reimo-rapport met
+# ?artikelnr=...) bewaren vóór de login-gate, zodat hij een (her)login overleeft.
+try:
+    _art = st.query_params.get("artikelnr")
+    if _art:
+        st.session_state["pending_artikelnr"] = _art
+except Exception:
+    pass
+
 require_auth()
 
 
@@ -55,6 +65,7 @@ PRODUCTBEHEER_URL = f"{odoo_url}/inttools/productbeheer"
 PAGES = {
     "facturen":        st.Page("pages/1_Facturen.py",        title="Facturen",              icon="📄"),
     "reimo_bestellen": st.Page("pages/3_Reimo_Bestellen.py", title="Reimo bestellen",       icon="🛒"),
+    "reimo_product":   st.Page("pages/12_Reimo_Product_Toevoegen.py", title="Reimo product toevoegen", icon="➕", url_path="product_toevoegen"),
     "reimo_sync":      st.Page("pages/2_Reimo_Sync.py",      title="Reimo beschikbaarheid", icon="📦"),
     "topsystems":      st.Page("pages/4_TopSystems_Prijzen.py", title="Top Systems prijzen", icon="💰"),
     "allspark":        st.Page("pages/9_AllSpark_Sync.py",     title="All-Spark sync",        icon="🔌"),
@@ -68,6 +79,17 @@ PAGES = {
 
 # ============ LANDING ============
 def render_home():
+    # Kwam de gebruiker via ?artikelnr=... (knop in het Reimo-rapport) maar
+    # belandde hij door de login-gate op de root (Home)? Stuur dan één keer door
+    # naar de 'product toevoegen'-pagina; het artikelnr staat in session_state.
+    if (st.session_state.get("pending_artikelnr")
+            and not st.session_state.get("_routed_to_product")):
+        st.session_state["_routed_to_product"] = True
+        try:
+            st.switch_page(PAGES["reimo_product"])
+        except Exception:
+            pass
+
     def card_internal(icon, title, desc, caption, page):
         with st.container(border=True):
             st.markdown(f"#### {icon} {title}")
@@ -178,7 +200,7 @@ home_page = st.Page(render_home, title="Home", icon="🏠", default=True)
 # ============ Navigatie (gegroepeerde sidebar) ============
 nav = st.navigation({
     "": [home_page],
-    "Inkoop & facturen": [PAGES["facturen"], PAGES["reimo_bestellen"]],
+    "Inkoop & facturen": [PAGES["facturen"], PAGES["reimo_bestellen"], PAGES["reimo_product"]],
     "Leverancier-sync": [PAGES["reimo_sync"], PAGES["topsystems"], PAGES["allspark"],
                          PAGES["vbd"], PAGES["sync_dashboard"]],
     "Producten & orders": [PAGES["victron"], PAGES["so_opvolging"], PAGES["product_groepen"]],
