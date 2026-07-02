@@ -41,6 +41,16 @@ for key in ["ANTHROPIC_API_KEY", "ODOO_URL", "ODOO_DB", "ODOO_LOGIN", "ODOO_API_
 
 # ============ AUTH (Odoo-account) ============
 from auth import require_auth, current_user, logout
+
+# Deep-link parameter (bv. 'product toevoegen' vanuit het Reimo-rapport met
+# ?artikelnr=...) bewaren vóór de login-gate, zodat hij een (her)login overleeft.
+try:
+    _art = st.query_params.get("artikelnr")
+    if _art:
+        st.session_state["pending_artikelnr"] = _art
+except Exception:
+    pass
+
 require_auth()
 
 

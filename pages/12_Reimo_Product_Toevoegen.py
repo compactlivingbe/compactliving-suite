@@ -110,23 +110,31 @@ st.caption("Zoek een Reimo-artikel op (Profiweb + webshop) en maak het als produ
            "Inkoopprijs komt onder de leveranciers-/inkooptab.")
 
 # ---- artikelnummer (uit rapport-knop of manueel) ----
+# Deep-link ?artikelnr=... onthouden in de sessie zodat het een eventuele
+# (her)login op de suite overleeft en niet 'kwijt' raakt.
 qp_art = st.query_params.get("artikelnr", "")
+if qp_art:
+    st.session_state["pending_artikelnr"] = qp_art
+pending = st.session_state.get("pending_artikelnr", "")
+
 col_in, col_btn = st.columns([3, 1])
 with col_in:
-    code = st.text_input("Reimo artikelnummer", value=qp_art, key="art_input").strip()
+    code = st.text_input("Reimo artikelnummer", value=pending, key="art_input").strip()
 with col_btn:
     st.write("")
     zoek = st.button("🔎 Opzoeken", type="primary", use_container_width=True)
 
-# auto-opzoeken bij openen vanuit rapport (1x)
-if qp_art and st.session_state.get("auto_done") != qp_art:
-    st.session_state["auto_done"] = qp_art
-    with st.spinner(f"Artikel {qp_art} opzoeken in Profiweb + webshop…"):
-        do_lookup(qp_art)
-
+# Bepaal welk nummer op te zoeken: knop-klik, of een nieuw deep-link nummer (1x auto).
+target = ""
 if zoek and code:
-    with st.spinner(f"Artikel {code} opzoeken in Profiweb + webshop…"):
-        do_lookup(code)
+    target = code
+elif pending and st.session_state.get("looked_up_code") != pending:
+    target = pending
+
+if target:
+    st.session_state["looked_up_code"] = target
+    with st.spinner(f"Artikel {target} opzoeken in Profiweb + webshop…"):
+        do_lookup(target)
 
 lk = st.session_state.get("lookup")
 if lk:
