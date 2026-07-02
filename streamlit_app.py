@@ -63,6 +63,7 @@ PAGES = {
     "vbd":             st.Page("pages/6_VBD_Standkachels.py", title="VBD Standkachels",     icon="🔥"),
     "so_opvolging":    st.Page("pages/7_SO_Opvolging.py",    title="SO Opvolging",          icon="📊"),
     "product_groepen": st.Page("pages/5_Product_Groepen.py", title="Product groepen",       icon="🔗"),
+    "rapporten":       st.Page("pages/11_Rapporten.py",      title="Rapporten",             icon="📈", url_path="rapporten"),
 }
 
 
@@ -165,7 +166,11 @@ def render_home():
     st.markdown("### 📈 Rapporten")
     r1, r2, r3 = st.columns(3)
     with r1:
-        card_external("📈", "Rapporten", "Overzichts- en business-rapporten in Odoo.",
+        card_internal("📈", "Reimo rapporten", "Wekelijkse Reimo-rapporten: nieuwe producten "
+                      "(cumulatief, met datum van toevoeging) en niet meer verkochte producten.",
+                      "Nieuwigheden-scrape + Odoo-beschikbaarheid.", PAGES["rapporten"])
+    with r2:
+        card_external("📊", "Odoo-rapporten", "Overzichts- en business-rapporten in Odoo.",
                       "Odoo-tool", RAPPORTEN_URL)
 
     st.divider()
@@ -182,6 +187,7 @@ nav = st.navigation({
     "Leverancier-sync": [PAGES["reimo_sync"], PAGES["topsystems"], PAGES["allspark"],
                          PAGES["vbd"], PAGES["sync_dashboard"]],
     "Producten & orders": [PAGES["victron"], PAGES["so_opvolging"], PAGES["product_groepen"]],
+    "Rapporten": [PAGES["rapporten"]],
 })
 
 
