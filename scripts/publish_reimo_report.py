@@ -65,12 +65,14 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
             code_by_tmpl[tid] = s["product_code"]
     if not code_by_tmpl:
         return []
-    tmpls = c.search_read(
-        "product.template",
-        [("id", "in", list(code_by_tmpl)), ("sale_line_warn_msg", "ilike", DISCONTINUED_NEEDLE)],
-        ["name", "default_code", "list_price", "sale_line_warn_msg", "image_128",
-         "qty_available"],
-        limit=100000, order="name")
+    # active_test=False zodat reeds gearchiveerde producten óók getoond worden
+    # (met status 'Gearchiveerd'); anders zouden ze uit de lijst verdwijnen.
+    tmpls = c.call(
+        "product.template", "search_read",
+        [[("id", "in", list(code_by_tmpl)), ("sale_line_warn_msg", "ilike", DISCONTINUED_NEEDLE)],
+         ["name", "default_code", "list_price", "sale_line_warn_msg", "image_128",
+          "qty_available", "active", "is_published", "purchase_ok"]],
+        {"limit": 100000, "order": "name", "context": {"active_test": False}})
     out = []
     for t in tmpls:
         msg = (t.get("sale_line_warn_msg") or "").replace("\U0001F6AB", "").strip()
@@ -82,6 +84,9 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
             "odoo_code": t.get("default_code") or "",
             "prijs": t.get("list_price") or 0.0,
             "voorraad": t.get("qty_available") or 0.0,
+            "actief": bool(t.get("active")),
+            "op_website": bool(t.get("is_published")),
+            "bestelbaar": bool(t.get("purchase_ok")),
             "reden": msg.split("\n", 1)[0].strip() if msg else "",
             "foto": f"{base}/web/image/product.template/{t['id']}/image_128" if heeft_foto else "",
             "foto_groot": f"{base}/web/image/product.template/{t['id']}/image_512" if heeft_foto else "",
