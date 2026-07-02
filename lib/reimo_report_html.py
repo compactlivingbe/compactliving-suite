@@ -215,15 +215,14 @@ def _discontinued_rows(items: list[dict], suite_url: str = "") -> str:
         vr_txt = f"{vr:g}"
         vr_cell = (f"<td class='num' style='color:#166534;font-weight:600'>{vr_txt}</td>"
                    if vr > 0 else "<td class='num muted'>0</td>")
-        # status = welke actie is uitgevoerd (uit de Odoo-toestand)
+        # status = welke actie(s) uitgevoerd (uit de Odoo-toestand)
         badges = []
         if not d.get("actief", True):
             badges.append("<span class='badge st-arch'>&#128230; Gearchiveerd</span>")
-        else:
-            if not d.get("op_website", True):
-                badges.append("<span class='badge st-web'>&#127760; Uit webshop</span>")
-            if not d.get("bestelbaar", True):
-                badges.append("<span class='badge st-buy'>&#9940; Niet bestelbaar</span>")
+        elif not d.get("op_website", True):
+            badges.append("<span class='badge st-web'>&#127760; Uit webshop</span>")
+        if not d.get("bestelbaar", True):
+            badges.append("<span class='badge st-buy'>&#9940; Niet meer bestellen</span>")
         status = " ".join(badges) if badges else "<span class='muted'>geen actie</span>"
         thumb = _thumb_html(d.get("foto", ""), d.get("foto_groot", ""))
         url = html.escape(d.get("odoo_url", ""), quote=True)
