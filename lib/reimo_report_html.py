@@ -65,6 +65,8 @@ CSS = """
   .sku { font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--muted); white-space:nowrap; }
   .pname { font-weight:600; }
   .pdesc { color:var(--muted); font-size:12px; }
+  .verv-vol { color:#991b1b; font-weight:600; }
+  .verv-part { color:#9a3412; font-weight:600; }
   .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:0; }
   .badge { display:inline-block; padding:2px 9px; border-radius:999px; font-size:12px; white-space:nowrap;
            background:#fee2e2; color:#991b1b; }
@@ -195,8 +197,19 @@ def _discontinued_rows(items: list[dict], suite_url: str = "") -> str:
         odoo_code = _td(d.get("odoo_code"))
         naam = _td(d.get("naam"))
         det = _td(d.get("detail"))
-        naam_html = f"<div class='pname'>{naam}</div>" + (
-            f"<div class='pdesc'>Vervallen: {det}</div>" if det else "")
+        n_verv = d.get("n_vervallen") or 0
+        n_tot = d.get("n_totaal") or 0
+        melding = html.escape(d.get("melding", ""), quote=True)
+        if d.get("volledig", True):
+            kop, kls = "Volledig niet meer verkocht", "verv-vol"
+        else:
+            kop = f"{n_verv} van {n_tot} varianten niet meer verkocht &middot; overige nog leverbaar"
+            kls = "verv-part"
+        sub = f"<div class='pdesc {kls}' title=\"{melding}\">{kop}"
+        if det:
+            sub += f": {det}"
+        sub += "</div>"
+        naam_html = f"<div class='pname'>{naam}</div>{sub}"
         prijs = f"&euro; {float(d.get('prijs') or 0):.2f}".replace(".", ",")
         vr = float(d.get("voorraad") or 0)
         vr_txt = f"{vr:g}"

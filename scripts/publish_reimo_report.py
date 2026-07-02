@@ -58,33 +58,51 @@ def fetch_reimo_code_map(c: OdooClient) -> dict:
 _DATE_RE = re.compile(r"\d{1,2}\.\d{1,2}\.\d{2,4}")
 
 
-def classify_warning(msg: str) -> tuple[bool, str]:
-    """Onderscheid echt vervallen (Auslauf) van tijdelijke lange backorder.
-
-    De sync schrijft geblokkeerde varianten onder 'Niet leverbaar:'. Een regel
-    met een datum = tijdelijk uit voorraad (verwacht op ...); een regel zónder
-    datum / met 'niet meer leverbaar' = echt vervallen.
-
-    Returns (echt_vervallen, detail) waarbij detail de vervallen variant(en) is.
-    """
-    blocked = []
-    in_block = False
+def parse_warning(msg: str) -> dict:
+    """Parseer de sync-melding in secties (varianten per status)."""
+    sec = {"niet": [], "beperkt": [], "voorraad": []}
+    cur = None
     for ln in (msg or "").splitlines():
-        s = ln.strip().lstrip("•").strip()
+        s = ln.strip()
         low = s.lower()
         if low.startswith("niet leverbaar"):
-            in_block = True
-            continue
-        if in_block:
-            if not s or low.startswith(("beperkt leverbaar", "op voorraad")):
-                break
-            blocked.append(s)
-    if not blocked:
-        return True, ""  # geen detail → conservatief als vervallen behandelen
-    auslauf = [b for b in blocked
+            cur = "niet"; continue
+        if low.startswith("beperkt leverbaar"):
+            cur = "beperkt"; continue
+        if low.startswith("op voorraad"):
+            cur = "voorraad"; continue
+        item = s.lstrip("•").strip()
+        if cur and item:
+            sec[cur].append(item)
+    auslauf = [b for b in sec["niet"]
                if "niet meer leverbaar" in b.lower() or not _DATE_RE.search(b)]
-    detail = "; ".join(auslauf if auslauf else blocked)
-    return (len(auslauf) > 0), detail
+    backorder = [b for b in sec["niet"] if b not in auslauf]
+    return {"auslauf": auslauf, "backorder": backorder,
+            "beperkt": sec["beperkt"], "voorraad": sec["voorraad"]}
+
+
+def classify_warning(msg: str) -> tuple[bool, dict]:
+    """Onderscheid echt vervallen (Auslauf) van tijdelijke lange backorder.
+
+    Een geblokkeerde variant met een datum = tijdelijk uit voorraad; zonder
+    datum / met 'niet meer leverbaar' = echt vervallen.
+
+    Returns (echt_vervallen, info) met tellingen en de vervallen variant(en).
+    """
+    p = parse_warning(msg)
+    auslauf, backorder = p["auslauf"], p["backorder"]
+    n_totaal = len(auslauf) + len(backorder) + len(p["beperkt"]) + len(p["voorraad"])
+    if (backorder or auslauf) and not auslauf:
+        return False, {}  # enkel backorder → geen Auslauf
+    n_vervallen = len(auslauf)
+    info = {
+        "detail": "; ".join(auslauf),
+        "n_vervallen": n_vervallen,
+        "n_totaal": n_totaal or max(n_vervallen, 1),
+        "volledig": (n_totaal - n_vervallen) <= 0,
+        "melding": (msg or "").replace("\U0001F6AB", "").strip(),
+    }
+    return True, info
 
 
 def fetch_discontinued(c: OdooClient) -> list[dict]:
@@ -109,7 +127,7 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
     out = []
     for t in tmpls:
         raw = (t.get("sale_line_warn_msg") or "")
-        echt_vervallen, detail = classify_warning(raw)
+        echt_vervallen, info = classify_warning(raw)
         if not echt_vervallen:
             # tijdelijk lang uit voorraad (backorder), geen Auslauf → niet tonen
             continue
@@ -124,7 +142,11 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
             "actief": bool(t.get("active")),
             "op_website": bool(t.get("is_published")),
             "bestelbaar": bool(t.get("purchase_ok")),
-            "detail": detail,
+            "detail": info.get("detail", ""),
+            "n_vervallen": info.get("n_vervallen", 0),
+            "n_totaal": info.get("n_totaal", 0),
+            "volledig": info.get("volledig", True),
+            "melding": info.get("melding", ""),
             "foto": f"{base}/web/image/product.template/{t['id']}/image_128" if heeft_foto else "",
             "foto_groot": f"{base}/web/image/product.template/{t['id']}/image_512" if heeft_foto else "",
             "odoo_url": f"{base}/odoo/inventory/products/{t['id']}",
