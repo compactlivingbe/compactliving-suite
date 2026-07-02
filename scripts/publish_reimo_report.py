@@ -121,8 +121,18 @@ def main() -> int:
         c = _odoo()
         discontinued = fetch_discontinued(c)
         code_map = fetch_reimo_code_map(c)
+        # Ook matchen op interne referentie (default_code) — vangt producten die
+        # in Odoo staan zonder Reimo-leverancierscode.
+        codes = list((store.get("products") or {}).keys())
+        for i in range(0, len(codes), 500):
+            chunk = codes[i:i + 500]
+            for t in c.search_read("product.template", [("default_code", "in", chunk)],
+                                   ["id", "default_code"], limit=100000):
+                dc = (t.get("default_code") or "").strip()
+                if dc and dc not in code_map:
+                    code_map[dc] = t["id"]
         print(f"Odoo: {len(discontinued)} niet-leverbare Reimo-producten; "
-              f"{len(code_map)} Reimo-codes in Odoo.")
+              f"{len(code_map)} codes gekoppeld.")
 
     html_text = rh.build_html(store, discontinued, gen_date,
                               odoo_codes=code_map, odoo_base=odoo_base)

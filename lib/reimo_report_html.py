@@ -73,8 +73,10 @@ CSS = """
   a.addbtn { display:inline-block; background:#0f766e; color:#fff !important; text-decoration:none;
              font-weight:600; font-size:12px; padding:4px 10px; border-radius:8px; white-space:nowrap; }
   a.addbtn:hover { background:#0b5c55; }
-  a.inodoo { color:#166534; font-weight:600; font-size:12px; text-decoration:none; white-space:nowrap; }
-  a.inodoo:hover { text-decoration:underline; }
+  a.inodoo { display:inline-block; background:#dcfce7; color:#166534 !important; text-decoration:none;
+             font-weight:600; font-size:12px; padding:4px 10px; border-radius:8px; white-space:nowrap;
+             border:1px solid #86efac; }
+  a.inodoo:hover { background:#bbf7d0; }
   .new { background:#ecfdf5 !important; }
   .newtag { display:inline-block; background:#ccfbf1; color:#0f766e; border-radius:999px;
             font-size:10.5px; padding:1px 7px; margin-left:6px; vertical-align:1px; }
