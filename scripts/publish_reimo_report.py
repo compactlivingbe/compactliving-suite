@@ -41,6 +41,19 @@ def _odoo() -> OdooClient:
         password=os.environ.get("ODOO_PASSWORD", ""))
 
 
+def fetch_reimo_code_map(c: OdooClient) -> dict:
+    """{Reimo-leverancierscode: product_tmpl_id} voor alle Reimo-producten in Odoo."""
+    sis = c.search_read("product.supplierinfo", [("partner_id", "=", REIMO_PARTNER_ID)],
+                        ["product_tmpl_id", "product_code"], limit=100000)
+    m = {}
+    for s in sis:
+        tid = s["product_tmpl_id"][0] if s.get("product_tmpl_id") else None
+        code = (s.get("product_code") or "").strip()
+        if tid and code and code not in m:
+            m[code] = tid
+    return m
+
+
 def fetch_discontinued(c: OdooClient) -> list[dict]:
     base = os.environ["ODOO_URL"].rstrip("/")
     sis = c.search_read("product.supplierinfo", [("partner_id", "=", REIMO_PARTNER_ID)],
@@ -102,12 +115,17 @@ def main() -> int:
     gen_date = date.today().isoformat()
 
     discontinued = []
+    code_map = {}
+    odoo_base = os.environ.get("ODOO_URL", "").rstrip("/")
     if not args.dry_run:
         c = _odoo()
         discontinued = fetch_discontinued(c)
-        print(f"Odoo: {len(discontinued)} niet-leverbare Reimo-producten.")
+        code_map = fetch_reimo_code_map(c)
+        print(f"Odoo: {len(discontinued)} niet-leverbare Reimo-producten; "
+              f"{len(code_map)} Reimo-codes in Odoo.")
 
-    html_text = rh.build_html(store, discontinued, gen_date)
+    html_text = rh.build_html(store, discontinued, gen_date,
+                              odoo_codes=code_map, odoo_base=odoo_base)
 
     if args.out:
         Path(args.out).write_text(html_text, encoding="utf-8")

@@ -55,6 +55,7 @@ PRODUCTBEHEER_URL = f"{odoo_url}/inttools/productbeheer"
 PAGES = {
     "facturen":        st.Page("pages/1_Facturen.py",        title="Facturen",              icon="📄"),
     "reimo_bestellen": st.Page("pages/3_Reimo_Bestellen.py", title="Reimo bestellen",       icon="🛒"),
+    "reimo_product":   st.Page("pages/12_Reimo_Product_Toevoegen.py", title="Reimo product toevoegen", icon="➕", url_path="product_toevoegen"),
     "reimo_sync":      st.Page("pages/2_Reimo_Sync.py",      title="Reimo beschikbaarheid", icon="📦"),
     "topsystems":      st.Page("pages/4_TopSystems_Prijzen.py", title="Top Systems prijzen", icon="💰"),
     "allspark":        st.Page("pages/9_AllSpark_Sync.py",     title="All-Spark sync",        icon="🔌"),
@@ -178,7 +179,7 @@ home_page = st.Page(render_home, title="Home", icon="🏠", default=True)
 # ============ Navigatie (gegroepeerde sidebar) ============
 nav = st.navigation({
     "": [home_page],
-    "Inkoop & facturen": [PAGES["facturen"], PAGES["reimo_bestellen"]],
+    "Inkoop & facturen": [PAGES["facturen"], PAGES["reimo_bestellen"], PAGES["reimo_product"]],
     "Leverancier-sync": [PAGES["reimo_sync"], PAGES["topsystems"], PAGES["allspark"],
                          PAGES["vbd"], PAGES["sync_dashboard"]],
     "Producten & orders": [PAGES["victron"], PAGES["so_opvolging"], PAGES["product_groepen"]],

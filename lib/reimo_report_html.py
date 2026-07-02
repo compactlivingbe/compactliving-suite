@@ -70,6 +70,11 @@ CSS = """
            background:#fee2e2; color:#991b1b; }
   a.btn { color:var(--accent); text-decoration:none; font-weight:600; white-space:nowrap; }
   a.btn:hover { text-decoration:underline; }
+  a.addbtn { display:inline-block; background:#0f766e; color:#fff !important; text-decoration:none;
+             font-weight:600; font-size:12px; padding:4px 10px; border-radius:8px; white-space:nowrap; }
+  a.addbtn:hover { background:#0b5c55; }
+  a.inodoo { color:#166534; font-weight:600; font-size:12px; text-decoration:none; white-space:nowrap; }
+  a.inodoo:hover { text-decoration:underline; }
   .new { background:#ecfdf5 !important; }
   .newtag { display:inline-block; background:#ccfbf1; color:#0f766e; border-radius:999px;
             font-size:10.5px; padding:1px 7px; margin-left:6px; vertical-align:1px; }
@@ -123,7 +128,10 @@ def _fmt_datum(s: str) -> str:
         return s or ""
 
 
-def _newcomer_rows(producten: list[dict], laatste_datum: str) -> str:
+def _newcomer_rows(producten: list[dict], laatste_datum: str,
+                   odoo_codes: dict | None = None, odoo_base: str = "",
+                   suite_url: str = "") -> str:
+    odoo_codes = odoo_codes or {}
     rows = sorted(producten,
                   key=lambda p: (p.get("toegevoegd_op", ""), p.get("artikelnr", "")),
                   reverse=True)
@@ -148,6 +156,15 @@ def _newcomer_rows(producten: list[dict], laatste_datum: str) -> str:
         link = f"<a class='btn' href='{url}' target='_blank' rel='noopener'>Bekijk &#8599;</a>" if url else "—"
         desc = _td(p.get("omschrijving"))
         desc_html = f"<div class='pdesc'>{desc}</div>" if desc else ""
+        # Odoo-actie: al aanwezig -> link naar product; anders -> toevoegen-knop
+        artcode = str(p.get("artikelnr", ""))
+        if artcode in odoo_codes:
+            tid = odoo_codes[artcode]
+            odoo_link = html.escape(f"{odoo_base}/odoo/inventory/products/{tid}", quote=True)
+            actie = f"<a class='inodoo' href='{odoo_link}' target='_blank' rel='noopener'>&#10003; in Odoo</a>"
+        else:
+            add_link = html.escape(f"{suite_url}/product_toevoegen?artikelnr={artcode}", quote=True)
+            actie = f"<a class='addbtn' href='{add_link}' target='_blank' rel='noopener'>&#43; In Odoo</a>"
         search = html.escape(f"{art} {naam} {merk} {p.get('categorie','')}".lower(), quote=True)
         rowcls = " class='new'" if is_new else ""
         out.append(
@@ -161,6 +178,7 @@ def _newcomer_rows(producten: list[dict], laatste_datum: str) -> str:
             f"<td>{dot}{lev}</td>"
             f"<td class='ctr'>{_fmt_datum(toeg)}</td>"
             f"<td class='ctr'>{link}</td>"
+            f"<td class='ctr'>{actie}</td>"
             "</tr>")
     return "".join(out)
 
@@ -190,15 +208,18 @@ def _discontinued_rows(items: list[dict]) -> str:
     return "".join(out)
 
 
-def build_html(store: dict, discontinued: list[dict], gen_date: str) -> str:
+def build_html(store: dict, discontinued: list[dict], gen_date: str,
+               odoo_codes: dict | None = None, odoo_base: str = "",
+               suite_url: str = "https://compactliving-suite.streamlit.app") -> str:
     producten = list((store.get("products") or {}).values())
     datums = sorted({p.get("toegevoegd_op", "") for p in producten if p.get("toegevoegd_op")},
                     reverse=True)
     laatste_datum = datums[0] if datums else ""
     nieuw_laatste = sum(1 for p in producten if p.get("toegevoegd_op") == laatste_datum)
+    in_odoo = sum(1 for p in producten if str(p.get("artikelnr", "")) in (odoo_codes or {}))
 
-    nc_rows = _newcomer_rows(producten, laatste_datum) or \
-        "<tr><td colspan='9' class='muted'>Nog geen producten opgeslagen.</td></tr>"
+    nc_rows = _newcomer_rows(producten, laatste_datum, odoo_codes, odoo_base, suite_url) or \
+        "<tr><td colspan='10' class='muted'>Nog geen producten opgeslagen.</td></tr>"
     dc_rows = _discontinued_rows(discontinued) or \
         "<tr><td colspan='7' class='muted'>Geen producten op 'niet leverbaar'. \U0001F389</td></tr>"
 
@@ -228,13 +249,16 @@ def build_html(store: dict, discontinued: list[dict], gen_date: str) -> str:
 
 <section id="p-nieuw" class="panel active">
   <p class="muted">Producten van de Reimo-nieuwigheden, cumulatief bijgehouden met de datum
-  waarop ze voor het eerst verschenen. Groen gemarkeerd = toegevoegd in de laatste ronde.</p>
+  waarop ze voor het eerst verschenen. Groen gemarkeerd = toegevoegd in de laatste ronde.
+  <b>{in_odoo}</b> van de {len(producten)} staan al in Odoo; gebruik <b>&#43; In Odoo</b> om een
+  product toe te voegen.</p>
   <input class="search" placeholder="Zoek op naam, artikelnr of merk&hellip;"
          id="q-nieuw" oninput="filterRows('q-nieuw','tbl-nieuw','cnt-nieuw')">
   <span class="muted" style="font-size:12px;">&nbsp;<b id="cnt-nieuw">{len(producten)}</b> getoond</span>
   <table id="tbl-nieuw"><thead><tr>
     <th class="ctr">Foto</th><th>Artikelnr</th><th>Naam</th><th>Merk</th><th>Categorie</th>
     <th class="num">Prijs</th><th>Leverbaarheid</th><th class="ctr">Toegevoegd</th><th class="ctr">Link</th>
+    <th class="ctr">Odoo</th>
   </tr></thead><tbody>{nc_rows}</tbody></table>
 </section>
 
