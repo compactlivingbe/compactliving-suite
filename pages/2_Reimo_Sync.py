@@ -4,7 +4,7 @@ from pathlib import Path
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
-from reimo_scraper import Profiweb, Odoo, decide, aggregate, DEFAULT_RULES
+from reimo_scraper import Profiweb, Odoo, decide, aggregate, derive_availability, DEFAULT_RULES
 
 try:
     st.set_page_config(page_title="Reimo Sync", page_icon="📦", layout="wide")
@@ -87,7 +87,7 @@ with tab_run:
         try:
             o = Odoo(cfg["odoo_url"], cfg["odoo_db"], cfg["odoo_login"], cfg["odoo_password"], log=log)
             o.authenticate()
-            codes = o.find_codes([66], selected_categ_ids, include_archived=include_archived, only_with_code=True)
+            codes = o.find_codes([51, 66, 11], selected_categ_ids, include_archived=include_archived, only_with_code=True)
             if max_articles:
                 codes = codes[:max_articles]
             log(f"Te scrapen: {len(codes)} codes")
@@ -96,6 +96,7 @@ with tab_run:
             pw.login()
 
             counts = {"ok": 0, "warn": 0, "block": 0, "err": 0}
+            delays_set = 0
             by_tmpl = {}
             results_data = []
 
@@ -112,6 +113,21 @@ with tab_run:
                     elif incoming_qty > 0 and action == "block":
                         action = "warning"
                         msg = f"{msg} (✓ {int(incoming_qty)} besteld - PO loopt)"
+
+                    # Reimo-beschikbaarheid + reële levertijd
+                    avail = derive_availability(info)
+                    if avail is None:
+                        info["_reimo_skip"] = True
+                    else:
+                        r_op, r_vanaf, r_delay = avail
+                        info["_reimo_op_voorraad"] = r_op
+                        info["_reimo_beschikbaar_vanaf"] = r_vanaf
+                        if c.get("si_id") and r_delay != int(c.get("cur_delay") or 0):
+                            try:
+                                o.set_delay(c["si_id"], r_delay)
+                                delays_set += 1
+                            except Exception as e:
+                                log(f"  delay {c['code']} FOUT: {e}")
 
                     by_tmpl.setdefault(c["tmpl_id"], {"name": c["tmpl_name"], "results": []})\
                         ["results"].append((c["code"], c["variant_label"], info, action, msg))
@@ -138,16 +154,27 @@ with tab_run:
 
             # Aggregate to Odoo
             log(f"Aggregeren naar {len(by_tmpl)} templates...")
-            wrote = 0
+            wrote = fields_wrote = 0
             for tid, data in by_tmpl.items():
                 a, m = aggregate(data["results"])
+                good = [r for r in data["results"] if not r[2].get("_reimo_skip")]
+                op = any(r[2].get("_reimo_op_voorraad") for r in good)
+                if op:
+                    vanaf = False
+                else:
+                    vanafs = [r[2].get("_reimo_beschikbaar_vanaf") for r in good
+                              if r[2].get("_reimo_beschikbaar_vanaf")]
+                    vanaf = min(vanafs) if vanafs else False
                 try:
                     o.write_warning(tid, a, m)
                     wrote += 1
+                    if good and o.write_reimo_fields(tid, op, vanaf):
+                        fields_wrote += 1
                 except Exception as e:
                     log(f"  Tmpl {tid} FOUT: {e}")
-            log(f"KLAAR. {wrote} templates geschreven.")
-            st.success(f"✓ Scrape voltooid: {counts['ok']} OK · {counts['warn']} warning · {counts['block']} block · {wrote} templates bijgewerkt")
+            log(f"KLAAR. {wrote} waarschuwingen · {fields_wrote} velden · {delays_set} levertijden geschreven.")
+            st.success(f"✓ Scrape voltooid: {counts['ok']} OK · {counts['warn']} warning · {counts['block']} block · "
+                       f"{wrote} templates · {fields_wrote} velden · {delays_set} levertijden bijgewerkt")
         except Exception as e:
             st.error(f"FOUT: {e}")
             log(f"FOUT: {e}")

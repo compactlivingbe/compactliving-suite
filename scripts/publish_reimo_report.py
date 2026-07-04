@@ -17,6 +17,7 @@ import argparse
 import base64
 import json
 import os
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -54,6 +55,56 @@ def fetch_reimo_code_map(c: OdooClient) -> dict:
     return m
 
 
+_DATE_RE = re.compile(r"\d{1,2}\.\d{1,2}\.\d{2,4}")
+
+
+def parse_warning(msg: str) -> dict:
+    """Parseer de sync-melding in secties (varianten per status)."""
+    sec = {"niet": [], "beperkt": [], "voorraad": []}
+    cur = None
+    for ln in (msg or "").splitlines():
+        s = ln.strip()
+        low = s.lower()
+        if low.startswith("niet leverbaar"):
+            cur = "niet"; continue
+        if low.startswith("beperkt leverbaar"):
+            cur = "beperkt"; continue
+        if low.startswith("op voorraad"):
+            cur = "voorraad"; continue
+        item = s.lstrip("•").strip()
+        if cur and item:
+            sec[cur].append(item)
+    auslauf = [b for b in sec["niet"]
+               if "niet meer leverbaar" in b.lower() or not _DATE_RE.search(b)]
+    backorder = [b for b in sec["niet"] if b not in auslauf]
+    return {"auslauf": auslauf, "backorder": backorder,
+            "beperkt": sec["beperkt"], "voorraad": sec["voorraad"]}
+
+
+def classify_warning(msg: str) -> tuple[bool, dict]:
+    """Onderscheid echt vervallen (Auslauf) van tijdelijke lange backorder.
+
+    Een geblokkeerde variant met een datum = tijdelijk uit voorraad; zonder
+    datum / met 'niet meer leverbaar' = echt vervallen.
+
+    Returns (echt_vervallen, info) met tellingen en de vervallen variant(en).
+    """
+    p = parse_warning(msg)
+    auslauf, backorder = p["auslauf"], p["backorder"]
+    n_totaal = len(auslauf) + len(backorder) + len(p["beperkt"]) + len(p["voorraad"])
+    if (backorder or auslauf) and not auslauf:
+        return False, {}  # enkel backorder → geen Auslauf
+    n_vervallen = len(auslauf)
+    info = {
+        "detail": "; ".join(auslauf),
+        "n_vervallen": n_vervallen,
+        "n_totaal": n_totaal or max(n_vervallen, 1),
+        "volledig": (n_totaal - n_vervallen) <= 0,
+        "melding": (msg or "").replace("\U0001F6AB", "").strip(),
+    }
+    return True, info
+
+
 def fetch_discontinued(c: OdooClient) -> list[dict]:
     base = os.environ["ODOO_URL"].rstrip("/")
     sis = c.search_read("product.supplierinfo", [("partner_id", "=", REIMO_PARTNER_ID)],
@@ -65,15 +116,21 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
             code_by_tmpl[tid] = s["product_code"]
     if not code_by_tmpl:
         return []
-    tmpls = c.search_read(
-        "product.template",
-        [("id", "in", list(code_by_tmpl)), ("sale_line_warn_msg", "ilike", DISCONTINUED_NEEDLE)],
-        ["name", "default_code", "list_price", "sale_line_warn_msg", "image_128",
-         "qty_available"],
-        limit=100000, order="name")
+    # active_test=False zodat reeds gearchiveerde producten óók getoond worden
+    # (met status 'Gearchiveerd'); anders zouden ze uit de lijst verdwijnen.
+    tmpls = c.call(
+        "product.template", "search_read",
+        [[("id", "in", list(code_by_tmpl)), ("sale_line_warn_msg", "ilike", DISCONTINUED_NEEDLE)],
+         ["name", "default_code", "list_price", "sale_line_warn_msg", "image_128",
+          "qty_available", "active", "is_published", "purchase_ok"]],
+        {"limit": 100000, "order": "name", "context": {"active_test": False}})
     out = []
     for t in tmpls:
-        msg = (t.get("sale_line_warn_msg") or "").replace("\U0001F6AB", "").strip()
+        raw = (t.get("sale_line_warn_msg") or "")
+        echt_vervallen, info = classify_warning(raw)
+        if not echt_vervallen:
+            # tijdelijk lang uit voorraad (backorder), geen Auslauf → niet tonen
+            continue
         heeft_foto = bool(t.get("image_128"))
         out.append({
             "tmpl_id": t["id"],
@@ -82,7 +139,14 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
             "odoo_code": t.get("default_code") or "",
             "prijs": t.get("list_price") or 0.0,
             "voorraad": t.get("qty_available") or 0.0,
-            "reden": msg.split("\n", 1)[0].strip() if msg else "",
+            "actief": bool(t.get("active")),
+            "op_website": bool(t.get("is_published")),
+            "bestelbaar": bool(t.get("purchase_ok")),
+            "detail": info.get("detail", ""),
+            "n_vervallen": info.get("n_vervallen", 0),
+            "n_totaal": info.get("n_totaal", 0),
+            "volledig": info.get("volledig", True),
+            "melding": info.get("melding", ""),
             "foto": f"{base}/web/image/product.template/{t['id']}/image_128" if heeft_foto else "",
             "foto_groot": f"{base}/web/image/product.template/{t['id']}/image_512" if heeft_foto else "",
             "odoo_url": f"{base}/odoo/inventory/products/{t['id']}",

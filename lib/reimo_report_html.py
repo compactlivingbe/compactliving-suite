@@ -65,9 +65,14 @@ CSS = """
   .sku { font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--muted); white-space:nowrap; }
   .pname { font-weight:600; }
   .pdesc { color:var(--muted); font-size:12px; }
+  .verv-vol { color:#991b1b; font-weight:600; }
+  .verv-part { color:#9a3412; font-weight:600; }
   .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:0; }
   .badge { display:inline-block; padding:2px 9px; border-radius:999px; font-size:12px; white-space:nowrap;
            background:#fee2e2; color:#991b1b; }
+  .st-arch { background:#e5e7eb; color:#374151; }
+  .st-web { background:#ffedd5; color:#9a3412; }
+  .st-buy { background:#fee2e2; color:#991b1b; }
   a.btn { color:var(--accent); text-decoration:none; font-weight:600; white-space:nowrap; }
   a.btn:hover { text-decoration:underline; }
   a.addbtn { display:inline-block; background:#0f766e; color:#fff !important; text-decoration:none;
@@ -191,12 +196,34 @@ def _discontinued_rows(items: list[dict], suite_url: str = "") -> str:
         code = _td(d.get("reimo_code"))
         odoo_code = _td(d.get("odoo_code"))
         naam = _td(d.get("naam"))
+        det = _td(d.get("detail"))
+        n_verv = d.get("n_vervallen") or 0
+        n_tot = d.get("n_totaal") or 0
+        melding = html.escape(d.get("melding", ""), quote=True)
+        if d.get("volledig", True):
+            kop, kls = "Volledig niet meer verkocht", "verv-vol"
+        else:
+            kop = f"{n_verv} van {n_tot} varianten niet meer verkocht &middot; overige nog leverbaar"
+            kls = "verv-part"
+        sub = f"<div class='pdesc {kls}' title=\"{melding}\">{kop}"
+        if det:
+            sub += f": {det}"
+        sub += "</div>"
+        naam_html = f"<div class='pname'>{naam}</div>{sub}"
         prijs = f"&euro; {float(d.get('prijs') or 0):.2f}".replace(".", ",")
         vr = float(d.get("voorraad") or 0)
         vr_txt = f"{vr:g}"
         vr_cell = (f"<td class='num' style='color:#166534;font-weight:600'>{vr_txt}</td>"
                    if vr > 0 else "<td class='num muted'>0</td>")
-        reden = _td(d.get("reden") or "Niet meer leverbaar")
+        # status = welke actie(s) uitgevoerd (uit de Odoo-toestand)
+        badges = []
+        if not d.get("actief", True):
+            badges.append("<span class='badge st-arch'>&#128230; Gearchiveerd</span>")
+        elif not d.get("op_website", True):
+            badges.append("<span class='badge st-web'>&#127760; Uit webshop</span>")
+        if not d.get("bestelbaar", True):
+            badges.append("<span class='badge st-buy'>&#9940; Niet meer bestellen</span>")
+        status = " ".join(badges) if badges else "<span class='muted'>geen actie</span>"
         thumb = _thumb_html(d.get("foto", ""), d.get("foto_groot", ""))
         url = html.escape(d.get("odoo_url", ""), quote=True)
         link = f"<a class='btn' href='{url}' target='_blank' rel='noopener'>Open &#8599;</a>" if url else "—"
@@ -213,10 +240,10 @@ def _discontinued_rows(items: list[dict], suite_url: str = "") -> str:
             f"<td class='ctr'>{thumb}</td>"
             f"<td class='sku'>{code}</td>"
             f"<td class='sku'>{odoo_code or '—'}</td>"
-            f"<td class='pname'>{naam}</td>"
+            f"<td>{naam_html}</td>"
             f"<td class='num'>{prijs}</td>"
             f"{vr_cell}"
-            f"<td><span class='badge'>{reden}</span></td>"
+            f"<td>{status}</td>"
             f"<td class='ctr'>{link}</td>"
             f"<td class='ctr'>{beheer}</td>"
             "</tr>")
@@ -286,7 +313,7 @@ def build_html(store: dict, discontinued: list[dict], gen_date: str,
   <span class="muted" style="font-size:12px;">&nbsp;<b id="cnt-uit">{len(discontinued)}</b> getoond</span>
   <table id="tbl-uit"><thead><tr>
     <th class="ctr">Foto</th><th>Reimo-code</th><th>Odoo-code</th><th>Naam</th><th class="num">Verkoopprijs</th>
-    <th class="num">Voorraad</th><th>Reden</th><th class="ctr">Odoo</th><th class="ctr">Actie</th>
+    <th class="num">Voorraad</th><th>Status</th><th class="ctr">Odoo</th><th class="ctr">Actie</th>
   </tr></thead><tbody>{dc_rows}</tbody></table>
 </section>
 

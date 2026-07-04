@@ -9,6 +9,9 @@ logs/
 reports/
 dumps/
 config.json
+_run_config.json
+_run_*.log
+_run_*.out
 *.xml
 results.csv
 productlist.xml
