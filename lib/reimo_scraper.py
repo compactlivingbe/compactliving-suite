@@ -307,6 +307,50 @@ def decide(rules, info):
     return "no-message", ""
 
 
+def _iso_date(dstr):
+    """'dd.mm.jj' of 'dd.mm.jjjj' → 'YYYY-MM-DD' (of None)."""
+    for fmt in ("%d.%m.%y", "%d.%m.%Y"):
+        try:
+            return datetime.strptime(dstr, fmt).date().isoformat()
+        except ValueError:
+            continue
+    return None
+
+
+# Levertijd-parameters (dagen). Odoo telt zelf het transport Reimo→CL erbij op de
+# offerteregel; de 'delay' op de leverancierslijn is de reële voorraad-/wachttijd bij Reimo.
+DELAY_IN_STOCK = 4        # op voorraad bij Reimo
+DELAY_TRANSPORT = 4       # basis dat bij de wachttijd tot datum D opgeteld wordt
+DELAY_UNKNOWN = 45        # geen (geldige) datum bekend
+DELAY_CAP = 45            # plafond — nooit extreme waarden
+
+
+def derive_availability(info):
+    """Leidt uit de Reimo-info de drie te schrijven waarden af, volgens de sync-spec:
+      - op_voorraad (bool)
+      - beschikbaar_vanaf (str 'YYYY-MM-DD' | False): de RUWE Reimo-datum (nooit +transport)
+      - delay (int): reële levertijd (dagen) op de Reimo-leverancierslijn
+    Retourneert None wanneer de status niet betrouwbaar bepaald kon worden
+    (lookup-fout) → in dat geval niets in Odoo aanraken.
+    Weerspiegelt de beschikbaarheid BIJ REIMO (los van eigen voorraad/PO's)."""
+    if not info.get("found"):
+        # Echt niet gevonden in Reimo-catalogus → onbekend; transiënte fout → overslaan
+        if info.get("raw_status") == "NOT_FOUND":
+            return False, False, DELAY_UNKNOWN
+        return None
+    # Op voorraad bij Reimo
+    if not info.get("discontinued") and info.get("raw_status") == "AVAILABLE":
+        return True, False, DELAY_IN_STOCK
+    # Niet op voorraad, maar een herbevoorradingsdatum in de TOEKOMST bekend
+    days = info.get("expected_days")
+    iso = _iso_date(info["expected_date"]) if info.get("expected_date") else None
+    if iso and days is not None and days >= 0:
+        delay = min(DELAY_CAP, max(DELAY_IN_STOCK, days + DELAY_TRANSPORT))
+        return False, iso, delay
+    # Geen datum / datum al verstreken / uitgelopen → onbekend
+    return False, False, DELAY_UNKNOWN
+
+
 def aggregate(results):
     """results: list of (code, label, info, action, msg)."""
     if not results: return "no-message", ""
@@ -353,6 +397,7 @@ class Odoo:
         self.url = url.rstrip("/"); self.db = db; self.user = user; self.password = password
         self.log = log; self.uid = None
         self.s = requests.Session()
+        self._reimo_fields = None
 
     def authenticate(self):
         r = self.s.post(f"{self.url}/web/session/authenticate",
@@ -390,7 +435,7 @@ class Odoo:
         if supplier_ids:
             sup_dom.append(["partner_id","in",supplier_ids])
         sis = self.call("product.supplierinfo","search_read",
-                        [sup_dom, ["id","product_tmpl_id","product_id","product_code","partner_id"]])
+                        [sup_dom, ["id","product_tmpl_id","product_id","product_code","partner_id","delay"]])
         by_tmpl = {}
         for s in sis:
             tid = s["product_tmpl_id"][0] if s["product_tmpl_id"] else None
@@ -423,6 +468,8 @@ class Odoo:
                             "code": (e["product_code"] or "").strip(),
                             "variant_label": variant_label.get(vid, ""),
                             "variant_id": vid,
+                            "si_id": e["id"],
+                            "cur_delay": int(e.get("delay") or 0),
                             "free_qty": free_qty.get(vid, 0.0),
                             "incoming_qty": incoming_qty.get(vid, 0.0)})
         return out
@@ -435,6 +482,35 @@ class Odoo:
         else:
             text = ("⚠️ Beperkt leverbaar\n" + msg) if msg else "⚠️ Beschikbaarheid op aanvraag"
         self.call("product.template","write", [[tmpl_id], {"sale_line_warn_msg": text}])
+
+    def reimo_fields_available(self):
+        """Detecteer één keer of de custom velden bestaan (Studio kan ze weghalen)."""
+        if self._reimo_fields is None:
+            try:
+                f = self.call("product.template", "fields_get",
+                              [["x_reimo_op_voorraad", "x_reimo_beschikbaar_vanaf"]],
+                              {"attributes": ["type"]})
+                self._reimo_fields = set(f.keys())
+            except Exception:
+                self._reimo_fields = set()
+        return self._reimo_fields
+
+    def write_reimo_fields(self, tmpl_id, op_voorraad, beschikbaar_vanaf):
+        """Schrijf x_reimo_op_voorraad + x_reimo_beschikbaar_vanaf op de template.
+        Slaat velden over die (nog) niet bestaan. Retourneert True als er iets geschreven is."""
+        avail = self.reimo_fields_available()
+        vals = {}
+        if "x_reimo_op_voorraad" in avail:
+            vals["x_reimo_op_voorraad"] = bool(op_voorraad)
+        if "x_reimo_beschikbaar_vanaf" in avail:
+            vals["x_reimo_beschikbaar_vanaf"] = beschikbaar_vanaf or False
+        if vals:
+            self.call("product.template", "write", [[tmpl_id], vals])
+        return bool(vals)
+
+    def set_delay(self, si_id, delay):
+        """Zet de reële levertijd (dagen) op de Reimo-leverancierslijn."""
+        self.call("product.supplierinfo", "write", [[si_id], {"delay": int(delay)}])
 
 
 # ============================================================================
@@ -479,7 +555,7 @@ def main():
     odoo.authenticate()
 
     scope = cfg["scope"]
-    codes = odoo.find_codes(scope.get("supplier_partner_ids", [66]),
+    codes = odoo.find_codes(scope.get("supplier_partner_ids", [51, 66, 11]),
                             scope.get("categ_ids", []),
                             scope.get("include_archived", True),
                             scope.get("only_with_supplier_code", True))
@@ -488,7 +564,7 @@ def main():
     rules = cfg.get("rules", DEFAULT_RULES)
     delay = cfg.get("scrape", {}).get("delay_seconds", 0.7)
     by_tmpl = {}
-    ok = err = 0
+    ok = err = delays_set = 0
     # CSV writer voor dashboard
     import csv as _csv
     csv_path = Path("results.csv")
@@ -517,6 +593,24 @@ def main():
                 action = "warning"
                 msg = (msg or "Niet leverbaar bij Reimo.") + f" (✓ {int(incoming_qty)} besteld - PO loopt)"
                 info["_po_override"] = incoming_qty
+            # Reimo-beschikbaarheid afleiden (los van eigen voorraad/PO)
+            avail = derive_availability(info)
+            if avail is None:
+                info["_reimo_skip"] = True   # lookup-fout → niets aanraken
+            else:
+                r_op, r_vanaf, r_delay = avail
+                info["_reimo_op_voorraad"] = r_op
+                info["_reimo_beschikbaar_vanaf"] = r_vanaf
+                # Reële levertijd op de Reimo-leverancierslijn zetten (enkel bij wijziging)
+                if c.get("si_id") and r_delay != int(c.get("cur_delay") or 0):
+                    if not args.dry_run:
+                        try:
+                            odoo.set_delay(c["si_id"], r_delay)
+                            delays_set += 1
+                        except Exception as e:
+                            log(f"    delay {c['code']} FOUT: {e}")
+                    else:
+                        delays_set += 1
             by_tmpl.setdefault(c["tmpl_id"], {"name": c["tmpl_name"], "results": []})\
                 ["results"].append((c["code"], c["variant_label"], info, action, msg))
             csv_w.writerow([datetime.now().isoformat(timespec="seconds"),
@@ -534,19 +628,32 @@ def main():
     csv_f.close()
 
     log(f"Aggregeren naar {len(by_tmpl)} templates...")
-    wrote = 0
+    wrote = fields_wrote = 0
     for tid, data in by_tmpl.items():
         a, m = aggregate(data["results"])
+        # Velden per template, enkel uit betrouwbaar bepaalde resultaten:
+        #   op_voorraad = minstens één variant op voorraad → dan datum leegmaken;
+        #   anders vroegste bekende datum over de varianten.
+        good = [r for r in data["results"] if not r[2].get("_reimo_skip")]
+        op = any(r[2].get("_reimo_op_voorraad") for r in good)
+        if op:
+            vanaf = False
+        else:
+            vanafs = [r[2].get("_reimo_beschikbaar_vanaf") for r in good
+                      if r[2].get("_reimo_beschikbaar_vanaf")]
+            vanaf = min(vanafs) if vanafs else False   # ISO-strings sorteren chronologisch
         if args.dry_run:
-            log(f"  [DRY] tmpl {tid} ({data['name']}): {a}")
+            log(f"  [DRY] tmpl {tid} ({data['name']}): {a} | op_voorraad={op} vanaf={vanaf}")
         else:
             try:
                 odoo.write_warning(tid, a, m)
                 wrote += 1
-                log(f"  → tmpl {tid} ({data['name']}): {a}")
+                if good and odoo.write_reimo_fields(tid, op, vanaf):
+                    fields_wrote += 1
+                log(f"  → tmpl {tid} ({data['name']}): {a} | op_voorraad={op} vanaf={vanaf}")
             except Exception as e:
                 log(f"  → tmpl {tid} FOUT: {e}")
-    log(f"KLAAR. ok={ok} err={err} templates_geschreven={wrote}")
+    log(f"KLAAR. ok={ok} err={err} waarschuwingen={wrote} velden={fields_wrote} levertijden={delays_set}")
     if log_file: log_file.close()
 
 
