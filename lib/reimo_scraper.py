@@ -31,30 +31,43 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Reimo
 # Beschikbaarheid komt in x_reimo_beschikbaarheid; sale_line_warn_msg blijft van de
 # gebruiker (handmatige offerte-notitie) met de beschikbaarheid eronder na deze lijn.
 REIMO_AVAIL_FIELD = "x_reimo_beschikbaarheid"
-REIMO_DELIM = "———— Reimo beschikbaarheid (automatisch — niet bewerken) ————"
-_AVAIL_START = ("🚫 NIET LEVERBAAR", "⚠️ Beperkt leverbaar", "⚠️ Beschikbaarheid", REIMO_DELIM)
+MANUAL_HEADER = "📝 ─── EIGEN NOTITIE ───"
+REIMO_DELIM = "📦 ─── REIMO LEVERBAARHEID (automatisch — niet bewerken) ───"
+# Oude/losse beschikbaarheids-starts (voor herkenning van niet-handmatige inhoud)
+_AVAIL_START = ("🚫 NIET LEVERBAAR", "⚠️ Beperkt leverbaar", "⚠️ Beschikbaarheid",
+                REIMO_DELIM, "———— Reimo beschikbaarheid")
 
 
 def extract_manual(current: str) -> str:
-    """Haal het handmatige deel uit sale_line_warn_msg (alles boven de delimiter).
-    Oude inhoud die enkel sync-beschikbaarheid is, telt niet als handmatig."""
+    """Haal het handmatige deel uit sale_line_warn_msg (alles boven de leverbaarheid).
+    Verwijdert de EIGEN NOTITIE-kop; inhoud die enkel sync-beschikbaarheid is telt niet."""
     cur = (current or "").strip()
     if not cur:
         return ""
-    if REIMO_DELIM in cur:
-        return cur.split(REIMO_DELIM, 1)[0].rstrip()
-    if cur.startswith(_AVAIL_START):
-        return ""
-    return cur.rstrip()
+    # beschikbaarheidsdeel eraf (nieuwe of oude delimiter)
+    for delim in (REIMO_DELIM, "———— Reimo beschikbaarheid (automatisch — niet bewerken) ————"):
+        if delim in cur:
+            cur = cur.split(delim, 1)[0].rstrip()
+            break
+    else:
+        if cur.startswith(_AVAIL_START):
+            return ""
+    # eigen-notitie-kop eraf
+    if cur.startswith(MANUAL_HEADER):
+        cur = cur[len(MANUAL_HEADER):].lstrip("\n")
+    return cur.strip()
 
 
 def compose_warn(manual: str, availability: str):
-    """Stel sale_line_warn_msg samen: handmatige notitie + beschikbaarheid eronder."""
-    manual = (manual or "").rstrip()
+    """Stel sale_line_warn_msg samen: EIGEN NOTITIE (met kop) + beschikbaarheid (met kop)."""
+    manual = (manual or "").strip()
     availability = (availability or "").strip()
-    if manual and availability:
-        return f"{manual}\n\n{REIMO_DELIM}\n{availability}"
-    return availability or manual or False
+    parts = []
+    if manual:
+        parts.append(f"{MANUAL_HEADER}\n{manual}")
+    if availability:
+        parts.append(f"{REIMO_DELIM}\n{availability}")
+    return "\n\n".join(parts) or False
 
 
 # ============================================================================
