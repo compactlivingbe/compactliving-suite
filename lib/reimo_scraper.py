@@ -31,43 +31,13 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Reimo
 # Beschikbaarheid komt in x_reimo_beschikbaarheid; sale_line_warn_msg blijft van de
 # gebruiker (handmatige offerte-notitie) met de beschikbaarheid eronder na deze lijn.
 REIMO_AVAIL_FIELD = "x_reimo_beschikbaarheid"
-MANUAL_HEADER = "📝 ─── EIGEN NOTITIE ───"
-REIMO_DELIM = "📦 ─── REIMO LEVERBAARHEID (automatisch — niet bewerken) ───"
-# Oude/losse beschikbaarheids-starts (voor herkenning van niet-handmatige inhoud)
-_AVAIL_START = ("🚫 NIET LEVERBAAR", "⚠️ Beperkt leverbaar", "⚠️ Beschikbaarheid",
-                REIMO_DELIM, "———— Reimo beschikbaarheid")
-
-
-def extract_manual(current: str) -> str:
-    """Haal het handmatige deel uit sale_line_warn_msg (alles boven de leverbaarheid).
-    Verwijdert de EIGEN NOTITIE-kop; inhoud die enkel sync-beschikbaarheid is telt niet."""
-    cur = (current or "").strip()
-    if not cur:
-        return ""
-    # beschikbaarheidsdeel eraf (nieuwe of oude delimiter)
-    for delim in (REIMO_DELIM, "———— Reimo beschikbaarheid (automatisch — niet bewerken) ————"):
-        if delim in cur:
-            cur = cur.split(delim, 1)[0].rstrip()
-            break
-    else:
-        if cur.startswith(_AVAIL_START):
-            return ""
-    # eigen-notitie-kop eraf
-    if cur.startswith(MANUAL_HEADER):
-        cur = cur[len(MANUAL_HEADER):].lstrip("\n")
-    return cur.strip()
+# Gedeelde notitie/leverbaarheid-logica (ook door de VBD-pagina gebruikt).
+from warn_util import extract_manual, compose, MANUAL_HEADER, REIMO_DELIM  # noqa: E402,F401
 
 
 def compose_warn(manual: str, availability: str):
-    """Stel sale_line_warn_msg samen: EIGEN NOTITIE (met kop) + beschikbaarheid (met kop)."""
-    manual = (manual or "").strip()
-    availability = (availability or "").strip()
-    parts = []
-    if manual:
-        parts.append(f"{MANUAL_HEADER}\n{manual}")
-    if availability:
-        parts.append(f"{REIMO_DELIM}\n{availability}")
-    return "\n\n".join(parts) or False
+    """Reimo-variant: EIGEN NOTITIE + Reimo-leverbaarheid eronder."""
+    return compose(manual, availability, REIMO_DELIM)
 
 
 # ============================================================================
