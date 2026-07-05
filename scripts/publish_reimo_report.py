@@ -32,6 +32,9 @@ NEWCOMERS_PATH = REPO_ROOT / "data" / "reimo_newcomers.json"
 ATT_NAME = "Reimo rapport (website).html"
 REIMO_PARTNER_ID = 66
 DISCONTINUED_NEEDLE = "NIET LEVERBAAR"
+# Beschikbaarheid staat sinds de veld-splitsing in x_reimo_beschikbaarheid
+# (sale_line_warn_msg is voortaan de handmatige offerte-notitie + beschikbaarheid).
+AVAIL_FIELD = "x_reimo_beschikbaarheid"
 
 
 def _odoo() -> OdooClient:
@@ -120,13 +123,13 @@ def fetch_discontinued(c: OdooClient) -> list[dict]:
     # (met status 'Gearchiveerd'); anders zouden ze uit de lijst verdwijnen.
     tmpls = c.call(
         "product.template", "search_read",
-        [[("id", "in", list(code_by_tmpl)), ("sale_line_warn_msg", "ilike", DISCONTINUED_NEEDLE)],
-         ["name", "default_code", "list_price", "sale_line_warn_msg", "image_128",
+        [[("id", "in", list(code_by_tmpl)), (AVAIL_FIELD, "ilike", DISCONTINUED_NEEDLE)],
+         ["name", "default_code", "list_price", AVAIL_FIELD, "image_128",
           "qty_available", "active", "is_published", "purchase_ok"]],
         {"limit": 100000, "order": "name", "context": {"active_test": False}})
     out = []
     for t in tmpls:
-        raw = (t.get("sale_line_warn_msg") or "")
+        raw = (t.get(AVAIL_FIELD) or "")
         echt_vervallen, info = classify_warning(raw)
         if not echt_vervallen:
             # tijdelijk lang uit voorraad (backorder), geen Auslauf → niet tonen

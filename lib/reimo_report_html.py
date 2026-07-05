@@ -5,7 +5,7 @@ wordt gezet en op /inttools/rapporten/reimo in een iframe getoond wordt.
 Zelfde huisstijl (CSS/tabs) als het bestaande 'Producten met documenten'-rapport
 zodat het native aanvoelt. Twee tabs:
   - Nieuwe producten  (uit data/reimo_newcomers.json, cumulatief met datum)
-  - Niet meer verkocht (live uit Odoo: sale_line_warn_msg = NIET LEVERBAAR)
+  - Niet meer verkocht (live uit Odoo: x_reimo_beschikbaarheid = NIET LEVERBAAR)
 """
 from __future__ import annotations
 
