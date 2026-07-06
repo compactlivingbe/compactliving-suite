@@ -68,5 +68,12 @@
     "success": true,
     "summary": "0 missing \u00b7 0 cost \u00b7 0 sale",
     "url": "https://github.com/compactlivingbe/compactliving-suite/actions/runs/28505944019"
+  },
+  {
+    "timestamp": "2026-07-06T09:28:45.930894Z",
+    "workflow": "Reimo Profiweb weekly",
+    "success": true,
+    "summary": "593 OK \u00b7 24 warning \u00b7 4 block",
+    "url": "https://github.com/compactlivingbe/compactliving-suite/actions/runs/28780359272"
   }
 ]
