@@ -3,7 +3,7 @@
 Flow gemapt uit echte HAR capture (mei 2026):
 1. Login (form_anmelden -> POST naar r40msvcas400_call.pl)
 2. Naviger naar Schnellbestellung (AKTION=NAVIGATION, schnittstelle=000070)
-3. POST BEST_REG met alle items in één submit (max 10 per submit -- Reimo Quick Order beperkt)
+3. POST BEST_REG met ALLE items van de winkelmand in één submit (één order, geen 10-limiet)
 4. Parse response voor Auftrag-Nr (= bestelreferentie)
 
 Gebruik:
@@ -132,7 +132,14 @@ class ReimoOrderer:
         soup = BeautifulSoup(self.last_response_html or "", "html.parser")
         form = soup.find("form", {"name": "form_navigation_suche_schnellbestellung"})
         if not form:
-            raise ReimoOrderError("form_navigation_suche_schnellbestellung niet gevonden -- niet ingelogd?")
+            # Na add_to_cart staat de laatste pagina soms zonder menu-sidebar.
+            # Opnieuw inloggen herstelt de sidebar; de winkelmand blijft server-side bewaard.
+            self.log("Navigatie-sidebar ontbreekt — opnieuw inloggen om te herstellen...")
+            self.login()
+            soup = BeautifulSoup(self.last_response_html or "", "html.parser")
+            form = soup.find("form", {"name": "form_navigation_suche_schnellbestellung"})
+            if not form:
+                raise ReimoOrderError("form_navigation_suche_schnellbestellung niet gevonden -- niet ingelogd?")
         data = {inp.get("name"): inp.get("value", "")
                 for inp in form.find_all("input") if inp.get("name")}
         action = (form.get("action") or CALL_URL).strip()
@@ -149,7 +156,9 @@ class ReimoOrderer:
                     bemerkung="", versand="SOFORT", dry_run=False):
         """Plaats een bestelling.
 
-        items: list of (artnr, qty) tuples. Max 10 per call (Reimo Schnellbestellung).
+        items: list of (artnr, qty) tuples. Geen limiet: de volledige winkelmand
+               wordt in ÉÉN order geplaatst (Reimo Schnellbestellung pagineert
+               intern per 10, maar de order zelf is de hele mand).
         kommission: vrije tekst (bv. Odoo PO nummer) -- komt op de bestelbon.
         email: leveringsbevestiging adres.
         abholdatum: 'DD.MM.YY' (default = vandaag).
@@ -160,10 +169,6 @@ class ReimoOrderer:
         """
         if not items:
             raise ReimoOrderError("Geen items in bestelling")
-        if len(items) > MAX_LINES_PER_ORDER:
-            raise ReimoOrderError(
-                f"Max {MAX_LINES_PER_ORDER} items per bestelling (kreeg {len(items)}). "
-                f"Splits in meerdere orders.")
 
         if not abholdatum:
             abholdatum = date.today().strftime("%d.%m.%y")
@@ -198,20 +203,25 @@ class ReimoOrderer:
                 if name:
                     base_data[name] = inp.get("value", "")
 
-        # Stap 3: Bouw BEST_REG payload
-        # Gebaseerd op echte HAR capture (mei 2026)
+        # Stap 3: Bouw BEST_REG payload — dynamisch voor N regels.
+        # Gebaseerd op echte HAR capture (mei 2026), veralgemeend van 10 → N:
+        # de meta-velden var_anzahl_zeilen / var_liste_zahlenfelder / var_datumprf8
+        # enumereren per regel, dus die moeten meegroeien met het aantal items.
+        n = len(items)
+        termine = "|".join(f"TERMIN{i}" for i in range(1, n + 1))
+        menge_flds = "|".join(f"MENGE{i}=9=0" for i in range(1, n + 1))
         data = {
             "var_schnittstelle": "000070",
             "var_hauptpfad": "../r40/easyweb400/kunde_reimo/",
             "var_folgemaske": "reimo_suche_schnellbestellung.html",
-            "var_anzahl_zeilen": "00010",
+            "var_anzahl_zeilen": f"{n:05d}",
             "var_transaktionsnr": self.transaktionsnr or "",
-            "var_datumprf8": "ABHOLDATUM|ABHOLDATUM2|TERMIN1|TERMIN2|TERMIN3|TERMIN4|TERMIN5|TERMIN6|TERMIN7|TERMIN8|TERMIN9|TERMIN10",
-            "var_liste_zahlenfelder": "AUNR=7=0|MENGE=9=0|MENGE1=9=0|MENGE2=9=0|MENGE3=9=0|MENGE4=9=0|MENGE5=9=0|MENGE6=9=0|MENGE7=9=0|MENGE8=9=0|MENGE9=9=0|MENGE10=9=0|",
+            "var_datumprf8": "ABHOLDATUM|ABHOLDATUM2|" + termine,
+            "var_liste_zahlenfelder": "AUNR=7=0|MENGE=9=0|" + menge_flds + "|",
             "var_sprache": "DE",
             "var_back_key": "001",
             "var_first_key": "001",
-            "var_nextkey": "011",
+            "var_nextkey": f"{n + 1:03d}",
             "AKTION": "BEST_REG",
             "MENGE": "1",
             "ABHOLDATUM": abholdatum,
@@ -227,18 +237,13 @@ class ReimoOrderer:
             "BEMERK": bemerkung,
         }
 
-        # Item lijnen APOS1..APOS10
-        for idx in range(1, MAX_LINES_PER_ORDER + 1):
-            apos = f"{idx:03d}"
-            data[f"APOS{idx}"] = apos
-            if idx <= len(items):
-                code, qty = items[idx - 1]
-                data[f"ARTNR{idx}"] = str(code)
-                data[f"MENGE{idx}"] = str(int(qty))
-                data[f"RABATT{idx}"] = "   0,00"
-            else:
-                data[f"MENGE{idx}"] = " "
-                data[f"RABATT{idx}"] = "   0,00"
+        # Alle N regels (APOS1..APOSn) — geen 10-limiet meer
+        for idx in range(1, n + 1):
+            code, qty = items[idx - 1]
+            data[f"APOS{idx}"] = f"{idx:03d}"
+            data[f"ARTNR{idx}"] = str(code)
+            data[f"MENGE{idx}"] = str(int(qty))
+            data[f"RABATT{idx}"] = "   0,00"
 
         # Stap 4: POST BEST_REG (= echte commit, items uit cart worden order)
         self.log(f"BEST_REG: {len(items)} items, abholdatum={abholdatum}, versand={versand}")
