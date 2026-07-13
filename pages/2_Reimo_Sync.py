@@ -15,7 +15,8 @@ from auth import require_auth
 require_auth()
 
 st.title("📦 Reimo Profiweb sync")
-st.caption("Scrape Reimo beschikbaarheid → schrijft `sale_line_warn_msg` per template in Odoo.")
+st.caption("Scrape Reimo beschikbaarheid → schrijft `x_reimo_beschikbaarheid` per template in Odoo "
+           "(en zet die ook onder je handmatige `sale_line_warn_msg`-notitie).")
 
 
 def load_cfg():

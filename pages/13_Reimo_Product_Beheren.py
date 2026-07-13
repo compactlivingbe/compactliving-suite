@@ -29,7 +29,7 @@ ODOO_URL = os.environ.get("ODOO_URL", "https://compactliving.odoo.com").rstrip("
 
 FIELDS = ["name", "default_code", "list_price", "active", "is_published",
           "purchase_ok", "sale_ok", "qty_available", "virtual_available",
-          "sale_line_warn_msg", "image_128"]
+          "sale_line_warn_msg", "x_reimo_beschikbaarheid", "image_128"]
 
 
 @st.cache_resource(show_spinner=False)
@@ -139,8 +139,11 @@ with right:
         f"{'🟢 Actief' if actief else '⚪ Gearchiveerd'} · "
         f"{'🌐 Op webshop' if online else '🚫 Niet op webshop'} · "
         f"{'🛒 Bestelbaar' if koopbaar else '⛔ Niet meer bestellen'}")
+    if prod.get("x_reimo_beschikbaarheid"):
+        st.info(prod["x_reimo_beschikbaarheid"])
     if prod.get("sale_line_warn_msg"):
-        st.info(prod["sale_line_warn_msg"])
+        st.caption("Waarschuwing op verkooporders (handmatige notitie + beschikbaarheid):")
+        st.code(prod["sale_line_warn_msg"], language=None)
 
     # aanbeveling
     if qty <= 0:

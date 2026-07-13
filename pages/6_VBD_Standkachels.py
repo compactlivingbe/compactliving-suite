@@ -9,6 +9,7 @@ import requests
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from odoo_client import OdooClient
 from vbd_scraper import fetch_all, fetch_full_description, compare_with_odoo, DEFAULT_CATEGORIES, BASE
+from warn_util import extract_manual, compose, VBD_DELIM
 
 try:
     st.set_page_config(page_title="VBD Standkachels", page_icon="🔥", layout="wide")
@@ -670,16 +671,24 @@ if "_vbd_result" in st.session_state:
                     if st.button(f"⚠ Zet verkoop-waarschuwing op {len(sel_d)} templates",
                                   type="primary", key="vbd_disc_warn"):
                         ok = err = 0
-                        for _, r in sel_d.iterrows():
+                        tids = [int(r["template_id"]) for _, r in sel_d.iterrows()]
+                        # huidige waarschuwing lezen om de handmatige notitie te bewaren
+                        cur_map = {t["id"]: (t.get("sale_line_warn_msg") or "")
+                                   for t in odoo.read("product.template", tids,
+                                                      ["sale_line_warn_msg"])}
+                        for tid in tids:
                             try:
-                                odoo.write("product.template", [int(r["template_id"])],
-                                            {"sale_line_warn_msg": msg_text,
-                                             "sale_line_warn": "warning"})
+                                combined = compose(extract_manual(cur_map.get(tid, "")),
+                                                   msg_text, VBD_DELIM)
+                                odoo.write("product.template", [tid],
+                                           {"sale_line_warn_msg": combined or False,
+                                            "x_vbd_beschikbaarheid": msg_text or False})
                                 ok += 1
                             except Exception as e:
                                 err += 1
-                                st.error(f"{r['sku']}: {e}")
-                        st.success(f"✓ {ok} templates bijgewerkt · {err} fout")
+                                st.error(f"tmpl {tid}: {e}")
+                        st.success(f"✓ {ok} templates bijgewerkt · {err} fout "
+                                   "(handmatige notitie bewaard).")
                 with ac2:
                     if st.button(f"🗑 Verwijder VBD supplierinfo (×{len(sel_d)})",
                                   key="vbd_disc_unlink"):

@@ -133,7 +133,7 @@ Per PO klik je "Bestel nu" → de items worden via Reimo Schnellbestellung verst
 het Reimo Auftrag-Nr wordt automatisch teruggeschreven naar Odoo `Reimo ref`.
 
 ⚠️ Eerste keer: gebruik **Dry run** om te valideren zonder echte bestelling.
-Max 10 lijnen per bestelling (Reimo Schnellbestellung limit) — meer wordt gesplitst.
+De volledige winkelmand wordt in **één** Reimo-order geplaatst (geen splitsing op 10).
 """)
 
 
@@ -323,7 +323,8 @@ if order_payload:
                     for c, q, d, p in o["items"]
                 ]), hide_index=True, use_container_width=True)
                 if len(o["items"]) > 10:
-                    st.warning(f"⚠ {len(o['items'])} items > 10 → wordt gesplitst in {-(-len(o['items'])//10)} Reimo orders")
+                    st.caption(f"ℹ️ {len(o['items'])} items → in **één** Reimo-order geplaatst "
+                               "(Reimo toont 10 per pagina, maar de bestelling is de volledige mand).")
             else:
                 st.error("Geen items met Reimo code → kan niet bestellen")
 
@@ -369,19 +370,14 @@ if (dry or real) and ReimoOrderer is not None and order_payload:
             if not o["items"]:
                 continue
             items_only = [(c, q) for c, q, _, _ in o["items"]]
-            refs = []
-            for batch_idx in range(0, len(items_only), 10):
-                batch = items_only[batch_idx:batch_idx+10]
-                suffix = f" deel {batch_idx//10 + 1}" if len(items_only) > 10 else ""
-                aunr = orderer.place_order(
-                    batch,
-                    kommission=o["po_name"] + suffix,
-                    email=email,
-                    bemerkung=bemerk,
-                    dry_run=dry,
-                )
-                refs.append(aunr)
-            ref_str = ", ".join(refs)
+            # Volledige mand in ÉÉN Reimo-order (geen splitsing meer op 10)
+            ref_str = orderer.place_order(
+                items_only,
+                kommission=o["po_name"],
+                email=email,
+                bemerkung=bemerk,
+                dry_run=dry,
+            )
             if dry:
                 st.info(f"🔬 Dry run **{o['po_name']}** → zou {len(items_only)} items besteld hebben")
             else:

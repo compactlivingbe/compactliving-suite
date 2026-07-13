@@ -143,7 +143,7 @@ def render_home():
     with i2:
         card_internal("🛒", "Reimo bestellen", "Bevestigde Reimo-inkooporders automatisch in het "
                       "Profiweb-winkelmandje plaatsen.",
-                      "Max 10 lijnen per order; winkelmand-beheer ingebouwd.", PAGES["reimo_bestellen"])
+                      "Volledige mand in één order; winkelmand-beheer ingebouwd.", PAGES["reimo_bestellen"])
     with i3:
         card_external("🏗️", "Project verwerken", "Camperbouw-projecten verwerken en opvolgen in Odoo.",
                       "Odoo-tool", PROJECT_URL)

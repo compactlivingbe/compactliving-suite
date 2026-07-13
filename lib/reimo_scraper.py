@@ -28,6 +28,17 @@ PROFIWEB_LOGIN_URL = (
 PROFIWEB_CALL_URL = "https://profiweb.reimo.com/cgi-bin/r40msvcas400_call.pl"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ReimoScraper/1.0"
 
+# Beschikbaarheid komt in x_reimo_beschikbaarheid; sale_line_warn_msg blijft van de
+# gebruiker (handmatige offerte-notitie) met de beschikbaarheid eronder na deze lijn.
+REIMO_AVAIL_FIELD = "x_reimo_beschikbaarheid"
+# Gedeelde notitie/leverbaarheid-logica (ook door de VBD-pagina gebruikt).
+from warn_util import extract_manual, compose, MANUAL_HEADER, REIMO_DELIM  # noqa: E402,F401
+
+
+def compose_warn(manual: str, availability: str):
+    """Reimo-variant: EIGEN NOTITIE + Reimo-leverbaarheid eronder."""
+    return compose(manual, availability, REIMO_DELIM)
+
 
 # ============================================================================
 # Profiweb HTTP client
@@ -428,7 +439,7 @@ class Odoo:
         if include_archived:
             domain += ["|", ["active","=",True], ["active","=",False]]
         tmpls = self.call("product.template","search_read",
-                          [domain, ["id","name","seller_ids","categ_id"]])
+                          [domain, ["id","name","seller_ids","categ_id","sale_line_warn_msg"]])
         all_seller_ids = sum((t["seller_ids"] for t in tmpls), [])
         if not all_seller_ids: return []
         sup_dom = [["id","in",all_seller_ids]]
@@ -471,24 +482,32 @@ class Odoo:
                             "si_id": e["id"],
                             "cur_delay": int(e.get("delay") or 0),
                             "free_qty": free_qty.get(vid, 0.0),
-                            "incoming_qty": incoming_qty.get(vid, 0.0)})
+                            "incoming_qty": incoming_qty.get(vid, 0.0),
+                            "current_warn": t.get("sale_line_warn_msg") or ""})
         return out
 
-    def write_warning(self, tmpl_id, action, msg):
+    def write_warning(self, tmpl_id, action, msg, current_warn=""):
+        # Beschikbaarheidstekst (clean) → x_reimo_beschikbaarheid.
         if action == "no-message":
-            text = False
+            avail = ""
         elif action == "block":
-            text = ("🚫 NIET LEVERBAAR\n" + msg) if msg else "🚫 NIET LEVERBAAR"
+            avail = ("🚫 NIET LEVERBAAR\n" + msg) if msg else "🚫 NIET LEVERBAAR"
         else:
-            text = ("⚠️ Beperkt leverbaar\n" + msg) if msg else "⚠️ Beschikbaarheid op aanvraag"
-        self.call("product.template","write", [[tmpl_id], {"sale_line_warn_msg": text}])
+            avail = ("⚠️ Beperkt leverbaar\n" + msg) if msg else "⚠️ Beschikbaarheid op aanvraag"
+        # sale_line_warn_msg = handmatige notitie (bewaard) + beschikbaarheid eronder.
+        combined = compose_warn(extract_manual(current_warn), avail)
+        vals = {"sale_line_warn_msg": combined}
+        if REIMO_AVAIL_FIELD in self.reimo_fields_available():
+            vals[REIMO_AVAIL_FIELD] = avail or False
+        self.call("product.template","write", [[tmpl_id], vals])
 
     def reimo_fields_available(self):
         """Detecteer één keer of de custom velden bestaan (Studio kan ze weghalen)."""
         if self._reimo_fields is None:
             try:
                 f = self.call("product.template", "fields_get",
-                              [["x_reimo_op_voorraad", "x_reimo_beschikbaar_vanaf"]],
+                              [["x_reimo_op_voorraad", "x_reimo_beschikbaar_vanaf",
+                                REIMO_AVAIL_FIELD]],
                               {"attributes": ["type"]})
                 self._reimo_fields = set(f.keys())
             except Exception:
@@ -611,7 +630,8 @@ def main():
                             log(f"    delay {c['code']} FOUT: {e}")
                     else:
                         delays_set += 1
-            by_tmpl.setdefault(c["tmpl_id"], {"name": c["tmpl_name"], "results": []})\
+            by_tmpl.setdefault(c["tmpl_id"], {"name": c["tmpl_name"], "results": [],
+                                              "current_warn": c.get("current_warn", "")})\
                 ["results"].append((c["code"], c["variant_label"], info, action, msg))
             csv_w.writerow([datetime.now().isoformat(timespec="seconds"),
                             c["tmpl_id"], c["tmpl_name"], c["code"], c.get("variant_label",""),
@@ -646,7 +666,7 @@ def main():
             log(f"  [DRY] tmpl {tid} ({data['name']}): {a} | op_voorraad={op} vanaf={vanaf}")
         else:
             try:
-                odoo.write_warning(tid, a, m)
+                odoo.write_warning(tid, a, m, data.get("current_warn", ""))
                 wrote += 1
                 if good and odoo.write_reimo_fields(tid, op, vanaf):
                     fields_wrote += 1
