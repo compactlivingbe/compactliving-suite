@@ -1,19 +1,19 @@
 [
   {
-    "tmpl_id": "5205",
-    "template": "Caddy Maxi 2008-2020 \u2013 P1 Rechts \u2013 LWB \u2013 Schuifraam \u2013 Privacy \u2013 Carbest",
+    "tmpl_id": "5780",
+    "template": "Afdekkapje voor ventilatieopening RW FUSION, zwart",
     "categ": "",
     "action": "block",
-    "detail": "[31618] 30.10.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5205"
+    "detail": "[E899808] 06.11.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5780"
   },
   {
-    "tmpl_id": "1218",
-    "template": "Carbest RW Van - klapraam",
+    "tmpl_id": "1220",
+    "template": "Carbest RW Fusion Curved - klapraam",
     "categ": "",
     "action": "block",
-    "detail": "[319100] 11.09.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1218"
+    "detail": "[319004] 11.09.26 | [319005] 14.07.26 | [319013] 06.11.26 | [319006] 06.11.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1220"
   },
   {
     "tmpl_id": "364",
@@ -28,39 +28,63 @@
     "template": "Transit V363 bj 2014 \u2013 P2 Rechts \u2013 5981 \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
     "categ": "",
     "action": "block",
-    "detail": "[31734] 16.10.26",
+    "detail": "[31734] 23.10.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5297"
+  },
+  {
+    "tmpl_id": "191",
+    "template": "Aansluiting 12-24V met montegeplaat",
+    "categ": "",
+    "action": "warning",
+    "detail": "[81140] 17.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/191"
   },
   {
     "tmpl_id": "612",
     "template": "CEE-ingangscontactdoos met magnetische sluiting | wit",
     "categ": "",
     "action": "warning",
-    "detail": "[820374] 31.07.26",
+    "detail": "[820374] 07.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/612"
+  },
+  {
+    "tmpl_id": "5205",
+    "template": "Caddy Maxi 2008-2020 \u2013 P1 Rechts \u2013 LWB \u2013 Schuifraam \u2013 Privacy \u2013 Carbest",
+    "categ": "",
+    "action": "warning",
+    "detail": "[31618] 11.09.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5205"
   },
   {
     "tmpl_id": "5199",
     "template": "Caddy Maxi 2008-2020 \u2013 P1 Rechts \u2013 LWB \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
     "categ": "",
     "action": "warning",
-    "detail": "[316021] 07.07.26",
+    "detail": "[316021] 14.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5199"
   },
   {
-    "tmpl_id": "1220",
-    "template": "Carbest RW Fusion Curved - klapraam",
+    "tmpl_id": "2179",
+    "template": "Carbest RW STYLE Rollo/Hor",
     "categ": "",
     "action": "warning",
-    "detail": "[319003] 07.07.26 | [319004] 07.07.26 | [319005] 07.07.26 | [319006] 10.07.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1220"
+    "detail": "[3180020] 14.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/2179"
+  },
+  {
+    "tmpl_id": "1218",
+    "template": "Carbest RW Van - klapraam",
+    "categ": "",
+    "action": "warning",
+    "detail": "[319100] 11.09.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1218"
   },
   {
     "tmpl_id": "2180",
     "template": "Carbest RW Van Rollo/Hor",
     "categ": "",
     "action": "warning",
-    "detail": "[319113] 10.07.26 | [319123] 10.07.26 | [319162] 10.07.26",
+    "detail": "[319113] 14.07.26 | [319123] 14.07.26 | [319162] 14.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/2180"
   },
   {
@@ -84,7 +108,7 @@
     "template": "Fiamma Luifel F43van 2,7m Royal Grey, Deep Black",
     "categ": "",
     "action": "warning",
-    "detail": "[440545] 07.08.26",
+    "detail": "[440545] 14.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/786"
   },
   {
@@ -92,7 +116,7 @@
     "template": "Lage zetel console voor Ducato 250/Boxer/Jumper",
     "categ": "",
     "action": "warning",
-    "detail": "[59548] 07.07.26",
+    "detail": "[59548] 14.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/815"
   },
   {
@@ -100,7 +124,7 @@
     "template": "Maxxair Maxxfan Deluxe ventilator",
     "categ": "",
     "action": "warning",
-    "detail": "[398192] 17.07.26",
+    "detail": "[398192] 17.07.26 | [398192] 17.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/131"
   },
   {
@@ -112,12 +136,28 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/89"
   },
   {
+    "tmpl_id": "5788",
+    "template": "Mini Batterieschalter",
+    "categ": "",
+    "action": "warning",
+    "detail": "[81229] 07.08.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5788"
+  },
+  {
     "tmpl_id": "460",
     "template": "Premium thermische matten Blackline cabine",
     "categ": "",
     "action": "warning",
     "detail": "[372344] 17.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/460"
+  },
+  {
+    "tmpl_id": "1133",
+    "template": "Renogy Solarpanel 120W",
+    "categ": "",
+    "action": "warning",
+    "detail": "[840240] 14.08.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/1133"
   },
   {
     "tmpl_id": "425",
@@ -128,11 +168,27 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/425"
   },
   {
+    "tmpl_id": "288",
+    "template": "Sika Sikaflex 522 300ml",
+    "categ": "",
+    "action": "warning",
+    "detail": "[294104] 17.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/288"
+  },
+  {
+    "tmpl_id": "289",
+    "template": "Sika Sikaflex 554 300ml",
+    "categ": "",
+    "action": "warning",
+    "detail": "[294113] 17.07.26 | [294113] 17.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/289"
+  },
+  {
     "tmpl_id": "715",
     "template": "Telair Clima e-Van 5400H airconditioning met warmtepomp",
     "categ": "",
     "action": "warning",
-    "detail": "[495014] 10.07.26",
+    "detail": "[495014] 14.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/715"
   },
   {
@@ -140,7 +196,7 @@
     "template": "Transit V363 bj 2014 \u2013 P2 Rechts \u2013 5531/5981/6704 \u2013 Schuifraam \u2013 Privacy \u2013 Carbest",
     "categ": "",
     "action": "warning",
-    "detail": "[31730] 07.07.26 | [31730] 07.07.26",
+    "detail": "[31730] 14.07.26 | [31730] 14.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/508"
   },
   {
@@ -156,8 +212,16 @@
     "template": "Vito bj 2015 \u2013 P2 Rechts \u2013 kR/mR/lR \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
     "categ": "",
     "action": "warning",
-    "detail": "[315962] 07.07.26",
+    "detail": "[315962] 14.07.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5247"
+  },
+  {
+    "tmpl_id": "377",
+    "template": "Water vuldop | zwart | met 2 sleutels",
+    "categ": "",
+    "action": "warning",
+    "detail": "[65216] 17.07.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/377"
   },
   {
     "tmpl_id": "716",
