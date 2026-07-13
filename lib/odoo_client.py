@@ -2,6 +2,7 @@
 Equivalent van XML-RPC maar over JSON HTTP — robuuster onder Streamlit/cloud.
 """
 import json
+import re
 import requests
 from typing import Any
 
@@ -75,11 +76,35 @@ class OdooClient:
     def read(self, model: str, ids: list, fields: list) -> list:
         return self.call(model, "read", [ids, fields])
 
+    @staticmethod
+    def _norm_vat(v: str) -> str:
+        """Normaliseer een BTW-nummer: enkel letters/cijfers, uppercase.
+        Zo matcht 'BE1003.398.286' met de opslag 'BE1003398286'."""
+        return re.sub(r"[^0-9A-Za-z]", "", v or "").upper()
+
     def find_partner(self, name: str, vat: str = None):
         if vat:
-            res = self.search_read("res.partner", [("vat", "=", vat)], ["id", "name", "vat"], 5)
-            if res:
-                return res[0]
+            # 1) exacte match op ruwe én genormaliseerde waarde (Odoo slaat meestal
+            #    zonder puntjes/spaties op, de factuur bevat ze soms wél)
+            tried = []
+            for cand in (vat, self._norm_vat(vat)):
+                if cand and cand not in tried:
+                    tried.append(cand)
+                    res = self.search_read("res.partner", [("vat", "=", cand)],
+                                           ["id", "name", "vat"], 5)
+                    if res:
+                        return res[0]
+            # 2) fallback: vergelijk genormaliseerd tegen partners met dezelfde cijferkern
+            #    (vangt ook het omgekeerde geval op waar de opslag wél puntjes bevat)
+            nv = self._norm_vat(vat)
+            core = re.sub(r"\D", "", vat)
+            if len(core) >= 6:
+                res = self.search_read("res.partner",
+                                       ["|", ("vat", "ilike", core), ("vat", "ilike", nv)],
+                                       ["id", "name", "vat"], 30)
+                for r in res:
+                    if self._norm_vat(r.get("vat")) == nv:
+                        return r
         res = self.search_read(
             "res.partner",
             [("supplier_rank", ">", 0), ("name", "ilike", name)],
