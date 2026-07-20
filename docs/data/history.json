@@ -82,5 +82,12 @@
     "success": true,
     "summary": "588 OK \u00b7 33 warning \u00b7 5 block",
     "url": "https://github.com/compactlivingbe/compactliving-suite/actions/runs/29235233541"
+  },
+  {
+    "timestamp": "2026-07-20T08:34:49.115456Z",
+    "workflow": "Reimo Profiweb weekly",
+    "success": true,
+    "summary": "597 OK \u00b7 31 warning \u00b7 4 block",
+    "url": "https://github.com/compactlivingbe/compactliving-suite/actions/runs/29727082451"
   }
 ]
