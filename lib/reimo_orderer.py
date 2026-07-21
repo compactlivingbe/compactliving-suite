@@ -173,21 +173,31 @@ class ReimoOrderer:
         if not abholdatum:
             abholdatum = date.today().strftime("%d.%m.%y")
 
-        # Stap 1: voeg elk item toe aan winkelmandje (zichtbaar in Profiweb voor user)
-        self.log(f"Items toevoegen aan Profiweb winkelmandje ({len(items)}):")
-        for code, qty in items:
-            try:
-                self.add_to_cart(code, qty)
-            except Exception as e:
-                self.log(f"  ✗ {code} faalde: {e}")
-
+        # DRY RUN: enkel de items in het Profiweb winkelmandje zetten, zodat je ze
+        # visueel kunt controleren op profiweb.reimo.com. GEEN echte order.
         if dry_run:
+            self.log(f"Items toevoegen aan Profiweb winkelmandje ({len(items)}):")
+            for code, qty in items:
+                try:
+                    self.add_to_cart(code, qty)
+                except Exception as e:
+                    self.log(f"  ✗ {code} faalde: {e}")
             self.log(f"DRY RUN klaar: {len(items)} items zitten nu in Profiweb winkelmandje.")
-            self.log(f"   Login op profiweb.reimo.com → Bestellung → Schnellbestellung om te zien.")
-            self.log(f"   Geen echte order geplaatst (BEST_REG overgeslagen).")
+            self.log("   Login op profiweb.reimo.com → Bestellung → Schnellbestellung om te zien.")
+            self.log("   Geen echte order geplaatst (BEST_REG overgeslagen).")
             return "DRY_RUN_ITEMS_IN_CART"
 
-        # Stap 2: open Schnellbestellung pagina (om var_transaktionsnr te refreshen)
+        # ECHTE ORDER: rechtstreeks via Schnellbestellung BEST_REG met alle items.
+        # BELANGRIJK: hier GEEN add_to_cart doen. BEST_REG plaatst de meegegeven
+        # items zelf; ze eerst aan de winkelmand toevoegen zou ze DUBBEL bestellen.
+        # Ruim eerst de winkelmand op (bv. restanten van een dry run) zodat de
+        # order exact deze items bevat.
+        try:
+            self.clear_cart()
+        except Exception as e:
+            self.log(f"Waarschuwing: winkelmand opschonen faalde ({e}) — ga toch door.")
+
+        # Open Schnellbestellung pagina (om var_transaktionsnr te refreshen)
         self.goto_schnellbestellung()
 
         # Stap 2: parse current form to get hidden fields + structure
