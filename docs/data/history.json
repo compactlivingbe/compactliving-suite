@@ -96,5 +96,12 @@
     "success": true,
     "summary": "604 OK \u00b7 25 warning \u00b7 3 block",
     "url": "https://github.com/compactlivingbe/compactliving-suite/actions/runs/30250680338"
+  },
+  {
+    "timestamp": "2026-08-01T07:41:56.255363Z",
+    "workflow": "Top Systems Victron monthly",
+    "success": true,
+    "summary": "0 missing \u00b7 0 cost \u00b7 0 sale",
+    "url": "https://github.com/compactlivingbe/compactliving-suite/actions/runs/30690244438"
   }
 ]
