@@ -8,12 +8,12 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5780"
   },
   {
-    "tmpl_id": "198",
-    "template": "Fiamma luifel | F80S 2,9m | kleur doek Royal Blue | Frame in wit ",
+    "tmpl_id": "2180",
+    "template": "Carbest RW Van Rollo/Hor",
     "categ": "",
     "action": "block",
-    "detail": "[436267] 02.10.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/198"
+    "detail": "[319123] 06.11.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/2180"
   },
   {
     "tmpl_id": "364",
@@ -24,11 +24,19 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/364"
   },
   {
+    "tmpl_id": "5248",
+    "template": "Vito bj 2015 \u2013 P2 Links \u2013 kR/mR/lR \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
+    "categ": "",
+    "action": "block",
+    "detail": "[315961] 13.11.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5248"
+  },
+  {
     "tmpl_id": "612",
     "template": "CEE-ingangscontactdoos met magnetische sluiting | wit",
     "categ": "",
     "action": "warning",
-    "detail": "[820374] 21.08.26",
+    "detail": "[820374] 28.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/612"
   },
   {
@@ -60,7 +68,7 @@
     "template": "Dompelpomp 14l/min., 0,5 bar",
     "categ": "",
     "action": "warning",
-    "detail": "[620601] 28.08.26",
+    "detail": "[620601] 04.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/205"
   },
   {
@@ -88,6 +96,14 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/786"
   },
   {
+    "tmpl_id": "198",
+    "template": "Fiamma luifel | F80S 2,9m | kleur doek Royal Blue | Frame in wit ",
+    "categ": "",
+    "action": "warning",
+    "detail": "[436267] 02.10.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/198"
+  },
+  {
     "tmpl_id": "784",
     "template": "Fuse holder - distributie | 1 MEGA in / 4 MIDI uit",
     "categ": "",
@@ -104,27 +120,11 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/475"
   },
   {
-    "tmpl_id": "815",
-    "template": "Lage zetel console voor Ducato 250/Boxer/Jumper",
-    "categ": "",
-    "action": "warning",
-    "detail": "[59548] 28.07.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/815"
-  },
-  {
-    "tmpl_id": "131",
-    "template": "Maxxair Maxxfan Deluxe ventilator",
-    "categ": "",
-    "action": "warning",
-    "detail": "[398192] 31.07.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/131"
-  },
-  {
     "tmpl_id": "561",
     "template": "Minivergrendeling | automatisch klikslot | stuk",
     "categ": "",
     "action": "warning",
-    "detail": "[53251] 07.08.26",
+    "detail": "[53251] 14.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/561"
   },
   {
@@ -132,16 +132,8 @@
     "template": "Premium thermische matten Blackline cabine",
     "categ": "",
     "action": "warning",
-    "detail": "[372344] 28.07.26",
+    "detail": "[372344] 04.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/460"
-  },
-  {
-    "tmpl_id": "724",
-    "template": "Rockerschakelaar (AAN/UIT) met indicatielampje",
-    "categ": "",
-    "action": "warning",
-    "detail": "[811217] 18.09.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/724"
   },
   {
     "tmpl_id": "425",
@@ -156,7 +148,7 @@
     "template": "Sika Sikaflex 522 300ml",
     "categ": "",
     "action": "warning",
-    "detail": "[294104] 14.08.26",
+    "detail": "[294104] 07.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/288"
   },
   {
@@ -164,7 +156,7 @@
     "template": "Standby Charger Pro",
     "categ": "",
     "action": "warning",
-    "detail": "[812243] 28.08.26",
+    "detail": "[812243] 11.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5794"
   },
   {
@@ -180,7 +172,7 @@
     "template": "Transit V363 bj 2014 \u2013 P2 Rechts \u2013 5531/5981/6704 \u2013 Schuifraam \u2013 Privacy \u2013 Carbest",
     "categ": "",
     "action": "warning",
-    "detail": "[31730] 28.07.26 | [31730] 28.07.26",
+    "detail": "[31730] 04.08.26 | [31730] 04.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/508"
   },
   {
@@ -188,23 +180,7 @@
     "template": "Truma Combi D6E met iNet X Paneel",
     "categ": "",
     "action": "warning",
-    "detail": "[721929] 07.08.26",
+    "detail": "[721929] 04.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/353"
-  },
-  {
-    "tmpl_id": "438",
-    "template": "Truma Lamelleninzetstuk LA luchtverdeling | zwart",
-    "categ": "",
-    "action": "warning",
-    "detail": "[72151] 14.08.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/438"
-  },
-  {
-    "tmpl_id": "403",
-    "template": "Uni-Quick 12mm: Afvoerklep 2 ingangen",
-    "categ": "",
-    "action": "warning",
-    "detail": "[650537] 21.08.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/403"
   }
 ]
