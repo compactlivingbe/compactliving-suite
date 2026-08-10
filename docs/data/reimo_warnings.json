@@ -16,6 +16,14 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/2180"
   },
   {
+    "tmpl_id": "796",
+    "template": "Fiamma adapter kit Ford Custom | F45s / F43van / F35pro",
+    "categ": "",
+    "action": "block",
+    "detail": "[440602] DISCONTINUED",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/796"
+  },
+  {
     "tmpl_id": "364",
     "template": "Powerstation EcoFlow Delta 2 Max",
     "categ": "",
@@ -28,15 +36,23 @@
     "template": "Vito bj 2015 \u2013 P2 Links \u2013 kR/mR/lR \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
     "categ": "",
     "action": "block",
-    "detail": "[315961] 13.11.26",
+    "detail": "[315961] 20.11.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5248"
+  },
+  {
+    "tmpl_id": "797",
+    "template": "Zonnepaneel Flex 135W zwart 855x800x3 mm",
+    "categ": "",
+    "action": "block",
+    "detail": "[853161] DISCONTINUED",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/797"
   },
   {
     "tmpl_id": "612",
     "template": "CEE-ingangscontactdoos met magnetische sluiting | wit",
     "categ": "",
     "action": "warning",
-    "detail": "[820374] 28.08.26",
+    "detail": "[820374] 04.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/612"
   },
   {
@@ -68,7 +84,7 @@
     "template": "Dompelpomp 14l/min., 0,5 bar",
     "categ": "",
     "action": "warning",
-    "detail": "[620601] 04.09.26",
+    "detail": "[620601] 11.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/205"
   },
   {
@@ -88,12 +104,12 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/767"
   },
   {
-    "tmpl_id": "786",
-    "template": "Fiamma Luifel F43van 2,7m Royal Grey, Deep Black",
+    "tmpl_id": "557",
+    "template": "Fiamma expansievat A20",
     "categ": "",
     "action": "warning",
-    "detail": "[440545] 21.08.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/786"
+    "detail": "[440688] 02.10.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/557"
   },
   {
     "tmpl_id": "198",
@@ -112,14 +128,6 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/784"
   },
   {
-    "tmpl_id": "475",
-    "template": "GOK Caramatic DriveOne vert. 30mbar M20x1,5xRVS10/8",
-    "categ": "",
-    "action": "warning",
-    "detail": "[75450] 07.08.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/475"
-  },
-  {
     "tmpl_id": "561",
     "template": "Minivergrendeling | automatisch klikslot | stuk",
     "categ": "",
@@ -128,12 +136,12 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/561"
   },
   {
-    "tmpl_id": "460",
-    "template": "Premium thermische matten Blackline cabine",
+    "tmpl_id": "375",
+    "template": "REMIcare-muggengaasdeur met tafellijst |   Ducato (X250/X290)",
     "categ": "",
     "action": "warning",
-    "detail": "[372344] 04.08.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/460"
+    "detail": "[35075] 14.08.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/375"
   },
   {
     "tmpl_id": "425",
@@ -144,19 +152,11 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/425"
   },
   {
-    "tmpl_id": "288",
-    "template": "Sika Sikaflex 522 300ml",
-    "categ": "",
-    "action": "warning",
-    "detail": "[294104] 07.08.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/288"
-  },
-  {
     "tmpl_id": "5794",
     "template": "Standby Charger Pro",
     "categ": "",
     "action": "warning",
-    "detail": "[812243] 11.09.26",
+    "detail": "[812243] 28.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5794"
   },
   {
@@ -172,7 +172,7 @@
     "template": "Transit V363 bj 2014 \u2013 P2 Rechts \u2013 5531/5981/6704 \u2013 Schuifraam \u2013 Privacy \u2013 Carbest",
     "categ": "",
     "action": "warning",
-    "detail": "[31730] 04.08.26 | [31730] 04.08.26",
+    "detail": "[31730] 28.08.26 | [31730] 28.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/508"
   },
   {
@@ -182,5 +182,13 @@
     "action": "warning",
     "detail": "[721929] 04.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/353"
+  },
+  {
+    "tmpl_id": "348",
+    "template": "Zonnepaneel aansluitprofielen | zwart",
+    "categ": "",
+    "action": "warning",
+    "detail": "[85163] 18.09.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/348"
   }
 ]
