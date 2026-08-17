@@ -36,7 +36,7 @@
     "template": "Vito bj 2015 \u2013 P2 Links \u2013 kR/mR/lR \u2013 Vast raam \u2013 Privacy \u2013 Carbest",
     "categ": "",
     "action": "block",
-    "detail": "[315961] 20.11.26",
+    "detail": "[315961] 27.11.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5248"
   },
   {
@@ -48,11 +48,19 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/797"
   },
   {
+    "tmpl_id": "191",
+    "template": "Aansluiting 12-24V met montegeplaat",
+    "categ": "",
+    "action": "warning",
+    "detail": "[81140] 18.08.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/191"
+  },
+  {
     "tmpl_id": "612",
     "template": "CEE-ingangscontactdoos met magnetische sluiting | wit",
     "categ": "",
     "action": "warning",
-    "detail": "[820374] 04.09.26",
+    "detail": "[820374] 11.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/612"
   },
   {
@@ -72,6 +80,14 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5205"
   },
   {
+    "tmpl_id": "5197",
+    "template": "Caddy Maxi bj 2021 / Tourneo Connect bj 2022 \u2013 P2 Rechts \u2013 LWB \u2013 Schuifraam \u2013 Privacy \u2013 Carbest",
+    "categ": "",
+    "action": "warning",
+    "detail": "[316027] 11.09.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5197"
+  },
+  {
     "tmpl_id": "325",
     "template": "Crafter bj 2017 \u2013 P2 Rechts \u2013 5986/6836/7391 \u2013 Schuifraam \u2013 Privacy \u2013 Carbest",
     "categ": "",
@@ -84,7 +100,7 @@
     "template": "Dompelpomp 14l/min., 0,5 bar",
     "categ": "",
     "action": "warning",
-    "detail": "[620601] 11.09.26",
+    "detail": "[620601] 18.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/205"
   },
   {
@@ -108,8 +124,16 @@
     "template": "Fiamma expansievat A20",
     "categ": "",
     "action": "warning",
-    "detail": "[440688] 02.10.26",
+    "detail": "[440688] 09.10.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/557"
+  },
+  {
+    "tmpl_id": "721",
+    "template": "Fiamma luifel F80S Kit Cover + RainGuard Slim 370 cm | L3 | Zwart",
+    "categ": "",
+    "action": "warning",
+    "detail": "[440458] 18.09.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/721"
   },
   {
     "tmpl_id": "198",
@@ -132,7 +156,7 @@
     "template": "Minivergrendeling | automatisch klikslot | stuk",
     "categ": "",
     "action": "warning",
-    "detail": "[53251] 14.08.26",
+    "detail": "[53251] 28.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/561"
   },
   {
@@ -140,7 +164,7 @@
     "template": "REMIcare-muggengaasdeur met tafellijst |   Ducato (X250/X290)",
     "categ": "",
     "action": "warning",
-    "detail": "[35075] 14.08.26",
+    "detail": "[35075] 18.08.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/375"
   },
   {
@@ -152,12 +176,12 @@
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/425"
   },
   {
-    "tmpl_id": "5794",
-    "template": "Standby Charger Pro",
+    "tmpl_id": "570",
+    "template": "Schroefverbinding 12 mm x 1/2\" buitendraad",
     "categ": "",
     "action": "warning",
-    "detail": "[812243] 28.08.26",
-    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5794"
+    "detail": "[65382] 21.08.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/570"
   },
   {
     "tmpl_id": "5230",
@@ -166,6 +190,14 @@
     "action": "warning",
     "detail": "[315901] 11.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/5230"
+  },
+  {
+    "tmpl_id": "715",
+    "template": "Telair Clima e-Van 5400H airconditioning met warmtepomp",
+    "categ": "",
+    "action": "warning",
+    "detail": "[495014] 25.09.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/715"
   },
   {
     "tmpl_id": "508",
@@ -180,8 +212,16 @@
     "template": "Truma Combi D6E met iNet X Paneel",
     "categ": "",
     "action": "warning",
-    "detail": "[721929] 04.09.26",
+    "detail": "[721929] 11.09.26",
     "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/353"
+  },
+  {
+    "tmpl_id": "545",
+    "template": "Wateraansluiting met voormengkraan + douche wit, zonder slot",
+    "categ": "",
+    "action": "warning",
+    "detail": "[63221] 28.08.26",
+    "odoo_url": "https://compactliving.odoo.com/odoo/inventory/products/545"
   },
   {
     "tmpl_id": "348",
